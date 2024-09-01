@@ -5,9 +5,18 @@ from django.dispatch import receiver
 class Customer(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField()
+    available_from = models.TimeField(blank=True, null=True)
+    available_to = models.TimeField(blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+class Salesman(models.Model):
+    code = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.code
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -20,6 +29,7 @@ class Product(models.Model):
 class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE)
     delivery_date = models.DateField(null=True, blank=True)  # Optional field
     payment_date = models.DateField(null=True, blank=True)    # Optional field
     products = models.ManyToManyField(Product, through='InvoiceItem')
