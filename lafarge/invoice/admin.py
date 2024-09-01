@@ -1,10 +1,15 @@
 from django.contrib import admin
-from .models import Customer, Product, Invoice, InvoiceItem
+from .models import Customer, Salesman, Invoice, InvoiceItem, Product
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'address')
     search_fields = ('name', 'address')
+
+@admin.register(Salesman)
+class SalesmanAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name')
+    search_fields = ('code', 'name')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
