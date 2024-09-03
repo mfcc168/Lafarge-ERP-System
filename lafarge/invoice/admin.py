@@ -25,9 +25,10 @@ class ProductTransactionAdmin(admin.ModelAdmin):
 
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
-    extra = 0
-    readonly_fields = ('sum_price', 'price')
-    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price')
+    extra = 0  # Number of extra forms to display
+    readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
+    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price', 'invoice_type')  # Include invoice_type field
+
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):

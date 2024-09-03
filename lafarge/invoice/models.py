@@ -78,19 +78,30 @@ class Invoice(models.Model):
         return self.number
 
 class InvoiceItem(models.Model):
+    INVOICE_TYPE_CHOICES = [
+        ('normal', 'Normal'),
+        ('sample', 'Sample'),
+        ('bonus', 'Bonus'),
+    ]
+
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sum_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    invoice_type = models.CharField(max_length=10, choices=INVOICE_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
-        if not self.net_price:
-            self.price = self.product.price
+        if self.invoice_type == 'normal':
+            if not self.net_price:
+                self.price = self.product.price
+            self.sum_price = self.price * self.quantity
+        else:
+            # For 'sample' and 'bonus' types, the sum_price is zero
+            self.sum_price = 0.00
 
-        self.sum_price = self.price * self.quantity
-
+        # Update product inventory for all invoice types
         if self.pk:  # Existing record, update inventory
             previous = InvoiceItem.objects.get(pk=self.pk)
             delta = self.quantity - previous.quantity
@@ -103,16 +114,15 @@ class InvoiceItem(models.Model):
         # Log the transaction
         ProductTransaction.objects.create(
             product=self.product,
-            transaction_type='sale',
+            transaction_type='sale' if self.invoice_type == 'normal' else 'adjustment',
             change=-delta,
             quantity_after_transaction=self.product.quantity,
-            description=f"Sale in invoice {self.invoice.number}"
+            description=f"{self.invoice_type.capitalize()} in invoice {self.invoice.number}"
         )
 
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # Restore inventory when an InvoiceItem is deleted
         self.product.quantity += self.quantity
         self.product.save()
 
@@ -122,10 +132,14 @@ class InvoiceItem(models.Model):
             transaction_type='adjustment',
             change=self.quantity,
             quantity_after_transaction=self.product.quantity,
-            description=f"Deletion of invoice item {self.invoice.number}"
+            description=f"Deletion of {self.invoice_type} invoice item {self.invoice.number}"
         )
 
         super().delete(*args, **kwargs)
+
+    def __str__(self):
+        return f"Invoice {self.invoice.number} - {self.product.name} ({self.quantity} @ {self.price})"
+
 
 
 # Signals to update total price
