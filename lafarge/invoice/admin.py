@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, Salesman, Invoice, InvoiceItem, Product
+from .models import Customer, Salesman, Invoice, InvoiceItem, Product, ProductTransaction
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -13,14 +13,21 @@ class SalesmanAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'quantity', 'price')
+    list_display = ('name', 'quantity', 'price', 'unit_per_box', 'box_amount', 'box_remain')
     search_fields = ('name',)
+    readonly_fields = ('box_amount', 'box_remain')  # Make box_amount and box_remain read-only
+
+@admin.register(ProductTransaction)
+class ProductTransactionAdmin(admin.ModelAdmin):
+    list_display = ('product', 'transaction_type', 'change', 'quantity_after_transaction', 'timestamp', 'description')
+    search_fields = ('product__name', 'transaction_type', 'description')
+    list_filter = ('transaction_type', 'timestamp')
 
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
-    extra = 0  # Number of extra forms to display
-    readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
-    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price')  # Order of fields displayed
+    extra = 0
+    readonly_fields = ('sum_price', 'price')
+    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price')
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
@@ -28,19 +35,14 @@ class InvoiceAdmin(admin.ModelAdmin):
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
     readonly_fields = ('total_price',)
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        # After saving related items (InvoiceItems), recalculate the total price
         form.instance.save()
 
-
-
-# Register InvoiceItem if you want to manage it separately
 @admin.register(InvoiceItem)
 class InvoiceItemAdmin(admin.ModelAdmin):
     list_display = ('invoice', 'product', 'quantity', 'price', 'sum_price')
     search_fields = ('invoice__number', 'product__name')
-    fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')  # Order of fields displayed
+    fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
     readonly_fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
-
-
