@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, Salesman, Invoice, InvoiceItem, Product, ProductTransaction
+from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -8,6 +8,11 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name')
+    search_fields = ('code', 'name')
+
+@admin.register(Deliveryman)
+class DeliverymanAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
     search_fields = ('code', 'name')
 
