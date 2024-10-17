@@ -1,0 +1,89 @@
+{% load static %}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<section class="py-3 py-md-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-9 col-xl-8 col-xxl-7">
+        <div class="row gy-3 mb-3">
+          <div class="col-6">
+            <h2 class="text-uppercase m-0">Invoice #{{ invoice.number }}</h2>
+          </div>
+          <div class="col-6">
+            <a class="d-block text-end" href="#">
+              <img src="{% static 'path_to_logo/logo.svg' %}" class="img-fluid" alt="Logo" width="135" height="44">
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <span class="col-6">Salesman: {{ invoice.salesman.name }}</span>
+              <span class="col-6 text-sm-end"></span>
+              <span class="col-6">Date</span>
+
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-12 col-sm-6 col-md-8">
+            <h4>Bill To</h4>
+            <address>
+              <strong>{{ invoice.customer.name }}</strong><br>
+              {{ invoice.customer.address|linebreaksbr }}<br>
+            </address>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4">
+
+
+            <h4>From</h4>
+            <address>
+              <strong>Lafarge Co., Ltd.</strong><br>
+              Unit 12 & 15, 23/F., Tower B, Southmark,<br>
+              Yip Hing Street, Wong Chuk Hang,<br>
+              Hong Kong<br>
+              Website: www.lafargehk.com<br>
+              Email: info@lafargehk.com<br>
+              Phone: +852 3188 5538<br>
+              Fax: +852 3188 5977<br>
+            </address>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-uppercase">Qty</th>
+                    <th scope="col" class="text-uppercase">Product</th>
+                    <th scope="col" class="text-uppercase text-end">Unit Price</th>
+                    <th scope="col" class="text-uppercase text-end">Amount</th>
+                  </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                  {% for item in invoice.invoiceitem_set.all %}
+                  <tr>
+                    <th scope="row">{{ item.quantity }}</th>
+                    <td>{{ item.product.name }}</td>
+                    <td class="text-end">{{ item.price }}</td>
+                    <td class="text-end">{{ item.sum_price }}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td colspan="3" class="text-end">Subtotal</td>
+                    <td class="text-end">{{ invoice.total_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-end">
+            <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_invoice_pdf' invoice.number %}'">Download Invoice</button>
+            <button type="button" class="btn btn-danger mb-3">Submit Payment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
