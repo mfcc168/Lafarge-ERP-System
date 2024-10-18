@@ -41,23 +41,16 @@ def download_invoice_pdf(request, invoice_number):
 
     # Set title font
     pdf.setFont("Helvetica-Bold", 20)
-    pdf.drawString(50, height - 50, f"Invoice #{invoice.number}")
-
-    # Add company and customer information
-    pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(300, height - 115, "From: Lafarge Co., Ltd.")
-    pdf.setFont("Helvetica", 10)
-    pdf.drawString(300, height - 130, "Unit 12 & 15, 23/F., Tower B, Southmark,")
-    pdf.drawString(300, height - 145, "Yip Hing Street, Wong Chuk Hang, Hong Kong")
+    pdf.drawString(450, height - 50, f"Original")
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]  # Trim whitespace
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 115, f"Bill To: {invoice.customer.name}")
-    y_position = height - 130
+    pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
+    y_position = height - 230
 
     # Create a TextObject for multi-line address
-    text_object = pdf.beginText(50, y_position)
+    text_object = pdf.beginText(70, y_position)
     text_object.setFont("Helvetica", 10)
 
     for line in address_lines:
@@ -65,16 +58,16 @@ def download_invoice_pdf(request, invoice_number):
 
     pdf.drawText(text_object)
 
-    # Add a line separator
-    #pdf.setLineWidth(1)
-    #pdf.setStrokeColor(colors.grey)
-    #pdf.line(50, height - 200, width - 50, height - 200)
-
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(50, height - 70, f"Salesman: {invoice.salesman.name}")
-    pdf.drawString(50, height - 80,
-                   f"Date: {invoice.delivery_date.strftime('%Y-%m-%d') if invoice.delivery_date else 'N/A'}")
+    pdf.drawString(70, height - 110,
+                   f"Date : {invoice.delivery_date.strftime('%Y-%m-%d') if invoice.delivery_date else ''}")
+    pdf.drawString(70, height - 130,
+                  f"Inovice No. : {invoice.number}")
+    pdf.drawString(70, height - 150,
+                  f"Terms : ")
+    pdf.drawString(70, height - 170,
+                  f"Salesman : {invoice.salesman.name}")
 
     # Table for Invoice Items
     data = [["Qty", "Product", "Unit Price", "Amount"]]
@@ -86,13 +79,12 @@ def download_invoice_pdf(request, invoice_number):
             f"${item.sum_price:.2f}"
         ])
 
-    data.append(["", "", "Subtotal", f"${invoice.total_price:.2f}"])
+    #data.append(["", "", "Subtotal", f"${invoice.total_price:.2f}"])
 
     # Configure table styles
     table = Table(data, colWidths=[50, 250, 100, 100])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
@@ -103,11 +95,11 @@ def download_invoice_pdf(request, invoice_number):
 
     # Position the table
     table.wrapOn(pdf, width, height)
-    table.drawOn(pdf, 50, height - 400)
+    table.drawOn(pdf, 50, height - 450)
 
     # Add total price at the bottom
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(400, height - 420, f"Total: ${invoice.total_price:.2f}")
+    pdf.drawString(400, height - 620, f"Total: ${invoice.total_price:.2f}")
 
     # Save the PDF data to the buffer
     pdf.save()
