@@ -66,7 +66,7 @@ class ProductTransaction(models.Model):
 
 class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
-    terms = models.CharField(max_length=50, unique=True)
+    terms = models.CharField(max_length=50, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE)
     delivery_date = models.DateField(null=True, blank=True)
