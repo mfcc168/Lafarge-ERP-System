@@ -52,7 +52,8 @@ def draw_invoice_page(pdf, invoice, copy_type):
                    f"Date : {invoice.delivery_date.strftime('%Y-%m-%d') if invoice.delivery_date else ''}")
     pdf.drawString(70, height - 130, f"Invoice No. : {invoice.number}")
     pdf.drawString(70, height - 150, f"Salesman : {invoice.salesman.name}")
-    pdf.drawString(70, height - 170, f"Terms : ")
+    if copy_type != "Poison Form":
+        pdf.drawString(70, height - 170, f"Terms : ")
 
     # Table for Invoice Items
     if copy_type == "Poison Form":
