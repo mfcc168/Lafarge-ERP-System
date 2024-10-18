@@ -8,6 +8,7 @@ class Customer(models.Model):
     address = models.TextField()
     available_from = models.CharField(max_length=255, blank=True, null=True)
     available_to = models.CharField(max_length=255, blank=True, null=True)
+    close_day = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -65,6 +66,7 @@ class ProductTransaction(models.Model):
 
 class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
+    terms = models.CharField(max_length=50, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE)
     delivery_date = models.DateField(null=True, blank=True)

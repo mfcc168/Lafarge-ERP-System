@@ -37,7 +37,7 @@ class InvoiceItemInline(admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('number', 'customer', 'delivery_date', 'payment_date', 'total_price')
+    list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price')
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
     readonly_fields = ('total_price',)
