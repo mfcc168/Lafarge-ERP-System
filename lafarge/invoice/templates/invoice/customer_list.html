@@ -27,9 +27,7 @@
             <tr>
                 <th>Customer Name</th>
                 <th>Address</th>
-                <th>Available From</th>
-                <th>Available To</th>
-                <th>Close Day</th>
+                <th>Office Hour</th>
                 <th>Purchase Records</th>
             </tr>
         </thead>
@@ -38,9 +36,7 @@
                 <tr>
                     <td>{{ customer.name }}</td>
                     <td>{{ customer.address }}</td>
-                    <td>{{ customer.available_from }}</td>
-                    <td>{{ customer.available_to }}</td>
-                    <td>{{ customer.close_day }}</td>
+                    <td>{{ customer.office_hour }}</td>
                     <td><a href="{% url 'customer_detail' customer.name %}">{{ customer.name }}</a></td>
                 </tr>
             {% empty %}
