@@ -34,17 +34,31 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 14)
     pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
-    y_position = height - 235
+    pdf.drawString(70, height - 235, f"Care Of: {invoice.customer.care_of}" if invoice.customer.care_of else "")
+    y_position = height - 255
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(70, y_position)
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
         text_object.textLine(line)
+
+    text_object.textLine(f"Tel: {invoice.customer.telephone_number} ({invoice.customer.contact_person})" if invoice.customer.telephone_number else "")
     pdf.drawText(text_object)
-    pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
-    pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
+
+    text_object = pdf.beginText(450, y_position)
+    text_object.setFont("Helvetica", 10)
+    for line in office_hour_lines:
+        text_object.textLine(line)
+    pdf.drawText(text_object)
+
+
+
+    #pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
+    #pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
+
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
     pdf.drawString(70, height - 110, f"Date : ")
@@ -55,15 +69,25 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     # Table for Invoice Items
     if copy_type == "Poison Form":
-        data = [["Quantity", "Product"]]
+        # Aggregate quantities for products with the same name
+        product_quantities = {}
         for item in invoice.invoiceitem_set.all():
+            product_name = item.product.name
+            if product_name in product_quantities:
+                product_quantities[product_name] += item.quantity
+            else:
+                product_quantities[product_name] = item.quantity
+
+        # Prepare table data
+        data = [["Quantity", "Product"]]
+        for product_name, total_quantity in product_quantities.items():
             data.append([
-                f"{item.quantity} {item.product.unit}",
-                item.product.name,
+                f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+                product_name,
             ])
 
         # Configure table styles
-        table = Table(data, colWidths=[50, 250, 100, 100])
+        table = Table(data, colWidths=[50, 250])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -80,11 +104,15 @@ def draw_invoice_page(pdf, invoice, copy_type):
     else:
         data = [["Quantity", "Product", "Unit Price", "Amount"]]
         for item in invoice.invoiceitem_set.all():
+            # Check if the item type is "bonus" or "sample"
+            unit_price_display = item.invoice_type if item.invoice_type in ["bonus",
+                                                                            "sample"] else f"${item.net_price:,.2f} (Net Price)" if item.net_price else f"${item.price:,.2f}"
+
             data.append([
                 f"{item.quantity} {item.product.unit}",
-                f"{item.product.name} ({item.invoice_type})" if item.invoice_type != "normal" else item.product.name,
-                f"${item.net_price:,.2f} (Net Price)" if item.net_price else f"${item.price:,.2f}",
-                f"${item.sum_price:,.2f}"
+                item.product.name,  # Display product name in the Product column
+                unit_price_display,  # Display the type or the price in the Unit Price column
+                f"${item.sum_price:,.2f}" if item.sum_price != 0 else "-"
             ])
 
         # Configure table styles

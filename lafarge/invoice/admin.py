@@ -3,8 +3,8 @@ from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Produ
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address')
-    search_fields = ('name', 'address')
+    list_display = ('name', 'care_of', 'address', 'telephone_number')
+    search_fields = ('name', 'care_of', 'address', 'telephone_number')
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):
@@ -37,6 +37,7 @@ class InvoiceItemInline(admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['customer']
     list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price')
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
