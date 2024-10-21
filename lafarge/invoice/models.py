@@ -74,7 +74,7 @@ class Invoice(models.Model):
     delivery_date = models.DateField(null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def calculate_total_price(self):
         total = sum(item.sum_price for item in self.invoiceitem_set.all())
@@ -98,9 +98,9 @@ class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    sum_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    net_price = models.DecimalField(max_digits=10, decimal_places=2)
+    sum_price = models.DecimalField(max_digits=10, decimal_places=2)
     invoice_type = models.CharField(max_length=10, choices=INVOICE_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
