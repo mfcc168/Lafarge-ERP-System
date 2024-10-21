@@ -42,14 +42,12 @@ def draw_invoice_page(pdf, invoice, copy_type):
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
         text_object.textLine(line)
-    #text_object.textLine(f"Available Time: {invoice.customer.available_from} to {invoice.customer.available_to}")
     pdf.drawText(text_object)
-    pdf.drawString(350, height - 215, f"Available Time: {invoice.customer.available_from} to {invoice.customer.available_to}")
-
+    pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
+    pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(70, height - 110,
-                   f"Date : {invoice.delivery_date.strftime('%Y-%m-%d') if invoice.delivery_date else ''}")
+    pdf.drawString(70, height - 110, f"Date : ")
     pdf.drawString(70, height - 130, f"Invoice No. : {invoice.number}")
     pdf.drawString(70, height - 150, f"Salesman : {invoice.salesman.name}")
     if copy_type != "Poison Form":
@@ -60,7 +58,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         data = [["Quantity", "Product"]]
         for item in invoice.invoiceitem_set.all():
             data.append([
-                item.quantity,
+                f"{item.quantity} {item.product.unit}",
                 item.product.name,
             ])
 
@@ -77,15 +75,15 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 50, height - 450)
+        table.drawOn(pdf, 175, height - 450)
 
     else:
         data = [["Quantity", "Product", "Unit Price", "Amount"]]
         for item in invoice.invoiceitem_set.all():
             data.append([
-                item.quantity,
-                item.product.name,
-                f"${item.price:,.2f}",
+                f"{item.quantity} {item.product.unit}",
+                f"{item.product.name} ({item.invoice_type})" if item.invoice_type != "normal" else item.product.name,
+                f"${item.net_price:,.2f} (Net Price)" if item.net_price else f"${item.price:,.2f}",
                 f"${item.sum_price:,.2f}"
             ])
 

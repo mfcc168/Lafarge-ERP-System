@@ -29,6 +29,7 @@ class Deliveryman(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
+    unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=0)
     unit_per_box = models.PositiveIntegerField(default=1)  # New field
@@ -105,6 +106,8 @@ class InvoiceItem(models.Model):
         if self.invoice_type == 'normal':
             if not self.net_price:
                 self.price = self.product.price
+            else:
+                self.price = self.net_price
             self.sum_price = self.price * self.quantity
         else:
             # For 'sample' and 'bonus' types, the sum_price is zero
