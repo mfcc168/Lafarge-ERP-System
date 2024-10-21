@@ -41,22 +41,7 @@
                     <td>{{ customer.available_from }}</td>
                     <td>{{ customer.available_to }}</td>
                     <td>{{ customer.close_day }}</td>
-                    <td>
-                        <ul>
-                            {% for invoice in customer.invoice_set.all %}
-                                <li>
-                                    Invoice {{ invoice.number }}: Total Price - {{ invoice.total_price }} (Salesman: {{ invoice.salesman.name }})
-                                    <ul>
-                                        {% for item in invoice.invoiceitem_set.all %}
-                                            <li>{{ item.product.name }}: {{ item.quantity }} units @ {{ item.price }} each (Type: {{ item.invoice_type }})</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% empty %}
-                                <li>No purchase records available.</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
+                    <td><a href="{% url 'customer_detail' customer.name %}">{{ customer.name }}</a></td>
                 </tr>
             {% empty %}
                 <tr>

@@ -1,0 +1,66 @@
+<!-- customer_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ customer.name }}'s Purchase Records</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ customer.name }}'s Purchase Records</h1>
+    <p><strong>Address:</strong> {{ customer.address }}</p>
+    <p><strong>Available From:</strong> {{ customer.available_from }}</p>
+    <p><strong>Available To:</strong> {{ customer.available_to }}</p>
+    <p><strong>Close Day:</strong> {{ customer.close_day }}</p>
+
+    <h2>Invoices</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice Number</th>
+                <th>Total Price</th>
+                <th>Salesman</th>
+                <th>Delivery Date</th>
+                <th>Payment Date</th>
+                <th>Items</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in customer.invoice_set.all %}
+                <tr>
+                    <td>{{ invoice.number }}</td>
+                    <td>{{ invoice.total_price }}</td>
+                    <td>{{ invoice.salesman.name }}</td>
+                    <td>{{ invoice.delivery_date }}</td>
+                    <td>{{ invoice.payment_date }}</td>
+                    <td>
+                        <ul>
+                            {% for item in invoice.invoiceitem_set.all %}
+                                <li>{{ item.product.name }}: {{ item.quantity }} units @ {{ item.price }} each (Type: {{ item.invoice_type }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No invoices found for this customer.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
