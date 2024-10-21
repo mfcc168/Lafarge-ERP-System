@@ -89,7 +89,7 @@ class Invoice(models.Model):
         return self.number
 
 class InvoiceItem(models.Model):
-    INVOICE_TYPE_CHOICES = [
+    PRODUCT_TYPE_CHOICES = [
         ('normal', 'Normal'),
         ('sample', 'Sample'),
         ('bonus', 'Bonus'),
@@ -101,10 +101,10 @@ class InvoiceItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     net_price = models.DecimalField(max_digits=10, decimal_places=2)
     sum_price = models.DecimalField(max_digits=10, decimal_places=2)
-    invoice_type = models.CharField(max_length=10, choices=INVOICE_TYPE_CHOICES, default='normal')
+    product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
-        if self.invoice_type == 'normal':
+        if self.product_type == 'normal':
             if not self.net_price:
                 self.price = self.product.price
             else:
@@ -127,10 +127,10 @@ class InvoiceItem(models.Model):
         # Log the transaction
         ProductTransaction.objects.create(
             product=self.product,
-            transaction_type='sale' if self.invoice_type == 'normal' else 'adjustment',
+            transaction_type='sale' if self.product_type == 'normal' else 'adjustment',
             change=-delta,
             quantity_after_transaction=self.product.quantity,
-            description=f"{self.invoice_type.capitalize()} in invoice {self.invoice.number}"
+            description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
         )
 
         super().save(*args, **kwargs)
@@ -145,7 +145,7 @@ class InvoiceItem(models.Model):
             transaction_type='adjustment',
             change=self.quantity,
             quantity_after_transaction=self.product.quantity,
-            description=f"Deletion of {self.invoice_type} invoice item {self.invoice.number}"
+            description=f"Deletion of {self.product_type} invoice item {self.invoice.number}"
         )
 
         super().delete(*args, **kwargs)
