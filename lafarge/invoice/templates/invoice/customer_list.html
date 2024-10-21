@@ -1,0 +1,69 @@
+<!-- customer_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Records</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Customer Records</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Address</th>
+                <th>Available From</th>
+                <th>Available To</th>
+                <th>Close Day</th>
+                <th>Purchase Records</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.address }}</td>
+                    <td>{{ customer.available_from }}</td>
+                    <td>{{ customer.available_to }}</td>
+                    <td>{{ customer.close_day }}</td>
+                    <td>
+                        <ul>
+                            {% for invoice in customer.invoice_set.all %}
+                                <li>
+                                    Invoice {{ invoice.number }}: Total Price - {{ invoice.total_price }} (Salesman: {{ invoice.salesman.name }})
+                                    <ul>
+                                        {% for item in invoice.invoiceitem_set.all %}
+                                            <li>{{ item.product.name }}: {{ item.quantity }} units @ {{ item.price }} each (Type: {{ item.invoice_type }})</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% empty %}
+                                <li>No purchase records available.</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No customers found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

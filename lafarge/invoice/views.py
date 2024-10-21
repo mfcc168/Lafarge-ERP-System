@@ -1,15 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Invoice
+from .models import Customer, Invoice
 
-from django.conf import settings  # Add this import
+
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
 import io
-import os
 
 from .pdf_utils import draw_invoice_page
 
@@ -64,3 +60,15 @@ def download_invoice_pdf(request, invoice_number):
     response['Content-Disposition'] = f'attachment; filename="Invoice_{invoice.number}.pdf"'
 
     return response
+
+
+
+def customer_list(request):
+    # Get all customers along with their related invoices
+    customers = Customer.objects.all().prefetch_related('invoice_set')
+
+    # Pass the data to the template
+    context = {
+        'customers': customers,
+    }
+    return render(request, 'invoice/customer_list.html', context)
