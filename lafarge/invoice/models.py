@@ -5,10 +5,11 @@ from django.dispatch import receiver
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
+    care_of = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField()
-    available_from = models.CharField(max_length=255, blank=True, null=True)
-    available_to = models.CharField(max_length=255, blank=True, null=True)
-    close_day = models.CharField(max_length=255, blank=True, null=True)
+    office_hour = models.TextField(blank=True, null=True)
+    telephone_number = models.CharField(max_length=255, blank=True, null=True)
+    contact_person = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
