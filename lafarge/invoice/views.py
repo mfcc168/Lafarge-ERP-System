@@ -72,3 +72,13 @@ def customer_list(request):
         'customers': customers,
     }
     return render(request, 'invoice/customer_list.html', context)
+
+def customer_detail(request, customer_name):
+    # Fetch the customer by name, or return a 404 if not found
+    customer = get_object_or_404(Customer, name=customer_name)
+
+    # Pass the customer and related purchase records to the template
+    context = {
+        'customer': customer,
+    }
+    return render(request, 'invoice/customer_detail.html', context)
