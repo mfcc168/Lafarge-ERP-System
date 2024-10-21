@@ -32,7 +32,7 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th scope="col" class="text-uppercase">Qty</th>
+                    <th scope="col" class="text-uppercase">Quantity</th>
                     <th scope="col" class="text-uppercase">Product</th>
                     <th scope="col" class="text-uppercase text-end">Unit Price</th>
                     <th scope="col" class="text-uppercase text-end">Amount</th>
@@ -41,7 +41,7 @@
                 <tbody class="table-group-divider">
                   {% for item in invoice.invoiceitem_set.all %}
                   <tr>
-                    <th scope="row">{{ item.quantity }}</th>
+                    <th scope="row">{{ item.quantity }} {{ item.product.unit }}</th>
                     <td>{{ item.product.name }}</td>
                     <td class="text-end">{{ item.price }}</td>
                     <td class="text-end">{{ item.sum_price }}</td>

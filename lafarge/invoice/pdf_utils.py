@@ -106,7 +106,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         for item in invoice.invoiceitem_set.all():
             # Check if the item type is "bonus" or "sample"
             unit_price_display = item.product_type if item.product_type in ["bonus",
-                                                                            "sample"] else f"${item.net_price:,.2f} (Net Price)" if item.net_price else f"${item.price:,.2f}"
+                                                                            "sample"] else f"${item.net_price:,.2f} (Nett Price)" if item.net_price else f"${item.price:,.2f}"
 
             data.append([
                 f"{item.quantity} {item.product.unit}",
