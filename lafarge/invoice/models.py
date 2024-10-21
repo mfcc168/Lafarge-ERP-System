@@ -81,12 +81,12 @@ class Invoice(models.Model):
         self.total_price = total
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.calculate_total_price()
+        self.calculate_total_price()  # Calculate total before saving
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.number
+
 
 class InvoiceItem(models.Model):
     PRODUCT_TYPE_CHOICES = [
@@ -104,55 +104,60 @@ class InvoiceItem(models.Model):
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
-        if self.product_type == 'normal':
-            if not self.net_price:
-                self.price = self.product.price
-            else:
-                self.price = self.net_price
-            self.sum_price = self.price * self.quantity
-        else:
-            # For 'sample' and 'bonus' types, the sum_price is zero
-            self.sum_price = 0.00
-
-        # Update product inventory for all invoice types
-        if self.pk:  # Existing record, update inventory
+        if self.pk:  # Existing record
             previous = InvoiceItem.objects.get(pk=self.pk)
-            delta = self.quantity - previous.quantity
+            if previous.quantity != self.quantity:
+                # Calculate change in quantity
+                change = self.quantity - previous.quantity
+
+                # Adjust product quantity based on product type
+                if previous.product_type:
+                    self.product.quantity += previous.quantity  # Restore previous quantity
+                if self.product_type:
+                    self.product.quantity -= self.quantity  # Deduct new quantity
+
+                # Log the product transaction
+                ProductTransaction.objects.create(
+                    product=self.product,
+                    transaction_type='sale' if self.product_type == 'normal' else 'adjustment',
+                    change=-change,
+                    quantity_after_transaction=self.product.quantity,
+                    description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
+                )
+
         else:  # New record
-            delta = -self.quantity
+            # Adjust product quantity based on product type
+            if self.product_type:
+                self.product.quantity -= self.quantity
 
-        self.product.quantity += delta
+            # Log transaction for new item
+            ProductTransaction.objects.create(
+                product=self.product,
+                transaction_type='sale',
+                change=-self.quantity,
+                quantity_after_transaction=self.product.quantity,
+                description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
+            )
+
+        # Save product and the invoice item
         self.product.save()
-
-        # Log the transaction
-        ProductTransaction.objects.create(
-            product=self.product,
-            transaction_type='sale' if self.product_type == 'normal' else 'adjustment',
-            change=-delta,
-            quantity_after_transaction=self.product.quantity,
-            description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
-        )
-
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        # For deletion, always restock
         self.product.quantity += self.quantity
         self.product.save()
 
-        # Log the transaction
+        # Log restock transaction
         ProductTransaction.objects.create(
             product=self.product,
-            transaction_type='adjustment',
+            transaction_type='restock',
             change=self.quantity,
             quantity_after_transaction=self.product.quantity,
-            description=f"Deletion of {self.product_type} invoice item {self.invoice.number}"
+            description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
         )
 
         super().delete(*args, **kwargs)
-
-    def __str__(self):
-        return f"Invoice {self.invoice.number} - {self.product.name} ({self.quantity} @ {self.price})"
-
 
 
 # Signals to update total price
