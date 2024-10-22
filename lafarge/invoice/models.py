@@ -122,7 +122,7 @@ class InvoiceItem(models.Model):
                     transaction_type='sale' if self.product_type == 'normal' else 'adjustment',
                     change=-change,
                     quantity_after_transaction=self.product.quantity,
-                    description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
+                    description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
                 )
 
         else:  # New record

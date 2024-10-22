@@ -47,9 +47,9 @@ class InvoiceAdmin(admin.ModelAdmin):
         super().save_related(request, form, formsets, change)
         form.instance.save()
 
-@admin.register(InvoiceItem)
-class InvoiceItemAdmin(admin.ModelAdmin):
-    list_display = ('invoice', 'product', 'quantity', 'price', 'sum_price')
-    search_fields = ('invoice__number', 'product__name')
-    fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
-    readonly_fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
+# @admin.register(InvoiceItem)
+# class InvoiceItemAdmin(admin.ModelAdmin):
+#     list_display = ('invoice', 'product', 'quantity', 'price', 'sum_price')
+#     search_fields = ('invoice__number', 'product__name')
+#     fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
+#     readonly_fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
