@@ -104,6 +104,15 @@ class InvoiceItem(models.Model):
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
+        if self.product_type == 'normal':
+            if not self.net_price:
+                self.price = self.product.price
+            else:
+                self.price = self.net_price
+            self.sum_price = self.price * self.quantity
+        else:
+            # For 'sample' and 'bonus' types, the sum_price is zero
+            self.sum_price = 0.00
         if self.pk:  # Existing record
             previous = InvoiceItem.objects.get(pk=self.pk)
             if previous.quantity != self.quantity:
