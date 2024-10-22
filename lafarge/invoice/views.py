@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Customer, Invoice
+from .models import Product, ProductTransaction
 
 
 from django.http import HttpResponse
@@ -8,6 +9,13 @@ from reportlab.pdfgen import canvas
 import io
 
 from .pdf_utils import draw_invoice_page
+
+def home(request):
+    return render(request, 'invoice/home.html')
+
+def invoice_list(request):
+    invoices = Invoice.objects.all()
+    return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
 
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
@@ -82,3 +90,15 @@ def customer_detail(request, customer_name):
         'customer': customer,
     }
     return render(request, 'invoice/customer_detail.html', context)
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'invoice/product_list.html', {'products': products})
+
+def product_transaction_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    transactions = ProductTransaction.objects.filter(product=product).order_by('-timestamp')
+    return render(request, 'invoice/product_transaction_detail.html', {
+        'product': product,
+        'transactions': transactions
+    })
