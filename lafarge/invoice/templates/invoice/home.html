@@ -1,0 +1,14 @@
+{% extends 'invoice/base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4 mt-5">Lafarge Invoice App</h1>
+    <p class="lead mt-3">Manage  products, customers, and invoices with ease.</p>
+    
+    <div class="mt-4">
+        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg mx-2">View Products</a>
+        <a href="{% url 'customer_list' %}" class="btn btn-secondary btn-lg mx-2">View Customers</a>
+        <a href="{% url 'invoice_list' %}" class="btn btn-success btn-lg mx-2">View Invoices</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
-{% load static %}
-<link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+{% extends 'invoice/base.html' %}
+{% load bootstrap5 %}
 
+{% block content %}
 <section class="py-3 py-md-5">
   <div class="container">
     <div class="row justify-content-center">
@@ -11,18 +12,18 @@
           </div>
           <div class="col-12">
             <div class="row">
-              <span class="col-6">Salesman: {{ invoice.salesman.name }}</span>
-              <span class="col-6">Date: </span>
-              <span class="col-6">Terms: </span>
+              <div class="col-6"><strong>Salesman:</strong> {{ invoice.salesman.name }}</div>
+              <div class="col-6"><strong>Date:</strong> {{ invoice.delivery_date }}</div>
+              <div class="col-6"><strong>Terms:</strong> {{ invoice.terms }}</div>
+            </div>
           </div>
         </div>
-          <div></div>
         <div class="row mb-3">
           <div class="col-12 col-sm-6 col-md-8">
             <h4>Sold To</h4>
             <address>
               <strong>{{ invoice.customer.name }}</strong><br>
-              {{ invoice.customer.address|linebreaksbr }}<br>
+              {{ invoice.customer.address|linebreaksbr }}
             </address>
           </div>
         </div>
@@ -38,7 +39,7 @@
                     <th scope="col" class="text-uppercase text-end">Amount</th>
                   </tr>
                 </thead>
-                <tbody class="table-group-divider">
+                <tbody>
                   {% for item in invoice.invoiceitem_set.all %}
                   <tr>
                     <th scope="row">{{ item.quantity }} {{ item.product.unit }}</th>
@@ -65,3 +66,4 @@
     </div>
   </div>
 </section>
+{% endblock %}
