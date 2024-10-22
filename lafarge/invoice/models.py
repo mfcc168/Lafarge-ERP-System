@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -104,69 +104,55 @@ class InvoiceItem(models.Model):
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
-        if self.product_type == 'normal':
-            if not self.net_price:
-                self.price = self.product.price
-            else:
-                self.price = self.net_price
-            self.sum_price = self.price * self.quantity
-        else:
-            # For 'sample' and 'bonus' types, the sum_price is zero
-            self.sum_price = 0.00
-        if self.pk:  # Existing record
-            previous = InvoiceItem.objects.get(pk=self.pk)
-            if previous.quantity != self.quantity:
-                # Calculate change in quantity
-                change = self.quantity - previous.quantity
+        with transaction.atomic():
+            # Retrieve the product from the database to get the latest quantity
+            current_product = Product.objects.get(pk=self.product.pk)
+            current_quantity = current_product.quantity
 
-                # Adjust product quantity based on product type
-                if previous.product_type:
-                    self.product.quantity += previous.quantity  # Restore previous quantity
-                if self.product_type:
-                    self.product.quantity -= self.quantity  # Deduct new quantity
+            # Adjust the product quantity based on the current invoice item
+            new_quantity = current_quantity - self.quantity
 
-                # Log the product transaction
-                ProductTransaction.objects.create(
-                    product=self.product,
-                    transaction_type='sale' if self.product_type == 'normal' else 'adjustment',
-                    change=-change,
-                    quantity_after_transaction=self.product.quantity,
-                    description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
-                )
+            # Update the product quantity
+            current_product.quantity = new_quantity
 
-        else:  # New record
-            # Adjust product quantity based on product type
-            if self.product_type:
-                self.product.quantity -= self.quantity
-
-            # Log transaction for new item
+            # Log the product transaction
+            transaction_type = 'sale' if self.product_type == 'normal' else 'adjustment'
             ProductTransaction.objects.create(
-                product=self.product,
-                transaction_type='sale',
+                product=current_product,
+                transaction_type=transaction_type,
                 change=-self.quantity,
-                quantity_after_transaction=self.product.quantity,
-                description=f"{self.product_type.capitalize()} in invoice {self.invoice.number}"
+                quantity_after_transaction=current_product.quantity,
+                description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
             )
 
-        # Save product and the invoice item
-        self.product.save()
-        super().save(*args, **kwargs)
+            # Calculate price details
+            if self.product_type == 'normal':
+                self.price = current_product.price if not self.net_price else self.net_price
+                self.sum_price = self.price * self.quantity
+            else:
+                self.sum_price = 0.00  # For sample and bonus types
+
+            # Save the updated product quantity
+            current_product.save()
+            # Finally, save the invoice item
+            super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # For deletion, always restock
-        self.product.quantity += self.quantity
-        self.product.save()
+        with transaction.atomic():
+            # For deletion, always restock
+            self.product.quantity += self.quantity
+            self.product.save()
 
-        # Log restock transaction
-        ProductTransaction.objects.create(
-            product=self.product,
-            transaction_type='restock',
-            change=self.quantity,
-            quantity_after_transaction=self.product.quantity,
-            description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
-        )
+            # Log restock transaction
+            ProductTransaction.objects.create(
+                product=self.product,
+                transaction_type='restock',
+                change=self.quantity,
+                quantity_after_transaction=self.product.quantity,
+                description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
+            )
 
-        super().delete(*args, **kwargs)
+            super().delete(*args, **kwargs)
 
 
 # Signals to update total price
@@ -174,6 +160,7 @@ class InvoiceItem(models.Model):
 def update_invoice_total(sender, instance, **kwargs):
     instance.invoice.calculate_total_price()
     instance.invoice.save()
+
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
