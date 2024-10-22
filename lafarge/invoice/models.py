@@ -105,22 +105,30 @@ class InvoiceItem(models.Model):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
-            # Retrieve the product from the database to get the latest quantity
+            # Determine if this is an update or a new item
+            is_edit = self.pk is not None
             current_product = Product.objects.get(pk=self.product.pk)
-            current_quantity = current_product.quantity
 
-            # Adjust the product quantity based on the current invoice item
-            new_quantity = current_quantity - self.quantity
+            if is_edit:
+                # If it's an edit, get the previous item to revert its quantity
+                previous_item = InvoiceItem.objects.get(pk=self.pk)
+                previous_quantity = previous_item.quantity
+
+                # Revert the previous quantity back to the product
+                current_product.quantity += previous_quantity
+
+            # Calculate new quantity
+            new_quantity = current_product.quantity - self.quantity
 
             # Update the product quantity
             current_product.quantity = new_quantity
 
             # Log the product transaction
-            transaction_type = 'sale' if self.product_type == 'normal' else 'adjustment'
+            transaction_type = 'update'
             ProductTransaction.objects.create(
                 product=current_product,
                 transaction_type=transaction_type,
-                change=-self.quantity,
+                change=-self.quantity if not is_edit else previous_quantity - self.quantity,
                 quantity_after_transaction=current_product.quantity,
                 description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
             )
