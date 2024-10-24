@@ -45,8 +45,13 @@
                   <tr>
                     <th scope="row">{{ item.quantity }} {{ item.product.unit }}</th>
                     <td>{{ item.product.name }}</td>
+                    {% if item.product_type == "normal"%}
                     <td class="text-end">{{ item.price }}</td>
                     <td class="text-end">{{ item.sum_price }}</td>
+                    {% else %}
+                    <td class="text-end">{{ item.product_type }}</td>
+                    <td class="text-end">-</td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
                   <tr>
@@ -61,6 +66,7 @@
         <div class="row">
           <div class="col-12 text-end">
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_invoice_pdf' invoice.number %}'">Download Invoice</button>
+            <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_order_form_pdf' invoice.number %}'">Download Order Form</button>
           </div>
         </div>
       </div>

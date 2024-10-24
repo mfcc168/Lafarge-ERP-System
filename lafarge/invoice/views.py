@@ -4,17 +4,17 @@ from .models import Product, ProductTransaction
 
 
 from django.http import HttpResponse
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, A5
 from reportlab.pdfgen import canvas
 import io
 
-from .pdf_utils import draw_invoice_page
+from .pdf_utils import draw_invoice_page, draw_order_form_page
 
 def home(request):
     return render(request, 'invoice/home.html')
 
 def invoice_list(request):
-    invoices = Invoice.objects.all()
+    invoices = Invoice.objects.all().order_by("-id")
     return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
 
 def invoice_detail(request, invoice_number):
@@ -69,6 +69,32 @@ def download_invoice_pdf(request, invoice_number):
 
     return response
 
+def download_order_form_pdf(request, invoice_number):
+    # Get the invoice object
+    order_form = get_object_or_404(Invoice, number=invoice_number)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A5)
+
+    # Draw the first page (Original copy)
+    draw_order_form_page(pdf, order_form)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Order_Form_{order_form.number}.pdf"'
+
+    return response
 
 
 def customer_list(request):

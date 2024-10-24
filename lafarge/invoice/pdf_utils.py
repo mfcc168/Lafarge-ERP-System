@@ -1,8 +1,9 @@
 import os
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, A5
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from django.conf import settings
+from datetime import datetime
 
 
 def draw_invoice_page(pdf, invoice, copy_type):
@@ -36,8 +37,15 @@ def draw_invoice_page(pdf, invoice, copy_type):
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
-    pdf.drawString(70, height - 235, f"Care Of: {invoice.customer.care_of}" if invoice.customer.care_of else "")
+    if "ltd" in invoice.customer.name.lower() or "dispensary" in invoice.customer.name.lower():
+        pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
+    else:
+        pdf.drawString(70, height - 215, f"Sold To: Dr. {invoice.customer.name}")
+    if invoice.customer.care_of:
+        if "ltd" in invoice.customer.name.lower() or "dispensary" in invoice.customer.name.lower():
+            pdf.drawString(70, height - 215, f"Care Of: {invoice.customer.care_of}")
+        else:
+            pdf.drawString(70, height - 215, f"Care Of: Dr. {invoice.customer.care_of}")
     y_position = height - 255
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(70, y_position)
@@ -135,3 +143,64 @@ def draw_invoice_page(pdf, invoice, copy_type):
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawString(400, height - 620, f"Total: ${invoice.total_price:,.2f}")
+
+def draw_order_form_page(pdf, order):
+    """
+    Draw the content of an order form page in the PDF (A5 portrait).
+
+    Args:
+        pdf: The ReportLab Canvas object.
+    """
+    width, height = A5
+
+    # Draw the background image
+    background_image_path = os.path.join(settings.STATIC_ROOT, 'OrderForm.png')
+    pdf.drawImage(background_image_path, 0, 0, width, height)
+
+    # Customer information
+    pdf.setFont("Helvetica-Bold", 8)
+    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower():
+        pdf.drawString(30, height - 100, f"From: {order.customer.name}")
+    else:
+        pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
+    pdf.drawString(30, height - 120, f"To : LAFARGE CO., LTD.")
+    pdf.drawString(30, height - 140, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+
+    pdf.drawString(30, height - 180, "This is to place an order for the following medical product(s):")
+
+    # Aggregate quantities for products with the same name
+    product_quantities = {}
+    for item in order.invoiceitem_set.all():
+        product_name = item.product.name.split('(')[0].strip() #strip lot no.
+        if product_name in product_quantities:
+            product_quantities[product_name] += item.quantity
+        else:
+            product_quantities[product_name] = item.quantity
+
+    # Prepare table data
+    data = [["Quantity", "Product"]]
+    for product_name, total_quantity in product_quantities.items():
+        data.append([
+            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+            product_name,
+        ])
+
+    # Configure table styles
+    table = Table(data, colWidths=[50, 250])
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+    ]))
+
+    # Position the table
+    table.wrapOn(pdf, width, height)
+    table.drawOn(pdf, 60, height - 300)
+    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower():
+        pdf.drawString(30, height - 340, f"Please confirm by replying to {order.customer.name}")
+    else:
+        pdf.drawString(30, height - 340, f"Please confirm by replying to Dr. {order.customer.name}")
+    pdf.drawString(30, height - 360, f"Tel:  {order.customer.telephone_number}")
