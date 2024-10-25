@@ -18,7 +18,8 @@ class InvoiceTable(tables.Table):
                 }
             }
         }
-        fields = ("number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
+        order_by = '-id'
+        fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
 
 
 class InvoiceFilter(FilterSet):
