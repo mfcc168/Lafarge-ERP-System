@@ -4,9 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lafarge Invoice App</title>
+    {% load static %}
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <style>
+        .table thead th a {
+            color: black;
+            text-decoration: none;
+            position: relative;
+        }
+            /* Base style for sortable columns */
+    th.sortable {
+        cursor: pointer;
+        position: relative;
+    }
+
+    /* Sorting indicator for ascending order */
+    th.ascend::after {
+        content: "▲"; /* Up arrow */
+        position: absolute;
+        right: 8px;
+        font-size: 12px;
+        color: #007bff;
+    }
+
+    /* Sorting indicator for descending order */
+    th.descend::after {
+        content: "▼"; /* Down arrow */
+        position: absolute;
+        right: 8px;
+        bottom: 5px;
+        font-size: 12px;
+        color: #007bff;
+    }
+    </style>
+
 </head>
 <body>
     <!-- Navbar -->

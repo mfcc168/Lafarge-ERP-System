@@ -1,35 +1,19 @@
 {% extends 'invoice/base.html' %}
-
+{% load bootstrap5 %}
 {% block content %}
 <div class="mt-5">
     <h2>Invoice List</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Invoice Number</th>
-                <th>Customer</th>
-                <th>Salesman</th>
-                <th>Total Price</th>
-                <th>Delivery Date</th>
-                <th>Payment Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for invoice in invoices %}
-                <tr>
-                    <td><a href="{% url 'invoice_detail' invoice.number %}" class="text-decoration-none">{{ invoice.number }}</a></td>
-                    <td>{{ invoice.customer.name }}</td>
-                    <td>{{ invoice.salesman.name }}</td>
-                    <td>{{ invoice.total_price }}</td>
-                    <td>{{ invoice.delivery_date }}</td>
-                    <td>{{ invoice.payment_date }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="6">No invoices found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if filter %}
+    <form action="" method="get" class="form">
+        <div class="row g-3">
+            {% bootstrap_form filter.form layout='inline' %}
+        </div>
+        <br>
+        {% bootstrap_button 'filter' %}
+    </form>
+    <br>
+    {% endif %}
+    {% load render_table from django_tables2 %}
+    {% render_table table %}
 </div>
 {% endblock %}

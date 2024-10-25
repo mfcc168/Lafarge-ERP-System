@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from .models import Customer, Invoice
 from .models import Product, ProductTransaction
 
+from django_tables2 import SingleTableView, SingleTableMixin
+from django_filters.views import FilterView
+from .tables import InvoiceTable, InvoiceFilter
 
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4, A5
@@ -13,9 +16,14 @@ from .pdf_utils import draw_invoice_page, draw_order_form_page
 def home(request):
     return render(request, 'invoice/home.html')
 
-def invoice_list(request):
-    invoices = Invoice.objects.all().order_by("-id")
-    return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
+# def invoice_list(request):
+#     invoices = Invoice.objects.all().order_by("-id")
+#     return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
+class InvoiceListView(SingleTableMixin, FilterView):
+    model = Invoice
+    table_class = InvoiceTable
+    template_name = "invoice/invoice_list.html"
+    filterset_class = InvoiceFilter
 
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
