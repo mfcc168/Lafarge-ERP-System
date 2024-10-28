@@ -43,9 +43,9 @@ def draw_invoice_page(pdf, invoice, copy_type):
         pdf.drawString(70, height - 215, f"Sold To: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if "ltd" in invoice.customer.name.lower() or "dispensary" in invoice.customer.name.lower():
-            pdf.drawString(70, height - 215, f"Care Of: {invoice.customer.care_of}")
+            pdf.drawString(70, height - 235, f"Care Of: {invoice.customer.care_of}")
         else:
-            pdf.drawString(70, height - 215, f"Care Of: Dr. {invoice.customer.care_of}")
+            pdf.drawString(70, height - 235, f"Care Of: Dr. {invoice.customer.care_of}")
     y_position = height - 255
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(70, y_position)
@@ -53,7 +53,11 @@ def draw_invoice_page(pdf, invoice, copy_type):
     for line in address_lines:
         text_object.textLine(line)
 
-    text_object.textLine(f"Tel: {invoice.customer.telephone_number} ({invoice.customer.contact_person})" if invoice.customer.telephone_number else "")
+    text_object.textLine(
+        f"Tel: {invoice.customer.telephone_number or ''}"
+        f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
+    )
+
     pdf.drawText(text_object)
 
     text_object = pdf.beginText(450, y_position)
@@ -73,7 +77,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
     pdf.drawString(70, height - 130, f"Invoice No. : {invoice.number}")
     pdf.drawString(70, height - 150, f"Salesman : {invoice.salesman.name}")
     if copy_type != "Poison Form":
-        pdf.drawString(70, height - 170, f"Terms : ")
+        pdf.drawString(70, height - 170, f"Terms : {invoice.terms}")
 
     # Table for Invoice Items
     if copy_type == "Poison Form":
@@ -159,7 +163,7 @@ def draw_order_form_page(pdf, order):
 
     # Customer information
     pdf.setFont("Helvetica-Bold", 8)
-    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower():
+    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower() or "limited" in order.customer.name.lower():
         pdf.drawString(30, height - 100, f"From: {order.customer.name}")
     else:
         pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
@@ -199,7 +203,7 @@ def draw_order_form_page(pdf, order):
     # Position the table
     table.wrapOn(pdf, width, height)
     table.drawOn(pdf, 60, height - 300)
-    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower():
+    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower() or "limited" in order.customer.name.lower():
         pdf.drawString(30, height - 340, f"Please confirm by replying to {order.customer.name}")
     else:
         pdf.drawString(30, height - 340, f"Please confirm by replying to Dr. {order.customer.name}")
