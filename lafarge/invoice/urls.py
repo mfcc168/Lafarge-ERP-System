@@ -1,11 +1,11 @@
 from django.urls import path
 from .views import InvoiceListView, invoice_detail, download_invoice_pdf, download_order_form_pdf\
-    , customer_list, customer_detail\
+    , CustomerListView, customer_detail\
     , product_list, product_transaction_detail\
     , home
 
 urlpatterns = [
-    path('customers/', customer_list, name='customer_list'),  # Added trailing slash for consistency
+    path('customers/', CustomerListView.as_view(), name='customer_list'),  # Added trailing slash for consistency
     path('customer/<str:customer_name>/', customer_detail, name='customer_detail'),
     path('products/', product_list, name='product_list'),
     path('products/<int:product_id>/', product_transaction_detail, name='product_transaction_detail'),

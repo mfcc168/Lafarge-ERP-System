@@ -4,7 +4,7 @@ from .models import Product, ProductTransaction
 
 from django_tables2 import SingleTableView, SingleTableMixin
 from django_filters.views import FilterView
-from .tables import InvoiceTable, InvoiceFilter
+from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter
 
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4, A5
@@ -104,16 +104,22 @@ def download_order_form_pdf(request, invoice_number):
 
     return response
 
+class CustomerListView(SingleTableMixin, FilterView):
+    model = Customer
+    table_class = CustomerTable
+    template_name = "invoice/customer_list.html"
+    filterset_class = CustomerFilter
 
-def customer_list(request):
-    # Get all customers along with their related invoices
-    customers = Customer.objects.all().prefetch_related('invoice_set')
 
-    # Pass the data to the template
-    context = {
-        'customers': customers,
-    }
-    return render(request, 'invoice/customer_list.html', context)
+# def customer_list(request):
+#     # Get all customers along with their related invoices
+#     customers = Customer.objects.all().prefetch_related('invoice_set')
+#
+#     # Pass the data to the template
+#     context = {
+#         'customers': customers,
+#     }
+#     return render(request, 'invoice/customer_list.html', context)
 
 def customer_detail(request, customer_name):
     # Fetch the customer by name, or return a 404 if not found
