@@ -3,8 +3,8 @@ from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Produ
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address')
-    search_fields = ('name', 'address')
+    list_display = ('name', 'care_of', 'address', 'telephone_number')
+    search_fields = ('name', 'care_of', 'address', 'telephone_number')
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):
@@ -32,12 +32,13 @@ class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
     extra = 0  # Number of extra forms to display
     readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
-    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price', 'invoice_type')  # Include invoice_type field
+    fields = ('product', 'quantity', 'net_price', 'price', 'sum_price', 'product_type')  # Include product_type field
 
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('number', 'customer', 'delivery_date', 'payment_date', 'total_price')
+    autocomplete_fields = ['customer']
+    list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price')
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
     readonly_fields = ('total_price',)
@@ -46,9 +47,9 @@ class InvoiceAdmin(admin.ModelAdmin):
         super().save_related(request, form, formsets, change)
         form.instance.save()
 
-@admin.register(InvoiceItem)
-class InvoiceItemAdmin(admin.ModelAdmin):
-    list_display = ('invoice', 'product', 'quantity', 'price', 'sum_price')
-    search_fields = ('invoice__number', 'product__name')
-    fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
-    readonly_fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
+# @admin.register(InvoiceItem)
+# class InvoiceItemAdmin(admin.ModelAdmin):
+#     list_display = ('invoice', 'product', 'quantity', 'price', 'sum_price')
+#     search_fields = ('invoice__number', 'product__name')
+#     fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')
+#     readonly_fields = ('invoice', 'product', 'quantity', 'net_price', 'sum_price')

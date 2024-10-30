@@ -1,33 +1,36 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
+    care_of = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField()
-    available_from = models.CharField(max_length=255, blank=True, null=True)
-    available_to = models.CharField(max_length=255, blank=True, null=True)
+    office_hour = models.TextField(blank=True, null=True)
+    telephone_number = models.CharField(max_length=255, blank=True, null=True)
+    contact_person = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 class Salesman(models.Model):
-    code = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.code
 
 class Deliveryman(models.Model):
-    code = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.code
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
+    unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=0)
     unit_per_box = models.PositiveIntegerField(default=1)  # New field
@@ -65,6 +68,7 @@ class ProductTransaction(models.Model):
 
 class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
+    terms = models.CharField(max_length=50, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE)
     delivery_date = models.DateField(null=True, blank=True)
@@ -77,15 +81,15 @@ class Invoice(models.Model):
         self.total_price = total
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.calculate_total_price()
+        self.calculate_total_price()  # Calculate total before saving
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.number
 
+
 class InvoiceItem(models.Model):
-    INVOICE_TYPE_CHOICES = [
+    PRODUCT_TYPE_CHOICES = [
         ('normal', 'Normal'),
         ('sample', 'Sample'),
         ('bonus', 'Bonus'),
@@ -97,56 +101,66 @@ class InvoiceItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sum_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    invoice_type = models.CharField(max_length=10, choices=INVOICE_TYPE_CHOICES, default='normal')
+    product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
-        if self.invoice_type == 'normal':
-            if not self.net_price:
-                self.price = self.product.price
-            self.sum_price = self.price * self.quantity
-        else:
-            # For 'sample' and 'bonus' types, the sum_price is zero
-            self.sum_price = 0.00
+        with transaction.atomic():
+            # Determine if this is an update or a new item
+            is_edit = self.pk is not None
+            current_product = Product.objects.get(pk=self.product.pk)
 
-        # Update product inventory for all invoice types
-        if self.pk:  # Existing record, update inventory
-            previous = InvoiceItem.objects.get(pk=self.pk)
-            delta = self.quantity - previous.quantity
-        else:  # New record
-            delta = -self.quantity
+            if is_edit:
+                # If it's an edit, get the previous item to revert its quantity
+                previous_item = InvoiceItem.objects.get(pk=self.pk)
+                previous_quantity = previous_item.quantity
 
-        self.product.quantity += delta
-        self.product.save()
+                # Revert the previous quantity back to the product
+                current_product.quantity += previous_quantity
 
-        # Log the transaction
-        ProductTransaction.objects.create(
-            product=self.product,
-            transaction_type='sale' if self.invoice_type == 'normal' else 'adjustment',
-            change=-delta,
-            quantity_after_transaction=self.product.quantity,
-            description=f"{self.invoice_type.capitalize()} in invoice {self.invoice.number}"
-        )
+            # Calculate new quantity
+            new_quantity = current_product.quantity - self.quantity
 
-        super().save(*args, **kwargs)
+            # Update the product quantity
+            current_product.quantity = new_quantity
+
+            # Log the product transaction
+            transaction_type = 'update'
+            ProductTransaction.objects.create(
+                product=current_product,
+                transaction_type=transaction_type,
+                change=-self.quantity if not is_edit else previous_quantity - self.quantity,
+                quantity_after_transaction=current_product.quantity,
+                description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
+            )
+
+            # Calculate price details
+            if self.product_type == 'normal':
+                self.price = current_product.price if not self.net_price else self.net_price
+                self.sum_price = self.price * self.quantity
+            else:
+                self.sum_price = 0.00  # For sample and bonus types
+
+            # Save the updated product quantity
+            current_product.save()
+            # Finally, save the invoice item
+            super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.product.quantity += self.quantity
-        self.product.save()
+        with transaction.atomic():
+            # For deletion, always restock
+            self.product.quantity += self.quantity
+            self.product.save()
 
-        # Log the transaction
-        ProductTransaction.objects.create(
-            product=self.product,
-            transaction_type='adjustment',
-            change=self.quantity,
-            quantity_after_transaction=self.product.quantity,
-            description=f"Deletion of {self.invoice_type} invoice item {self.invoice.number}"
-        )
+            # Log restock transaction
+            ProductTransaction.objects.create(
+                product=self.product,
+                transaction_type='restock',
+                change=self.quantity,
+                quantity_after_transaction=self.product.quantity,
+                description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
+            )
 
-        super().delete(*args, **kwargs)
-
-    def __str__(self):
-        return f"Invoice {self.invoice.number} - {self.product.name} ({self.quantity} @ {self.price})"
-
+            super().delete(*args, **kwargs)
 
 
 # Signals to update total price
@@ -154,6 +168,7 @@ class InvoiceItem(models.Model):
 def update_invoice_total(sender, instance, **kwargs):
     instance.invoice.calculate_total_price()
     instance.invoice.save()
+
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
