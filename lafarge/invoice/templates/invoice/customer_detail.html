@@ -21,5 +21,8 @@
     <br>
     {% load render_table from django_tables2 %}
     {% render_table table %}
+
+    <a href="{% url 'customer_list' %}" class="btn btn-primary mt-3">Back to Customer List</a>
+    <br>
 </div>
 {% endblock %}
