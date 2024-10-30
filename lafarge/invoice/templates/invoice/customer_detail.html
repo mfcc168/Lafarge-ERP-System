@@ -1,5 +1,6 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
+{% load export_url from django_tables2 %}
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-3">{{ customer.name }}'s Purchase Records</h1>
@@ -18,8 +19,10 @@
         {% bootstrap_button 'filter' %}
     </form>
     </div>
+    <a href="{% export_url 'xlsx' %}" class="btn btn-primary mt-3">Export to XLSX</a>
     <br>
     {% load render_table from django_tables2 %}
+    <br>
     {% render_table table %}
 
     <a href="{% url 'customer_list' %}" class="btn btn-primary mt-3">Back to Customer List</a>
