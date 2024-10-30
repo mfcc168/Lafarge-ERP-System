@@ -1,30 +1,40 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Customer, Invoice
-from .models import Product, ProductTransaction
-
-from django_tables2 import SingleTableView, SingleTableMixin
-from django_filters.views import FilterView
-from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter
-
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import A4, A5
-from reportlab.pdfgen import canvas
 import io
 
-from .pdf_utils import draw_invoice_page, draw_order_form_page
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.utils.decorators import method_decorator
+from django_filters.views import FilterView
+from django_tables2 import SingleTableMixin
+from reportlab.lib.pagesizes import A4, A5
+from reportlab.pdfgen import canvas
 
+from .models import Customer, Invoice
+from .models import Product, ProductTransaction
+from .pdf_utils import draw_invoice_page, draw_order_form_page
+from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter
+
+
+class StaffMemberRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+@staff_member_required
 def home(request):
     return render(request, 'invoice/home.html')
 
-# def invoice_list(request):
-#     invoices = Invoice.objects.all().order_by("-id")
-#     return render(request, 'invoice/invoice_list.html', {'invoices': invoices})
-class InvoiceListView(SingleTableMixin, FilterView):
+
+@method_decorator(staff_member_required, name='dispatch')
+class InvoiceListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
     model = Invoice
     table_class = InvoiceTable
     template_name = "invoice/invoice_list.html"
     filterset_class = InvoiceFilter
 
+
+@staff_member_required
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
     invoice = get_object_or_404(Invoice, number=invoice_number)
@@ -36,8 +46,7 @@ def invoice_detail(request, invoice_number):
     return render(request, 'invoice/invoice_detail.html', context)
 
 
-
-
+@staff_member_required
 def download_invoice_pdf(request, invoice_number):
     # Get the invoice object
     invoice = get_object_or_404(Invoice, number=invoice_number)
@@ -77,6 +86,8 @@ def download_invoice_pdf(request, invoice_number):
 
     return response
 
+
+@staff_member_required
 def download_order_form_pdf(request, invoice_number):
     # Get the invoice object
     order_form = get_object_or_404(Invoice, number=invoice_number)
@@ -104,23 +115,16 @@ def download_order_form_pdf(request, invoice_number):
 
     return response
 
-class CustomerListView(SingleTableMixin, FilterView):
+
+@method_decorator(staff_member_required, name='dispatch')
+class CustomerListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
     model = Customer
     table_class = CustomerTable
     template_name = "invoice/customer_list.html"
     filterset_class = CustomerFilter
 
 
-# def customer_list(request):
-#     # Get all customers along with their related invoices
-#     customers = Customer.objects.all().prefetch_related('invoice_set')
-#
-#     # Pass the data to the template
-#     context = {
-#         'customers': customers,
-#     }
-#     return render(request, 'invoice/customer_list.html', context)
-
+@staff_member_required
 def customer_detail(request, customer_name):
     # Fetch the customer by name, or return a 404 if not found
     customer = get_object_or_404(Customer, name=customer_name)
@@ -131,10 +135,14 @@ def customer_detail(request, customer_name):
     }
     return render(request, 'invoice/customer_detail.html', context)
 
+
+@staff_member_required
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'invoice/product_list.html', {'products': products})
 
+
+@staff_member_required
 def product_transaction_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     transactions = ProductTransaction.objects.filter(product=product).order_by('-timestamp')
