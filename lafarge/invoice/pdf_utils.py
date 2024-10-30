@@ -1,11 +1,13 @@
 import os
-from reportlab.lib.pagesizes import A4, A5
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
-from django.conf import settings
 from datetime import datetime
 
+from django.conf import settings
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, A5
+from reportlab.platypus import Table, TableStyle
+
 from .check_utils import prefix_check
+
 
 def draw_invoice_page(pdf, invoice, copy_type):
     """
@@ -67,10 +69,8 @@ def draw_invoice_page(pdf, invoice, copy_type):
         text_object.textLine(line)
     pdf.drawText(text_object)
 
-
-
-    #pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
-    #pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
+    # pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
+    # pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
@@ -149,6 +149,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawString(400, height - 620, f"Total: ${invoice.total_price:,.2f}")
 
+
 def draw_order_form_page(pdf, order):
     """
     Draw the content of an order form page in the PDF (A5 portrait).
@@ -176,7 +177,7 @@ def draw_order_form_page(pdf, order):
     # Aggregate quantities for products with the same name
     product_quantities = {}
     for item in order.invoiceitem_set.all():
-        product_name = item.product.name.split('(')[0].strip() #strip lot no.
+        product_name = item.product.name.split('(')[0].strip()  # strip lot no.
         if product_name in product_quantities:
             product_quantities[product_name] += item.quantity
         else:

@@ -1,10 +1,10 @@
 import django_tables2 as tables
-from django_filters import FilterSet, CharFilter, DateFilter
+from django_filters import FilterSet, CharFilter, DateFilter, DateTimeFilter
 from django_tables2.utils import A
 
 from .models import Customer
 from .models import Invoice
-
+from .models import ProductTransaction
 
 class CustomerTable(tables.Table):
     name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
@@ -53,7 +53,7 @@ class InvoiceTable(tables.Table):
             }
         }
         order_by = '-id'
-        fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
+        fields = ("number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
 
 
 class InvoiceFilter(FilterSet):
@@ -66,3 +66,62 @@ class InvoiceFilter(FilterSet):
     class Meta:
         model = Invoice
         fields = ["number", "salesman"]  # Only include direct model fields here
+
+
+class CustomerInvoiceTable(tables.Table):
+    number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
+                               attrs={'a': {'class': 'text-decoration-none'}})
+    total_price = tables.Column(verbose_name='Total Price')
+    salesman = tables.Column(verbose_name='Salesman')
+    delivery_date = tables.DateColumn(verbose_name='Delivery Date')
+    payment_date = tables.DateColumn(verbose_name='Payment Date')
+    items = tables.TemplateColumn(
+        template_code='''
+            <ul class="list-unstyled mb-0">
+                {% for item in record.invoiceitem_set.all %}
+                    <li>{{ item.product.name }}: {{ item.quantity }} {{ item.product.unit }} @ ${{ item.price }} ({{ item.product_type }})</li>
+                {% endfor %}
+            </ul>
+        ''',
+        verbose_name="Items"
+    )
+
+    class Meta:
+        model = Invoice
+        fields = ("number", "total_price", "salesman", "delivery_date", "payment_date")
+        attrs = {
+            'class': 'table table-striped table-bordered',
+            'th': {
+                '_ordering': {
+                    'orderable': 'sortable',  # Instead of `orderable`
+                    'ascending': 'ascend',  # Instead of `asc`
+                    'descending': 'descend'  # Instead of `desc`
+                }
+            }
+        }
+
+
+class ProductTransactionTable(tables.Table):
+    timestamp = tables.DateTimeColumn(format='Y-m-d H:i')
+
+    class Meta:
+        model = ProductTransaction
+        fields = ("change", "quantity_after_transaction", "timestamp", "description")
+        attrs = {
+            'class': 'table table-striped table-bordered',
+            'th': {
+                '_ordering': {
+                    'orderable': 'sortable',
+                    'ascending': 'ascend',
+                    'descending': 'descend'
+                }
+            }
+        }
+
+class ProductTransactionFilter(FilterSet):
+    timestamp_from = DateTimeFilter(field_name='timestamp', lookup_expr='gte', label="Timestamp From")
+    timestamp_to = DateTimeFilter(field_name='timestamp', lookup_expr='lte', label="Timestamp To")
+
+    class Meta:
+        model = ProductTransaction
+        fields = []  # List only non-model fields to avoid duplication

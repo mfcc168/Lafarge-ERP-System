@@ -13,7 +13,7 @@ from reportlab.pdfgen import canvas
 from .models import Customer, Invoice
 from .models import Product, ProductTransaction
 from .pdf_utils import draw_invoice_page, draw_order_form_page
-from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter
+from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter
 
 
 class StaffMemberRequiredMixin(UserPassesTestMixin):
@@ -126,12 +126,17 @@ class CustomerListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
 
 @staff_member_required
 def customer_detail(request, customer_name):
-    # Fetch the customer by name, or return a 404 if not found
     customer = get_object_or_404(Customer, name=customer_name)
+    invoices = Invoice.objects.filter(customer=customer)
 
-    # Pass the customer and related purchase records to the template
+    # Apply filter to the invoices queryset
+    filterset = InvoiceFilter(request.GET, queryset=invoices)
+    table = CustomerInvoiceTable(filterset.qs)
+
     context = {
         'customer': customer,
+        'table': table,
+        'filter': filterset,
     }
     return render(request, 'invoice/customer_detail.html', context)
 
@@ -146,7 +151,14 @@ def product_list(request):
 def product_transaction_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     transactions = ProductTransaction.objects.filter(product=product).order_by('-timestamp')
+
+    # Apply filter
+    filterset = ProductTransactionFilter(request.GET, queryset=transactions)
+    table = ProductTransactionTable(filterset.qs)
+
     return render(request, 'invoice/product_transaction_detail.html', {
         'product': product,
-        'transactions': transactions
+        'transactions': filterset.qs,
+        'table': table,
+        'filter': filterset
     })
