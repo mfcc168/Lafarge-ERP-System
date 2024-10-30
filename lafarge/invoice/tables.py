@@ -6,6 +6,8 @@ from .models import Customer
 from .models import Invoice
 from .models import ProductTransaction
 
+from django_tables2.export.views import ExportMixin
+
 class CustomerTable(tables.Table):
     name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
                              attrs={'a': {'class': 'text-decoration-none'}})
@@ -68,7 +70,7 @@ class InvoiceFilter(FilterSet):
         fields = ["number", "salesman"]  # Only include direct model fields here
 
 
-class CustomerInvoiceTable(tables.Table):
+class CustomerInvoiceTable(ExportMixin, tables.Table):
     number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
                                attrs={'a': {'class': 'text-decoration-none'}})
     total_price = tables.Column(verbose_name='Total Price')

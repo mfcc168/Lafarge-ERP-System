@@ -15,6 +15,8 @@ from .models import Product, ProductTransaction
 from .pdf_utils import draw_invoice_page, draw_order_form_page
 from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter
 
+from django_tables2.config import RequestConfig
+from django_tables2.export.export import TableExport
 
 class StaffMemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -132,6 +134,13 @@ def customer_detail(request, customer_name):
     # Apply filter to the invoices queryset
     filterset = InvoiceFilter(request.GET, queryset=invoices)
     table = CustomerInvoiceTable(filterset.qs)
+    RequestConfig(request).configure(table)
+
+    # Check for export format in request and handle CSV export
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)  # Pass the table instance here
+        return exporter.response(f"{customer_name}_invoices.{export_format}")
 
     context = {
         'customer': customer,
