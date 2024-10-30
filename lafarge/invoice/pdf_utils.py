@@ -5,6 +5,7 @@ from reportlab.platypus import Table, TableStyle
 from django.conf import settings
 from datetime import datetime
 
+from .check_utils import prefix_check
 
 def draw_invoice_page(pdf, invoice, copy_type):
     """
@@ -37,12 +38,12 @@ def draw_invoice_page(pdf, invoice, copy_type):
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 14)
-    if "ltd" in invoice.customer.name.lower() or "dispensary" in invoice.customer.name.lower():
+    if prefix_check(invoice.customer.name.lower()):
         pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
     else:
         pdf.drawString(70, height - 215, f"Sold To: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
-        if "ltd" in invoice.customer.name.lower() or "dispensary" in invoice.customer.name.lower():
+        if prefix_check(invoice.customer.name.lower()):
             pdf.drawString(70, height - 235, f"Care Of: {invoice.customer.care_of}")
         else:
             pdf.drawString(70, height - 235, f"Care Of: Dr. {invoice.customer.care_of}")
@@ -163,7 +164,7 @@ def draw_order_form_page(pdf, order):
 
     # Customer information
     pdf.setFont("Helvetica-Bold", 8)
-    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower() or "limited" in order.customer.name.lower():
+    if prefix_check(order.customer.name.lower()):
         pdf.drawString(30, height - 100, f"From: {order.customer.name}")
     else:
         pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
@@ -203,7 +204,7 @@ def draw_order_form_page(pdf, order):
     # Position the table
     table.wrapOn(pdf, width, height)
     table.drawOn(pdf, 60, height - 300)
-    if "ltd" in order.customer.name.lower() or "dispensary" in order.customer.name.lower() or "limited" in order.customer.name.lower():
+    if prefix_check(order.customer.name.lower()):
         pdf.drawString(30, height - 340, f"Please confirm by replying to {order.customer.name}")
     else:
         pdf.drawString(30, height - 340, f"Please confirm by replying to Dr. {order.customer.name}")
