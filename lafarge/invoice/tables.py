@@ -1,11 +1,15 @@
 import django_tables2 as tables
-from django_filters import FilterSet, ModelChoiceFilter
-from .models import Invoice, Customer
+from django_filters import FilterSet, CharFilter, DateFilter
 from django_tables2.utils import A
+
+from .models import Customer
+from .models import Invoice
+
 
 class CustomerTable(tables.Table):
     name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
-                               attrs={'a': {'class': 'text-decoration-none'}})
+                             attrs={'a': {'class': 'text-decoration-none'}})
+
     class Meta:
         model = Customer
         attrs = {
@@ -13,28 +17,29 @@ class CustomerTable(tables.Table):
             'th': {
                 '_ordering': {
                     'orderable': 'sortable',  # Instead of `orderable`
-                    'ascending': 'ascend',    # Instead of `asc`
-                    'descending': 'descend'   # Instead of `desc`
+                    'ascending': 'ascend',  # Instead of `asc`
+                    'descending': 'descend'  # Instead of `desc`
                 }
             }
         }
         fields = ("name", "care_of", "address", "office_hour", "telephone_number")
 
+
 class CustomerFilter(FilterSet):
+    name = CharFilter(field_name='name', lookup_expr='icontains', label="Customer Name")
+    care_of = CharFilter(field_name='care_of', lookup_expr='icontains', label="Care Of")
+    address = CharFilter(field_name='address', lookup_expr='icontains', label="Address")
+    telephone_number = CharFilter(field_name='telephone_number', lookup_expr='icontains', label="Telephone Number")
 
     class Meta:
         model = Customer
-        fields = {
-            "name": ["contains"],
-            "care_of": ["contains"],
-            "address": ["contains"],
-            "telephone_number": ["contains"],
-        }
+        fields = ["name", "care_of", "address", "telephone_number"]
 
 
 class InvoiceTable(tables.Table):
     number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
                                attrs={'a': {'class': 'text-decoration-none'}})
+
     class Meta:
         model = Invoice
         attrs = {
@@ -42,8 +47,8 @@ class InvoiceTable(tables.Table):
             'th': {
                 '_ordering': {
                     'orderable': 'sortable',  # Instead of `orderable`
-                    'ascending': 'ascend',    # Instead of `asc`
-                    'descending': 'descend'   # Instead of `desc`
+                    'ascending': 'ascend',  # Instead of `asc`
+                    'descending': 'descend'  # Instead of `desc`
                 }
             }
         }
@@ -52,14 +57,12 @@ class InvoiceTable(tables.Table):
 
 
 class InvoiceFilter(FilterSet):
-    customer = ModelChoiceFilter(queryset=Customer.objects.all(), label="Customer")
+    customer_name = CharFilter(field_name='customer__name', lookup_expr='icontains', label="Customer Name")
+    delivery_date = DateFilter(field_name='delivery_date', lookup_expr='gte', label="Delivery Date (From)")
+    delivery_date_to = DateFilter(field_name='delivery_date', lookup_expr='lte', label="Delivery Date (To)")
+    payment_date = DateFilter(field_name='payment_date', lookup_expr='gte', label="Payment Date (From)")
+    payment_date_to = DateFilter(field_name='payment_date', lookup_expr='lte', label="Payment Date (To)")
 
     class Meta:
         model = Invoice
-        fields = {
-            "number": ["contains"],
-            "customer": ["exact"],  # Allow filtering by an exact customer match
-            "delivery_date": ["gte", "lte"],
-            "payment_date": ["gte", "lte"],
-            "salesman": ["exact"],
-        }
+        fields = ["number", "salesman"]  # Only include direct model fields here
