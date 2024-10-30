@@ -1,0 +1,19 @@
+{% extends 'invoice/base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+<div class="mt-5">
+    <h2>Invoice List</h2>
+    {% if filter %}
+    <form action="" method="get" class="form">
+        <div class="row g-3">
+            {% bootstrap_form filter.form layout='inline' %}
+        </div>
+        <br>
+        {% bootstrap_button 'filter' %}
+    </form>
+    <br>
+    {% endif %}
+    {% load render_table from django_tables2 %}
+    {% render_table table %}
+</div>
+{% endblock %}
