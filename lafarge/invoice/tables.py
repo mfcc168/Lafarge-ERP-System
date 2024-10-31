@@ -133,7 +133,6 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
                                attrs={'a': {'class': 'text-decoration-none'}})
     customer = tables.Column(accessor='customer.name', verbose_name='Customer Name')
     payment_date = tables.DateColumn(verbose_name="Payment Date")
-    total_quantity = tables.Column(empty_values=(), verbose_name="Total Quantity")
     total_amount = tables.Column(empty_values=(), verbose_name="Total Amount")
     items = tables.TemplateColumn(
         template_code='''
@@ -148,7 +147,7 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
 
     class Meta:
         model = Invoice
-        fields = ("number", "payment_date", "items")
+        fields = ("number", "customer", "items", "payment_date")
         attrs = {
             'class': 'table table-striped table-bordered',
             'th': {
@@ -160,9 +159,6 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
             }
         }
 
-    # Custom column to calculate the total quantity
-    def render_total_quantity(self, record):
-        return sum(item.quantity for item in record.invoiceitem_set.all())
 
     # Custom column to calculate the total amount
     def render_total_amount(self, record):

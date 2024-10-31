@@ -41,14 +41,14 @@ def draw_invoice_page(pdf, invoice, copy_type):
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 14)
     if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(70, height - 215, f"Sold To: {invoice.customer.name}")
+        pdf.drawString(70, height - 215, f"SOLD TO: {invoice.customer.name}")
     else:
-        pdf.drawString(70, height - 215, f"Sold To: Dr. {invoice.customer.name}")
+        pdf.drawString(70, height - 215, f"SOLD TO: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
-        if prefix_check(invoice.customer.name.lower()):
-            pdf.drawString(70, height - 235, f"Care Of: {invoice.customer.care_of}")
+        if prefix_check(invoice.customer.care_of.lower()):
+            pdf.drawString(140, height - 235, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(70, height - 235, f"Care Of: Dr. {invoice.customer.care_of}")
+            pdf.drawString(140, height - 235, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 255
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(70, y_position)
@@ -61,6 +61,9 @@ def draw_invoice_page(pdf, invoice, copy_type):
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
 
+    text_object.textLine(f"Order No.: {invoice.order_number}" if invoice.order_number else '')
+    text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}" if invoice.customer.delivery_to else '')
+
     pdf.drawText(text_object)
 
     text_object = pdf.beginText(450, y_position)
@@ -69,8 +72,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
         text_object.textLine(line)
     pdf.drawText(text_object)
 
-    # pdf.drawString(350, height - 215, f"Office Hour: {invoice.customer.available_from} to {invoice.customer.available_to}")
-    # pdf.drawString(350, height - 235, f"Close on: {invoice.customer.close_day}" if invoice.customer.close_day else "")
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
@@ -120,12 +121,20 @@ def draw_invoice_page(pdf, invoice, copy_type):
             # Check if the item type is "bonus" or "sample"
             unit_price_display = item.product_type if item.product_type in ["bonus",
                                                                             "sample"] else f"${item.net_price:,.2f} (Nett Price)" if item.net_price else f"${item.price:,.2f}"
+            unit_price_display += f"\n"
+
+            product_name = item.product.name
+            product_name += f"\n"
+            if invoice.show_registration_code and item.product.registration_code:
+                product_name += f"(Reg. No.: {item.product.registration_code})"
+            if invoice.show_expiry_date and item.product.expiry_date:
+                product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
 
             data.append([
-                f"{item.quantity} {item.product.unit}",
-                item.product.name,  # Display product name in the Product column
+                f"{item.quantity} {item.product.unit}\n",
+                product_name,  # Display product name in the Product column
                 unit_price_display,  # Display the type or the price in the Unit Price column
-                f"${item.sum_price:,.2f}" if item.sum_price != 0 else "-"
+                f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
 
         # Configure table styles
@@ -136,6 +145,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font
             ('FONTSIZE', (0, 0), (-1, 0), 12),  # Larger font size for header
             ('FONTSIZE', (0, 1), (-1, -1), 10),  # Smaller font size for the rest of the table
+            ('TOPPADDING', (0, 1), (-1, -1), 10),  # Set top padding for all rows
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Padding for the header
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Background color for the rest of the table
 
@@ -143,7 +153,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 50, height - 450)
+        table.drawOn(pdf, 50, height - 550)
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)

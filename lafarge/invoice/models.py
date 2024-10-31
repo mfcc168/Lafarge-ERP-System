@@ -10,7 +10,8 @@ class Customer(models.Model):
     office_hour = models.TextField(blank=True, null=True)
     telephone_number = models.CharField(max_length=255, blank=True, null=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
-    delivery_note = models.TextField(blank=True, null=True)
+    delivery_to = models.CharField(max_length=255, blank=True, null=True)
+    delivery_address = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -31,6 +32,8 @@ class Deliveryman(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    registration_code = models.CharField(max_length=255, blank=True, null=True)
+    expiry_date = models.DateField(null=True, blank=True)
     unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=0)
@@ -76,6 +79,9 @@ class Invoice(models.Model):
     payment_date = models.DateField(null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    show_registration_code = models.BooleanField(default=False)
+    show_expiry_date = models.BooleanField(default=False)
+    order_number = models.CharField(max_length=50, null=True, blank=True)
 
     def calculate_total_price(self):
         total = sum(item.sum_price for item in self.invoiceitem_set.all())
