@@ -1,0 +1,28 @@
+{% extends 'invoice/base.html' %}
+{% load bootstrap5 %}
+{% load export_url from django_tables2 %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">{{ salesman.name }}'s Sales Records</h1>
+
+    <h2 class="mt-4">Invoices</h2>
+    <div class="mt-5">
+        <form action="" method="get" class="form">
+            <div class="row g-3">
+                {% bootstrap_form filter.form layout='inline' %}
+            </div>
+            <br>
+            {% bootstrap_button 'filter' %}
+        </form>
+    </div>
+
+    <a href="{% export_url 'xlsx' %}" class="btn btn-primary mt-3">Export to XLSX</a>
+    <br>
+    {% load render_table from django_tables2 %}
+    <br>
+    {% render_table table %}
+
+    <a href="{% url 'salesman_list' %}" class="btn btn-primary mt-3">Back to Salesman List</a>
+    <br>
+</div>
+{% endblock %}

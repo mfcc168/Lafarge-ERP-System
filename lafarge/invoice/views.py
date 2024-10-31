@@ -10,10 +10,10 @@ from django_tables2 import SingleTableMixin
 from reportlab.lib.pagesizes import A4, A5
 from reportlab.pdfgen import canvas
 
-from .models import Customer, Invoice
+from .models import Customer, Invoice, Salesman
 from .models import Product, ProductTransaction
 from .pdf_utils import draw_invoice_page, draw_order_form_page
-from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter
+from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
 
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
@@ -27,6 +27,34 @@ class StaffMemberRequiredMixin(UserPassesTestMixin):
 def home(request):
     return render(request, 'invoice/home.html')
 
+# View to list all salesmen
+def salesman_list(request):
+    salesmen = Salesman.objects.all()
+    return render(request, 'invoice/salesman_list.html', {'salesmen': salesmen})
+
+# View to display invoices related to a particular salesman
+def salesman_detail(request, salesman_id):
+    salesman = get_object_or_404(Salesman, id=salesman_id)
+    invoices = Invoice.objects.filter(salesman=salesman)
+
+    # Initialize filter with request data
+    filter = InvoiceFilter(request.GET, queryset=invoices)
+    filter.form.fields.pop('delivery_date', None)
+    filter.form.fields.pop('delivery_date_to', None)
+    filter.form.fields.pop('salesman', None)
+    table = SalesmanInvoiceTable(filter.qs)  # Use filtered queryset
+
+    # Handle export
+    export_format = request.GET.get("_export", None)
+    if export_format:
+        exporter = TableExport(export_format, table)
+        return exporter.response(f"{salesman.name}_invoices.{export_format}")
+
+    return render(request, 'invoice/salesman_detail.html', {
+        'salesman': salesman,
+        'table': table,
+        'filter': filter,
+    })
 
 @method_decorator(staff_member_required, name='dispatch')
 class InvoiceListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
