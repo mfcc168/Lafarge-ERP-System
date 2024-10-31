@@ -1,5 +1,8 @@
 import io
 
+from django.http import JsonResponse
+from django.db.models import Sum
+from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponse
@@ -27,12 +30,12 @@ class StaffMemberRequiredMixin(UserPassesTestMixin):
 def home(request):
     return render(request, 'invoice/home.html')
 
-# View to list all salesmen
+@staff_member_required
 def salesman_list(request):
     salesmen = Salesman.objects.all()
     return render(request, 'invoice/salesman_list.html', {'salesmen': salesmen})
 
-# View to display invoices related to a particular salesman
+@staff_member_required
 def salesman_detail(request, salesman_id):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     invoices = Invoice.objects.filter(salesman=salesman)
@@ -54,6 +57,27 @@ def salesman_detail(request, salesman_id):
         'salesman': salesman,
         'table': table,
         'filter': filter,
+    })
+
+def salesman_monthly_sales(request, salesman_id):
+    # Get current year and start of each month in the year
+    current_year = timezone.now().year
+    monthly_sales = (
+        Invoice.objects.filter(salesman_id=salesman_id, payment_date__year=current_year)
+        .values('payment_date__month')  # Group by month
+        .annotate(monthly_total=Sum('total_price'))  # Sum total_price per month
+        .order_by('payment_date__month')
+    )
+
+    # Prepare data for the chart
+    months = [0] * 12  # 12 months
+    for sale in monthly_sales:
+        month_index = sale['payment_date__month'] - 1
+        months[month_index] = float(sale['monthly_total'] or 0)
+
+    return JsonResponse({
+        'months': ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        'sales': months,
     })
 
 @method_decorator(staff_member_required, name='dispatch')
