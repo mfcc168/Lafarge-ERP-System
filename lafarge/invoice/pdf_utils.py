@@ -72,14 +72,14 @@ def draw_invoice_page(pdf, invoice, copy_type):
         text_object.textLine(line)
     pdf.drawText(text_object)
 
-
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(70, height - 70, f"Invoice No. : {invoice.number}")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(70, height - 110, f"Date : ")
-    pdf.drawString(70, height - 130, f"Invoice No. : {invoice.number}")
-    pdf.drawString(70, height - 150, f"Salesman : {invoice.salesman.name}")
+    pdf.drawString(70, height - 145 , f"Date : ")
+    pdf.drawString(70, height - 165, f"Salesman : {invoice.salesman.name}")
     if copy_type != "Poison Form":
-        pdf.drawString(70, height - 170, f"Terms : {invoice.terms}")
+        pdf.drawString(70, height - 185, f"Terms : {invoice.terms}")
 
     # Table for Invoice Items
     if copy_type == "Poison Form":
@@ -116,11 +116,14 @@ def draw_invoice_page(pdf, invoice, copy_type):
         table.drawOn(pdf, 175, height - 450)
 
     else:
+        # Define the data for the table
         data = [["Quantity", "Product", "Unit Price", "Amount"]]
         for item in invoice.invoiceitem_set.all():
-            # Check if the item type is "bonus" or "sample"
-            unit_price_display = item.product_type if item.product_type in ["bonus",
-                                                                            "sample"] else f"${item.net_price:,.2f} (Nett Price)" if item.net_price else f"${item.price:,.2f}"
+            unit_price_display = (
+                item.product_type if item.product_type in ["bonus", "sample"]
+                else f"${item.net_price:,.2f} (Nett Price)" if item.net_price
+                else f"${item.price:,.2f}"
+            )
             unit_price_display += f"\n"
 
             product_name = item.product.name
@@ -132,28 +135,30 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
             data.append([
                 f"{item.quantity} {item.product.unit}\n",
-                product_name,  # Display product name in the Product column
-                unit_price_display,  # Display the type or the price in the Unit Price column
+                product_name,
+                unit_price_display,
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
 
-        # Configure table styles
+        # Create the table
         table = Table(data, colWidths=[50, 250, 100, 100])
         table.setStyle(TableStyle([
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Header text color
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center alignment for all cells
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font
-            ('FONTSIZE', (0, 0), (-1, 0), 12),  # Larger font size for header
-            ('FONTSIZE', (0, 1), (-1, -1), 10),  # Smaller font size for the rest of the table
-            ('TOPPADDING', (0, 1), (-1, -1), 10),  # Set top padding for all rows
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Padding for the header
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Background color for the rest of the table
-
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('TOPPADDING', (0, 1), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ]))
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 50, height - 550)
+        table_width, table_height = table.wrap(0, 0)  # Get actual table height
+
+        # Draw the table, positioning it to expand downward
+        table.drawOn(pdf, 50, height - 350 - table_height)
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
