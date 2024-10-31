@@ -10,6 +10,7 @@ class Customer(models.Model):
     office_hour = models.TextField(blank=True, null=True)
     telephone_number = models.CharField(max_length=255, blank=True, null=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
+    delivery_note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name

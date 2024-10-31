@@ -6,6 +6,8 @@ from .models import Customer
 from .models import Invoice
 from .models import ProductTransaction
 
+from django_tables2.export.views import ExportMixin
+
 class CustomerTable(tables.Table):
     name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
                              attrs={'a': {'class': 'text-decoration-none'}})
@@ -68,7 +70,7 @@ class InvoiceFilter(FilterSet):
         fields = ["number", "salesman"]  # Only include direct model fields here
 
 
-class CustomerInvoiceTable(tables.Table):
+class CustomerInvoiceTable(ExportMixin, tables.Table):
     number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
                                attrs={'a': {'class': 'text-decoration-none'}})
     total_price = tables.Column(verbose_name='Total Price')
@@ -125,3 +127,43 @@ class ProductTransactionFilter(FilterSet):
     class Meta:
         model = ProductTransaction
         fields = []  # List only non-model fields to avoid duplication
+
+class SalesmanInvoiceTable(ExportMixin, tables.Table):
+    number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
+                               attrs={'a': {'class': 'text-decoration-none'}})
+    customer = tables.Column(accessor='customer.name', verbose_name='Customer Name')
+    payment_date = tables.DateColumn(verbose_name="Payment Date")
+    total_quantity = tables.Column(empty_values=(), verbose_name="Total Quantity")
+    total_amount = tables.Column(empty_values=(), verbose_name="Total Amount")
+    items = tables.TemplateColumn(
+        template_code='''
+            <ul class="list-unstyled mb-0">
+                {% for item in record.invoiceitem_set.all %}
+                    <li>{{ item.product.name }}: {{ item.quantity }} @ ${{ item.price }} ({{ item.product_type }})</li>
+                {% endfor %}
+            </ul>
+        ''',
+        verbose_name="Items"
+    )
+
+    class Meta:
+        model = Invoice
+        fields = ("number", "payment_date", "items")
+        attrs = {
+            'class': 'table table-striped table-bordered',
+            'th': {
+                '_ordering': {
+                    'orderable': 'sortable',
+                    'ascending': 'ascend',
+                    'descending': 'descend'
+                }
+            }
+        }
+
+    # Custom column to calculate the total quantity
+    def render_total_quantity(self, record):
+        return sum(item.quantity for item in record.invoiceitem_set.all())
+
+    # Custom column to calculate the total amount
+    def render_total_amount(self, record):
+        return sum(item.sum_price for item in record.invoiceitem_set.all())
