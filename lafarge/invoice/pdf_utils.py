@@ -29,29 +29,29 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     # Set title font and position based on the copy type
     if copy_type == "Customer Copy" or copy_type == "Company Copy":
-        pdf.setFont("Helvetica-Bold", 20)
-        pdf.drawString(385, height - 50, copy_type)
+        pdf.setFont("Helvetica-Bold", 15)
+        pdf.drawString(50, height - 73, copy_type)
 
     elif copy_type == "Original":
-        pdf.setFont("Helvetica-Bold", 20)
-        pdf.drawString(460, height - 50, copy_type)
+        pdf.setFont("Helvetica-Bold", 15)
+        pdf.drawString(50, height - 73, copy_type)
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
-    pdf.setFont("Helvetica-Bold", 14)
+    pdf.setFont("Helvetica-Bold", 10)
     if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(70, height - 215, f"SOLD TO: {invoice.customer.name}")
+        pdf.drawString(50, height - 165, f"SOLD TO: {invoice.customer.name}")
     else:
-        pdf.drawString(70, height - 215, f"SOLD TO: Dr. {invoice.customer.name}")
+        pdf.drawString(50, height - 165, f"SOLD TO: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(140, height - 235, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(140, height - 235, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 255
+            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 205
     # Create a TextObject for multi-line address
-    text_object = pdf.beginText(70, y_position)
+    text_object = pdf.beginText(50, y_position)
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
         text_object.textLine(line)
@@ -73,13 +73,13 @@ def draw_invoice_page(pdf, invoice, copy_type):
     pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(70, height - 70, f"Invoice No. : {invoice.number}")
+    pdf.drawString(50, height - 53, f"Invoice No. : {invoice.number}")
     # Salesman and Date
-    pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(70, height - 145 , f"Date : ")
-    pdf.drawString(70, height - 165, f"Salesman : {invoice.salesman.name}")
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(50, height - 105, f"Date : ")
+    pdf.drawString(50, height - 125, f"Salesman : {invoice.salesman.name}")
     if copy_type != "Poison Form":
-        pdf.drawString(70, height - 185, f"Terms : {invoice.terms}")
+        pdf.drawString(50, height - 145, f"Terms : {invoice.terms}")
 
     # Table for Invoice Items
     if copy_type == "Poison Form":
@@ -113,7 +113,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 175, height - 450)
+        table.drawOn(pdf, 155, height - 400)
 
     else:
         # Define the data for the table
@@ -158,7 +158,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
         # Draw the table, positioning it to expand downward
-        table.drawOn(pdf, 50, height - 350 - table_height)
+        table.drawOn(pdf, 50, height - 300 - table_height)
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
