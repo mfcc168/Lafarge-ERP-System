@@ -12,6 +12,8 @@ class Customer(models.Model):
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     delivery_to = models.CharField(max_length=255, blank=True, null=True)
     delivery_address = models.TextField(blank=True, null=True)
+    show_registration_code = models.BooleanField(default=False)
+    show_expiry_date = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -79,8 +81,6 @@ class Invoice(models.Model):
     payment_date = models.DateField(null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    show_registration_code = models.BooleanField(default=False)
-    show_expiry_date = models.BooleanField(default=False)
     order_number = models.CharField(max_length=50, null=True, blank=True)
 
     def calculate_total_price(self):

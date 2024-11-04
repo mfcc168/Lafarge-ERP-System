@@ -29,11 +29,11 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     # Set title font and position based on the copy type
     if copy_type == "Customer Copy" or copy_type == "Company Copy":
-        pdf.setFont("Helvetica-Bold", 15)
+        pdf.setFont("Helvetica-Bold", 10)
         pdf.drawString(50, height - 73, copy_type)
 
     elif copy_type == "Original":
-        pdf.setFont("Helvetica-Bold", 15)
+        pdf.setFont("Helvetica-Bold", 10)
         pdf.drawString(50, height - 73, copy_type)
 
     # Customer information
@@ -113,7 +113,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 155, height - 400)
+        table.drawOn(pdf, 180, height - 400)
 
     else:
         # Define the data for the table
@@ -128,9 +128,9 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
             product_name = item.product.name
             product_name += f"\n"
-            if invoice.show_registration_code and item.product.registration_code:
+            if invoice.customer.show_registration_code and item.product.registration_code:
                 product_name += f"(Reg. No.: {item.product.registration_code})"
-            if invoice.show_expiry_date and item.product.expiry_date:
+            if invoice.customer.show_expiry_date and item.product.expiry_date:
                 product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
 
             data.append([
@@ -148,8 +148,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('TOPPADDING', (0, 1), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ]))
 
@@ -158,7 +157,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
         # Draw the table, positioning it to expand downward
-        table.drawOn(pdf, 50, height - 300 - table_height)
+        table.drawOn(pdf, 50, height - 286 - table_height)
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
