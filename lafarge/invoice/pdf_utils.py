@@ -66,6 +66,8 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     pdf.drawText(text_object)
 
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(450, height - 185, f"OFFICE HOUR:")
     text_object = pdf.beginText(450, y_position)
     text_object.setFont("Helvetica", 10)
     for line in office_hour_lines:
@@ -183,7 +185,7 @@ def draw_order_form_page(pdf, order):
         pdf.drawString(30, height - 100, f"From: {order.customer.name}")
     else:
         pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
-    pdf.drawString(30, height - 120, f"To : LAFARGE CO., LTD.")
+    pdf.drawString(30, height - 120, f"To: LAFARGE CO., LTD.")
     pdf.drawString(30, height - 140, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
 
     pdf.drawString(30, height - 180, "This is to place an order for the following medical product(s):")
@@ -218,7 +220,7 @@ def draw_order_form_page(pdf, order):
 
     # Position the table
     table.wrapOn(pdf, width, height)
-    table.drawOn(pdf, 60, height - 300)
+    table.drawOn(pdf, 80, height - 300)
     if prefix_check(order.customer.name.lower()):
         pdf.drawString(30, height - 340, f"Please confirm by replying to {order.customer.name}")
     else:
