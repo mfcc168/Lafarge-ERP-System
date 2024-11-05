@@ -226,3 +226,72 @@ def draw_order_form_page(pdf, order):
     else:
         pdf.drawString(30, height - 340, f"Please confirm by replying to Dr. {order.customer.name}")
     pdf.drawString(30, height - 360, f"Tel:  {order.customer.telephone_number}")
+
+
+
+
+
+def draw_statement_page(pdf, invoice):
+    """
+    Draw the content of an invoice page in the PDF.
+
+    Args:
+        pdf: The ReportLab Canvas object.
+        invoice: The Invoice object.
+    """
+    width, height = A4
+
+    # Draw the background image
+
+    background_image_path = os.path.join(settings.STATIC_ROOT, 'Statement.png')
+    pdf.drawImage(background_image_path, 0, 0, width, height)
+
+
+    # Customer information
+    address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    pdf.setFont("Helvetica-Bold", 10)
+    if prefix_check(invoice.customer.name.lower()):
+        pdf.drawString(50, height - 165, f"{invoice.customer.name}")
+    else:
+        pdf.drawString(50, height - 165, f"Dr. {invoice.customer.name}")
+    if invoice.customer.care_of:
+        if prefix_check(invoice.customer.care_of.lower()):
+            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
+        else:
+            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 205
+    # Create a TextObject for multi-line address
+    text_object = pdf.beginText(50, y_position)
+    text_object.setFont("Helvetica", 10)
+    for line in address_lines:
+        text_object.textLine(line)
+
+
+
+    # Table for Invoice Items
+    # Define the data for the table
+    data = [["Invoice Date", "Invoice No.", "Amount"]]
+    data.append([
+        invoice.delivery_date,
+        invoice.number,
+        invoice.total_price
+    ])
+
+    # Create the table
+    table = Table(data, colWidths=[50, 250, 100, 100])
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+    ]))
+
+    # Position the table
+    table.wrapOn(pdf, width, height)
+    table_width, table_height = table.wrap(0, 0)  # Get actual table height
+
+    # Draw the table, positioning it to expand downward
+    table.drawOn(pdf, 50, height - 286 - table_height)
