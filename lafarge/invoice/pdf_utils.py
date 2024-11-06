@@ -172,6 +172,7 @@ def draw_order_form_page(pdf, order):
 
     Args:
         pdf: The ReportLab Canvas object.
+        order: The Order object.
     """
     width, height = A5
 
@@ -210,7 +211,8 @@ def draw_order_form_page(pdf, order):
     # Configure table styles
     table = Table(data, colWidths=[50, 250])
     table.setStyle(TableStyle([
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
@@ -218,14 +220,17 @@ def draw_order_form_page(pdf, order):
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
     ]))
 
-    # Position the table
+    # Position the table to expand downward
     table.wrapOn(pdf, width, height)
-    table.drawOn(pdf, 80, height - 300)
+    table_width, table_height = table.wrap(0, 0)  # Get actual table height
+    table.drawOn(pdf, 110, height - 200 - table_height)  # Start lower for downward expansion
+
+    # Footer
     if prefix_check(order.customer.name.lower()):
-        pdf.drawString(30, height - 340, f"Please confirm by replying to {order.customer.name}")
+        pdf.drawString(30, height - 390, f"Please confirm by replying to {order.customer.name}")
     else:
-        pdf.drawString(30, height - 340, f"Please confirm by replying to Dr. {order.customer.name}")
-    pdf.drawString(30, height - 360, f"Tel:  {order.customer.telephone_number}")
+        pdf.drawString(30, height - 390, f"Please confirm by replying to Dr. {order.customer.name}")
+    pdf.drawString(30, height - 410, f"Tel:  {order.customer.telephone_number}")
 
 
 
