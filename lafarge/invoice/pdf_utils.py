@@ -255,21 +255,23 @@ def draw_statement_page(pdf, invoice):
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(430, height - 185, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
     if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(50, height - 165, f"{invoice.customer.name}")
+        pdf.drawString(60, height - 185, f"{invoice.customer.name}")
     else:
-        pdf.drawString(50, height - 165, f"Dr. {invoice.customer.name}")
+        pdf.drawString(60, height - 185, f"Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(110, height - 205, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 205
+            pdf.drawString(110, height - 205, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 225
     # Create a TextObject for multi-line address
-    text_object = pdf.beginText(50, y_position)
+    text_object = pdf.beginText(60, y_position)
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
         text_object.textLine(line)
+    pdf.drawText(text_object)
 
 
 
@@ -279,19 +281,21 @@ def draw_statement_page(pdf, invoice):
     data.append([
         invoice.delivery_date,
         invoice.number,
-        invoice.total_price
+        f"HK$ {invoice.total_price:,.2f}"
     ])
 
     # Create the table
-    table = Table(data, colWidths=[50, 250, 100, 100])
+    table = Table(data, colWidths=[100, 100, 100])
     table.setStyle(TableStyle([
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header background color
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # Header text color
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 12),
         ('FONTSIZE', (0, 1), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Body background color
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Border around cells
     ]))
 
     # Position the table
@@ -299,4 +303,4 @@ def draw_statement_page(pdf, invoice):
     table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
     # Draw the table, positioning it to expand downward
-    table.drawOn(pdf, 50, height - 286 - table_height)
+    table.drawOn(pdf, 150, height - 366 - table_height)

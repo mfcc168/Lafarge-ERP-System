@@ -15,7 +15,7 @@ from reportlab.pdfgen import canvas
 
 from .models import Customer, Invoice, Salesman
 from .models import Product, ProductTransaction
-from .pdf_utils import draw_invoice_page, draw_order_form_page
+from .pdf_utils import draw_invoice_page, draw_order_form_page, draw_statement_page
 from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
 
 from django_tables2.config import RequestConfig
@@ -166,6 +166,34 @@ def download_order_form_pdf(request, invoice_number):
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Order_Form_{order_form.number}.pdf"'
+
+    return response
+
+@staff_member_required
+def download_statement_pdf(request, invoice_number):
+    # Get the invoice object
+    statement = get_object_or_404(Invoice, number=invoice_number)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    # Draw the first page (Original copy)
+    draw_statement_page(pdf, statement)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Statement_{statement.number}.pdf"'
 
     return response
 
