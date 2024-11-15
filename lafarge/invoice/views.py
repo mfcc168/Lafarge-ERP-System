@@ -169,34 +169,6 @@ def download_order_form_pdf(request, invoice_number):
 
     return response
 
-@staff_member_required
-def download_statement_pdf(request, invoice_number):
-    # Get the invoice object
-    statement = get_object_or_404(Invoice, number=invoice_number)
-
-    # Create a buffer to hold the PDF data
-    buffer = io.BytesIO()
-
-    # Setup the canvas with the buffer as the file
-    pdf = canvas.Canvas(buffer, pagesize=A4)
-
-    # Draw the first page (Original copy)
-    draw_statement_page(pdf, statement)
-
-    # Save the PDF data to the buffer
-    pdf.save()
-
-    # Get the PDF content from the buffer
-    buffer.seek(0)
-    pdf_content = buffer.getvalue()
-    buffer.close()
-
-    # Create a response with PDF content
-    response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Statement_{statement.number}.pdf"'
-
-    return response
-
 
 @method_decorator(staff_member_required, name='dispatch')
 class CustomerListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
@@ -277,3 +249,32 @@ def unpaid_invoices_by_customer(request, customer_name):
         "customer": customer,
         "unpaid_invoices": unpaid_invoices,
     })
+
+@staff_member_required
+def download_statement_pdf(request, customer_name):
+    # Get the invoice object
+    customer = get_object_or_404(Customer, name=customer_name)
+    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    # Draw the first page (Original copy)
+    draw_statement_page(pdf, customer, unpaid_invoices)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Statement_{customer.name}.pdf"'
+
+    return response

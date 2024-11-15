@@ -236,7 +236,7 @@ def draw_order_form_page(pdf, order):
 
 
 
-def draw_statement_page(pdf, invoice):
+def draw_statement_page(pdf, customer, unpaid_invoices):
     """
     Draw the content of an invoice page in the PDF.
 
@@ -253,18 +253,18 @@ def draw_statement_page(pdf, invoice):
 
 
     # Customer information
-    address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(480, height - 180, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
-    if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(60, height - 180, f"{invoice.customer.name}")
+    if prefix_check(customer.name.lower()):
+        pdf.drawString(60, height - 180, f"{customer.name}")
     else:
-        pdf.drawString(60, height - 180, f"Dr. {invoice.customer.name}")
-    if invoice.customer.care_of:
-        if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(60, height - 200, f"C/O: {invoice.customer.care_of}")
+        pdf.drawString(60, height - 180, f"Dr. {customer.name}")
+    if customer.care_of:
+        if prefix_check(customer.care_of.lower()):
+            pdf.drawString(60, height - 200, f"C/O: {customer.care_of}")
         else:
-            pdf.drawString(60, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
+            pdf.drawString(60, height - 200, f"C/O: Dr. {customer.care_of}")
     y_position = height - 220
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(60, y_position)
@@ -278,10 +278,18 @@ def draw_statement_page(pdf, invoice):
     # Table for Invoice Items
     # Define the data for the table
     data = [["Invoice Date", "Invoice No.", "Amount"]]
+    total_unpaid = 0
+    for invoice in unpaid_invoices:
+        total_unpaid += invoice.total_price
+        data.append([
+            invoice.delivery_date,
+            invoice.number,
+            f"HK$ {invoice.total_price:,.2f}"
+        ])
     data.append([
-        invoice.delivery_date,
-        invoice.number,
-        f"HK$ {invoice.total_price:,.2f}"
+        "",
+        "",
+        f"Total: HK$ {total_unpaid:,.2f}"
     ])
 
     # Create the table
@@ -295,7 +303,7 @@ def draw_statement_page(pdf, invoice):
         ('FONTSIZE', (0, 1), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Body background color
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Border around cells
+        ('GRID', (0, 0), (-1, -2), 0.5, colors.black),  # Border around cells
     ]))
 
     # Position the table
