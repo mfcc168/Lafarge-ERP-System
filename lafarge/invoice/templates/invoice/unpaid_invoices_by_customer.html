@@ -22,5 +22,5 @@
     </tbody>
 </table>
 
-<a href="{% url 'unpaid_invoices' %}" class="btn btn-primary">Back to All Customers</a>
+<a href="{% url 'download_statement_pdf' customer.name %}" class="btn btn-primary">Download Statement</a>
 {% endblock %}
