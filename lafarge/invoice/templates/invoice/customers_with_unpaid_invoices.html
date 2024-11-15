@@ -1,0 +1,36 @@
+{% extends "invoice/base.html" %}
+
+{% block content %}
+<h1>Customers with Unpaid Invoices</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Unpaid Invoices</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in customer_data %}
+        <tr>
+            <td>
+                <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}">
+                    {{ entry.customer.name }}
+                </a>
+            </td>
+            <td>
+                <ul>
+                    {% for invoice in entry.unpaid_invoices %}
+                    <li>
+                        Invoice Number: {{ invoice.number }},
+                        Delivery Date: {{ invoice.delivery_date }},
+                        Amount: {{ invoice.total_price }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

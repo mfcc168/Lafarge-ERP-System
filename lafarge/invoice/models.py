@@ -2,6 +2,9 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from datetime import timedelta, date
+from django.db.models import Q
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
@@ -82,6 +85,23 @@ class Invoice(models.Model):
     products = models.ManyToManyField(Product, through='InvoiceItem')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     order_number = models.CharField(max_length=50, null=True, blank=True)
+
+    @staticmethod
+    def get_unpaid_invoices():
+        today = timezone.now().date()
+        first_of_this_month = today.replace(day=1)
+        last_month = first_of_this_month - timedelta(days=1)
+        first_of_last_month = last_month.replace(day=1)
+
+        # Include all unpaid invoices from the previous month or older than 30 days
+        threshold_date = today - timedelta(days=30)
+
+        return Invoice.objects.filter(
+            Q(payment_date__isnull=True) & (
+                    Q(delivery_date__lte=threshold_date) |
+                    Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
+            )
+        )
 
     def calculate_total_price(self):
         total = sum(item.sum_price for item in self.invoiceitem_set.all())
