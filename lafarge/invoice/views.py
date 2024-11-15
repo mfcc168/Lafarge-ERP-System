@@ -251,3 +251,29 @@ def product_transaction_detail(request, product_id):
         'table': table,
         'filter': filterset
     })
+
+@staff_member_required
+def customers_with_unpaid_invoices(request):
+    unpaid_invoices = Invoice.get_unpaid_invoices()
+    customers = Customer.objects.filter(invoice__in=unpaid_invoices).distinct()
+    customer_data = [
+        {
+            "customer": customer,
+            "unpaid_invoices": unpaid_invoices.filter(customer=customer),
+        }
+        for customer in customers
+    ]
+
+    return render(request, "invoice/customers_with_unpaid_invoices.html", {"customer_data": customer_data})
+
+@staff_member_required
+def unpaid_invoices_by_customer(request, customer_name):
+    customer = get_object_or_404(Customer, name=customer_name)
+    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
+
+
+
+    return render(request, "invoice/unpaid_invoices_by_customer.html", {
+        "customer": customer,
+        "unpaid_invoices": unpaid_invoices,
+    })

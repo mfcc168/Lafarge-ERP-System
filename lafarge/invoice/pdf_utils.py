@@ -255,17 +255,17 @@ def draw_statement_page(pdf, invoice):
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(430, height - 185, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+    pdf.drawString(480, height - 180, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
     if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(60, height - 185, f"{invoice.customer.name}")
+        pdf.drawString(60, height - 180, f"{invoice.customer.name}")
     else:
-        pdf.drawString(60, height - 185, f"Dr. {invoice.customer.name}")
+        pdf.drawString(60, height - 180, f"Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(110, height - 205, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(60, height - 200, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(110, height - 205, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 225
+            pdf.drawString(60, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 220
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(60, y_position)
     text_object.setFont("Helvetica", 10)
@@ -287,7 +287,7 @@ def draw_statement_page(pdf, invoice):
     # Create the table
     table = Table(data, colWidths=[100, 100, 100])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header background color
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkgrey),  # Header background color
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # Header text color
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -303,4 +303,4 @@ def draw_statement_page(pdf, invoice):
     table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
     # Draw the table, positioning it to expand downward
-    table.drawOn(pdf, 150, height - 366 - table_height)
+    table.drawOn(pdf, 60, height - 366 - table_height)
