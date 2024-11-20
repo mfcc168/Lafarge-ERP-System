@@ -312,3 +312,84 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
 
     # Draw the table, positioning it to expand downward
     table.drawOn(pdf, 60, height - 366 - table_height)
+
+
+def draw_delivery_note(pdf, invoice):
+    """
+    Draw the content of an invoice page in the PDF.
+
+    Args:
+        pdf: The ReportLab Canvas object.
+        invoice: The Invoice object.
+    """
+    width, height = A4
+
+    # Customer information
+    address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
+    pdf.setFont("Helvetica-Bold", 10)
+    if prefix_check(invoice.customer.delivery_to.lower()):
+        pdf.drawString(50, height - 165, f"Delivery To: {invoice.customer.delivery_to}")
+    else:
+        pdf.drawString(50, height - 165, f"Delivery To: Dr. {invoice.customer.delivery_to}")
+    if invoice.customer.care_of:
+        if prefix_check(invoice.customer.care_of.lower()):
+            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
+        else:
+            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 205
+    # Create a TextObject for multi-line address
+    text_object = pdf.beginText(50, y_position)
+    text_object.setFont("Helvetica", 10)
+    for line in address_lines:
+        text_object.textLine(line)
+
+    text_object.textLine(
+        f"Tel: {invoice.customer.telephone_number or ''}"
+        f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
+    )
+
+    pdf.drawText(text_object)
+
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(450, height - 185, f"OFFICE HOUR:")
+    text_object = pdf.beginText(450, y_position)
+    text_object.setFont("Helvetica", 10)
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, height - 53, f"Invoice No. : {invoice.number}")
+    # Salesman and Date
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(50, height - 105, f"Date : ")
+
+    # Table for Invoice Items
+    # Aggregate quantities for products with the same name
+    product_quantities = {}
+    for item in invoice.invoiceitem_set.all():
+        product_name = item.product.name
+        if product_name in product_quantities:
+            product_quantities[product_name] += item.quantity
+        else:
+            product_quantities[product_name] = item.quantity
+
+    # Prepare table data
+    data = [["Quantity", "Product"]]
+    for product_name, total_quantity in product_quantities.items():
+        data.append([
+            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+            product_name,
+        ])
+
+    # Configure table styles
+    table = Table(data, colWidths=[50, 250])
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+    ]))
+
+    # Position the table
+    table.wrapOn(pdf, width, height)
+    table.drawOn(pdf, 180, height - 400)
