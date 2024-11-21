@@ -350,7 +350,7 @@ def draw_delivery_note(pdf, invoice):
         f"Tel: {invoice.customer.telephone_number or ''}"
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
-
+    text_object.textLine(f"Order No.: {invoice.order_number}" if invoice.order_number else '')
     pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 10)
