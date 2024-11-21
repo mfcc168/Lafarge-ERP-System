@@ -3,6 +3,8 @@
 {% block content %}
 <div class="mt-5">
     <h2>Customer List</h2>
+    <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'unpaid_invoices' %}'">Unpaid Invoices</button>
+
     {% if filter %}
     <form action="" method="get" class="form">
         <div class="row g-3">

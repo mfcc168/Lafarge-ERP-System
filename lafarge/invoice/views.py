@@ -15,7 +15,7 @@ from reportlab.pdfgen import canvas
 
 from .models import Customer, Invoice, Salesman
 from .models import Product, ProductTransaction
-from .pdf_utils import draw_invoice_page, draw_order_form_page
+from .pdf_utils import draw_invoice_page, draw_order_form_page, draw_statement_page, draw_delivery_note
 from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
 
 from django_tables2.config import RequestConfig
@@ -223,3 +223,87 @@ def product_transaction_detail(request, product_id):
         'table': table,
         'filter': filterset
     })
+
+@staff_member_required
+def customers_with_unpaid_invoices(request):
+    unpaid_invoices = Invoice.get_unpaid_invoices()
+    customers = Customer.objects.filter(invoice__in=unpaid_invoices).distinct()
+    customer_data = [
+        {
+            "customer": customer,
+            "unpaid_invoices": unpaid_invoices.filter(customer=customer),
+        }
+        for customer in customers
+    ]
+
+    return render(request, "invoice/customers_with_unpaid_invoices.html", {"customer_data": customer_data})
+
+@staff_member_required
+def unpaid_invoices_by_customer(request, customer_name):
+    customer = get_object_or_404(Customer, name=customer_name)
+    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
+
+
+
+    return render(request, "invoice/unpaid_invoices_by_customer.html", {
+        "customer": customer,
+        "unpaid_invoices": unpaid_invoices,
+    })
+
+@staff_member_required
+def download_statement_pdf(request, customer_name):
+    # Get the invoice object
+    customer = get_object_or_404(Customer, name=customer_name)
+    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    # Draw the first page (Original copy)
+    draw_statement_page(pdf, customer, unpaid_invoices)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Statement_{customer.name}.pdf"'
+
+    return response
+
+
+@staff_member_required
+def download_delivery_note_pdf(request, invoice_number):
+    # Get the invoice object
+    invoice = get_object_or_404(Invoice, number=invoice_number)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    # Draw the first page (Original copy)
+    draw_delivery_note(pdf, invoice)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Delivery_Note_{invoice.number}.pdf"'
+
+    return response
