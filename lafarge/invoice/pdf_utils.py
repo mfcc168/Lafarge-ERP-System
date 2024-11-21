@@ -255,7 +255,7 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     # Customer information
     address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(480, height - 180, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
     if prefix_check(customer.name.lower()):
         pdf.drawString(60, height - 180, f"{customer.name}")
     else:
@@ -324,19 +324,22 @@ def draw_delivery_note(pdf, invoice):
     """
     width, height = A4
 
+    background_image_path = os.path.join(settings.STATIC_ROOT, 'DeliveryNote.png')
+    pdf.drawImage(background_image_path, 0, 0, width, height)
+
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if prefix_check(invoice.customer.delivery_to.lower()):
-        pdf.drawString(50, height - 165, f"Delivery To: {invoice.customer.delivery_to}")
+        pdf.drawString(50, height - 180, f"Delivery To: {invoice.customer.delivery_to}")
     else:
-        pdf.drawString(50, height - 165, f"Delivery To: Dr. {invoice.customer.delivery_to}")
+        pdf.drawString(50, height - 180, f"Delivery To: Dr. {invoice.customer.delivery_to}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(100, height - 200, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 205
+            pdf.drawString(100, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 220
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
     text_object.setFont("Helvetica", 10)
@@ -351,7 +354,6 @@ def draw_delivery_note(pdf, invoice):
     pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(450, height - 185, f"OFFICE HOUR:")
     text_object = pdf.beginText(450, y_position)
     text_object.setFont("Helvetica", 10)
 
@@ -359,37 +361,44 @@ def draw_delivery_note(pdf, invoice):
     pdf.drawString(50, height - 53, f"Invoice No. : {invoice.number}")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 105, f"Date : ")
+    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
 
-    # Table for Invoice Items
-    # Aggregate quantities for products with the same name
-    product_quantities = {}
-    for item in invoice.invoiceitem_set.all():
-        product_name = item.product.name
-        if product_name in product_quantities:
-            product_quantities[product_name] += item.quantity
-        else:
-            product_quantities[product_name] = item.quantity
-
-    # Prepare table data
+    # Define the data for the table
     data = [["Quantity", "Product"]]
-    for product_name, total_quantity in product_quantities.items():
+    for item in invoice.invoiceitem_set.all():
+
+        product_name = item.product.name
+        product_name += f"\n"
+        if invoice.customer.show_registration_code and item.product.registration_code:
+            product_name += f"(Reg. No.: {item.product.registration_code})"
+        if invoice.customer.show_expiry_date and item.product.expiry_date:
+            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
+
         data.append([
-            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+            f"{item.quantity} {item.product.unit}\n",
             product_name,
         ])
 
-    # Configure table styles
-    table = Table(data, colWidths=[50, 250])
+    # Create the table
+    table = Table(data, colWidths=[150, 250])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
     ]))
 
     # Position the table
     table.wrapOn(pdf, width, height)
-    table.drawOn(pdf, 180, height - 400)
+    table_width, table_height = table.wrap(0, 0)  # Get actual table height
+
+    # Draw the table, positioning it to expand downward
+    table.drawOn(pdf, 50, height - 286 - table_height)
+
+    if prefix_check(invoice.customer.delivery_to.lower()):
+        pdf.drawString(410, height - 670, f"{invoice.customer.delivery_to}")
+    else:
+        pdf.drawString(410, height - 670, f"{invoice.customer.delivery_to}")

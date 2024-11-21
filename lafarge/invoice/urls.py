@@ -12,6 +12,7 @@ urlpatterns = [
     path('products/<int:product_id>/', views.product_transaction_detail, name='product_transaction_detail'),
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoice/<str:invoice_number>/', views.invoice_detail, name='invoice_detail'),
+    path('delivery-note/<str:invoice_number>/download/', views.download_delivery_note_pdf, name='download_delivery_note_pdf'),
     path('invoice/<str:invoice_number>/download/', views.download_invoice_pdf, name='download_invoice_pdf'),
     path('orderform/<str:invoice_number>/download/', views.download_order_form_pdf, name='download_order_form_pdf'),
     path('statement/<str:customer_name>/download/', views.download_statement_pdf, name='download_statement_pdf'),
