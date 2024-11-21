@@ -37,7 +37,9 @@
         <tbody>
             {% for entry in customer_data %}
                 <tr>
-                    <td>{{ entry.customer.name }}</td>
+                    <td><a href="{% url 'customer_unpaid_invoices' entry.customer.name %}">
+                    {{ entry.customer.name }}
+                </a></td>
                     <td>
                         <table>
                             <thead>
