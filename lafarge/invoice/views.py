@@ -21,6 +21,9 @@ from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, 
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
 
+from django.db.models.functions import TruncMonth
+from django.db.models import Sum
+
 class StaffMemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_staff
@@ -224,10 +227,11 @@ def product_transaction_detail(request, product_id):
         'filter': filterset
     })
 
+
 @staff_member_required
 def customers_with_unpaid_invoices(request):
+    customers = Customer.objects.filter(invoice__payment_date__isnull=True).distinct()
     unpaid_invoices = Invoice.get_unpaid_invoices()
-    customers = Customer.objects.filter(invoice__in=unpaid_invoices).distinct()
     customer_data = [
         {
             "customer": customer,
@@ -235,8 +239,27 @@ def customers_with_unpaid_invoices(request):
         }
         for customer in customers
     ]
+    # Calculate the total unpaid amount
+    total_unpaid = Invoice.objects.filter(payment_date__isnull=True).aggregate(
+        total=Sum('total_price')
+    )['total'] or 0  # Default to 0 if no unpaid invoices
 
-    return render(request, "invoice/customers_with_unpaid_invoices.html", {"customer_data": customer_data})
+    # Calculate monthly unpaid totals
+    monthly_unpaid = (
+        Invoice.objects.filter(payment_date__isnull=True)
+            .annotate(month=TruncMonth('delivery_date'))
+            .values('month')
+            .annotate(total=Sum('total_price'))
+            .order_by('month')
+    )
+
+    context = {
+        'customers': customers,
+        'total_unpaid': total_unpaid,
+        'monthly_unpaid': monthly_unpaid,
+        'customer_data': customer_data,
+    }
+    return render(request, 'invoice/customers_with_unpaid_invoices.html', context)
 
 @staff_member_required
 def unpaid_invoices_by_customer(request, customer_name):
