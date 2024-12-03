@@ -67,7 +67,9 @@
           <div class="col-12 text-end">
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_invoice_pdf' invoice.number %}'">Download Invoice</button>
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_order_form_pdf' invoice.number %}'">Download Order Form</button>
+            {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_delivery_note_pdf' invoice.number %}'">Download Delivery Note</button>
+            {% endif %}
           </div>
         </div>
       </div>
