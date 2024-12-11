@@ -64,9 +64,10 @@ def draw_invoice_page(pdf, invoice, copy_type):
         f"Tel: {invoice.customer.telephone_number or ''}"
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
-
-    text_object.textLine(f"Order No.: {invoice.order_number}" if invoice.order_number else '')
-    text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}" if invoice.customer.delivery_to else '')
+    if invoice.order_number:
+        text_object.textLine(f"Order No.: {invoice.order_number}")
+    if invoice.customer.delivery_to:
+        text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}")
 
     pdf.drawText(text_object)
 
@@ -107,10 +108,10 @@ def draw_invoice_page(pdf, invoice, copy_type):
             ])
 
         # Configure table styles
-        table = Table(data, colWidths=[50, 250])
+        table = Table(data, colWidths=[150, 250])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
@@ -119,7 +120,10 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Position the table
         table.wrapOn(pdf, width, height)
-        table.drawOn(pdf, 180, height - 400)
+        table_width, table_height = table.wrap(0, 0)  # Get actual table height
+
+        # Draw the table, positioning it to expand downward
+        table.drawOn(pdf, 50, height - 286 - table_height)
 
     else:
         # Define the data for the table
@@ -163,7 +167,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
         # Draw the table, positioning it to expand downward
-        table.drawOn(pdf, 50, height - 286 - table_height)
+        table.drawOn(pdf, 60, height - 286 - table_height)
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)

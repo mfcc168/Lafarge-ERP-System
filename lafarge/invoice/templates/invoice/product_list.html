@@ -11,6 +11,8 @@
                     <th>Quantity</th>
                     <th>Box Amount</th>
                     <th>Box Remain</th>
+                    <th>Registration Code</th>
+                    <th>Expiry Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +27,8 @@
                     <td>{{ product.quantity }}</td>
                     <td>{{ product.box_amount }}</td>
                     <td>{{ product.box_remain }}</td>
+                    <td>{{ product.registration_code }}</td>
+                    <td>{{ product.expiry_date }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
