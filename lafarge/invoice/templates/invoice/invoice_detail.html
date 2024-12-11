@@ -65,6 +65,7 @@
         </div>
         <div class="row">
           <div class="col-12 text-end">
+            <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_invoice_legacy_pdf' invoice.number %}'">Download Invoice Legacy</button>
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_invoice_pdf' invoice.number %}'">Download Invoice</button>
             <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'download_order_form_pdf' invoice.number %}'">Download Order Form</button>
             {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
