@@ -8,6 +8,115 @@ from reportlab.platypus import Table, TableStyle
 
 from .check_utils import prefix_check
 
+def draw_invoice_page_legacy(pdf, invoice):
+    """
+    Draw the content of an invoice page in the PDF.
+
+    Args:
+        pdf: The ReportLab Canvas object.
+        invoice: The Invoice object.
+    """
+    width, height = A4
+
+    # Draw the background image
+    #background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
+    #pdf.drawImage(background_image_path, 0, 0, width, height)
+    pdf.setFont("Helvetica-Bold", 12)
+
+    # Customer information
+    address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
+    pdf.setFont("Helvetica-Bold", 10)
+    if prefix_check(invoice.customer.name.lower()):
+        pdf.drawString(100, height - 150 + 2, f"{invoice.customer.name}")
+    else:
+        pdf.drawString(100, height - 150 + 2, f"Dr. {invoice.customer.name}")
+    if invoice.customer.care_of:
+        if prefix_check(invoice.customer.care_of.lower()):
+            pdf.drawString(150, height - 160 + 2, f"C/O: {invoice.customer.care_of}")
+        else:
+            pdf.drawString(150, height - 160 + 2, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 170 + 2
+    # Create a TextObject for multi-line address
+    text_object = pdf.beginText(100, y_position)
+    text_object.setFont("Helvetica", 10)
+    for line in address_lines:
+        text_object.textLine(line)
+
+    text_object.textLine(
+        f"Tel: {invoice.customer.telephone_number or ''}"
+        f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
+    )
+    if invoice.order_number:
+        #text_object.textLine(f"Order No.: {invoice.order_number}")
+        pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
+    if invoice.customer.delivery_to:
+        #text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}")
+        pdf.drawString(32, height - 455, f"Delivery To: {invoice.customer.delivery_to}")
+    pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
+
+    pdf.drawText(text_object)
+
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(470, height - 150 + 2, f"OFFICE HOUR:")
+    text_object = pdf.beginText(470, height - 165 + 2)
+    text_object.setFont("Helvetica", 10)
+    for line in office_hour_lines:
+        text_object.textLine(line)
+    pdf.drawText(text_object)
+
+    # Salesman and Date
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(75, height - 105, f"{invoice.terms}")
+    pdf.drawString(75, height - 125, f"{invoice.salesman.name}")
+
+    # Table for Invoice Items
+    # Define the data for the table
+    data = [[" ", " ", " ", " "]]
+    for item in invoice.invoiceitem_set.all():
+        unit_price_display = (
+            item.product_type if item.product_type in ["bonus", "sample"]
+            else f"${item.net_price:,.2f} (Nett Price)" if item.net_price
+            else f"${item.price:,.2f}"
+        )
+        unit_price_display += f"\n"
+
+        product_name = item.product.name
+        product_name += f"\n"
+        if invoice.customer.show_registration_code and item.product.registration_code:
+            product_name += f"(Reg. No.: {item.product.registration_code})"
+        if invoice.customer.show_expiry_date and item.product.expiry_date:
+            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
+
+        data.append([
+            product_name,
+            f"{item.quantity} {item.product.unit}\n",
+            unit_price_display,
+            f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
+        ])
+
+    # Create the table
+    table = Table(data, colWidths=[200, 122, 92, 100])
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        #('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+    ]))
+
+    # Position the table
+    table.wrapOn(pdf, width, height)
+    table_width, table_height = table.wrap(0, 0)  # Get actual table height
+
+    # Draw the table, positioning it to expand downward
+    table.drawOn(pdf, 37, height - 200 - table_height)
+
+    # Add total price at the bottom
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(460, height - 430, f"${invoice.total_price:,.2f}")
 
 def draw_invoice_page(pdf, invoice, copy_type):
     """
