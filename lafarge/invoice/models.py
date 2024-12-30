@@ -108,8 +108,12 @@ class Invoice(models.Model):
         self.total_price = total
 
     def save(self, *args, **kwargs):
-        self.calculate_total_price()  # Calculate total before saving
-        super().save(*args, **kwargs)
+        is_new = self.pk is None
+        if is_new:
+          super().save(*args, **kwargs)
+        if not is_new or self.pk:
+          self.calculate_total_price()
+          super().save(update_fields=['total_price'])  # Save only the total_price field
 
     def __str__(self):
         return self.number
