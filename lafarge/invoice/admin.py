@@ -62,7 +62,7 @@ class InvoiceAdmin(admin.ModelAdmin):
                 transaction_type='restock',
                 change=invoice_item.quantity,
                 quantity_after_transaction=product.quantity,
-                description=f"Restock due to deletion of invoice #{obj.number}"
+                description=f"Restock due to deletion of invoice #{obj.number} from {obj.customer.name}"
             )
 
         # Delete the invoice
