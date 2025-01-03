@@ -188,7 +188,7 @@ class InvoiceItem(models.Model):
                 transaction_type='restock',
                 change=self.quantity,
                 quantity_after_transaction=self.product.quantity,
-                description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
+                description=f"Restock due to deletion of {self.product_type} invoice item #{self.invoice.number}"
             )
 
             super().delete(*args, **kwargs)
