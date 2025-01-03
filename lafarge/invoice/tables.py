@@ -138,13 +138,6 @@ class ProductTransactionTable(tables.Table):
         fields = ("invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp", "description")
         attrs = {
             'class': 'table table-striped table-bordered',
-            'th': {
-                '_ordering': {
-                    'orderable': 'sortable',
-                    'ascending': 'ascend',
-                    'descending': 'descend'
-                }
-            }
         }
 
 

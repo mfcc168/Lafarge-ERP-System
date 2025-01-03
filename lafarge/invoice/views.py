@@ -240,7 +240,7 @@ def product_list(request):
 @staff_member_required
 def product_transaction_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    transactions = ProductTransaction.objects.filter(product=product).order_by('-timestamp')
+    transactions = ProductTransaction.objects.filter(product=product).order_by('timestamp')
 
     # Apply filter
     filterset = ProductTransactionFilter(request.GET, queryset=transactions)

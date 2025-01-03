@@ -57,13 +57,14 @@ class InvoiceAdmin(admin.ModelAdmin):
             product.save()
 
             # Log the restock transaction
-            ProductTransaction.objects.create(
-                product=product,
-                transaction_type='restock',
-                change=invoice_item.quantity,
-                quantity_after_transaction=product.quantity,
-                description=f"Restock due to deletion of invoice #{obj.number} from {obj.customer.name}"
-            )
+            if obj.delivery_date:
+                ProductTransaction.objects.create(
+                    product=product,
+                    transaction_type='restock',
+                    change=invoice_item.quantity,
+                    quantity_after_transaction=product.quantity,
+                    description=f"Restock due to deletion of invoice #{obj.number} from {obj.customer.name}"
+                )
 
         # Delete the invoice
         super().delete_model(request, obj)
