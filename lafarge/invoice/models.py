@@ -93,13 +93,12 @@ class Invoice(models.Model):
         last_month = first_of_this_month - timedelta(days=1)
         first_of_last_month = last_month.replace(day=1)
 
-        # Include all unpaid invoices from the previous month or older than 30 days
         threshold_date = today - timedelta(days=30)
 
         return Invoice.objects.filter(
             Q(payment_date__isnull=True) & (
-                    Q(delivery_date__lte=threshold_date) |
-                    Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
+                Q(delivery_date__lte=threshold_date) |
+                Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
             )
         )
 
@@ -109,14 +108,29 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        if is_new:
-          super().save(*args, **kwargs)
-        if not is_new or self.pk:
-          self.calculate_total_price()
-          super().save(*args, **kwargs)
+        previous_delivery_date = None
 
-    def __str__(self):
-        return self.number
+        if not is_new or self.pk:
+            # Get the previous state of the invoice
+            previous_delivery_date = Invoice.objects.get(pk=self.pk).delivery_date
+            # Calculate the total price after saving (whether it's new or existing)
+            self.calculate_total_price()
+
+        super().save(*args, **kwargs)
+
+        if not previous_delivery_date and self.delivery_date:
+            # Create ProductTransaction records for related items
+            for item in self.invoiceitem_set.all():
+                product = item.product
+                ProductTransaction.objects.create(
+                    product=product,
+                    transaction_type='sale',
+                    change=-item.quantity,
+                    quantity_after_transaction=product.quantity,
+                    description=f"{item.product_type.capitalize()} transaction in invoice #{self.number} from {self.customer.name}",
+                    timestamp=self.delivery_date
+                )
+
 
 
 class InvoiceItem(models.Model):
@@ -154,17 +168,6 @@ class InvoiceItem(models.Model):
             # Update the product quantity
             current_product.quantity = new_quantity
 
-            # Log the product transaction
-            if self.invoice.delivery_date:
-                transaction_type = 'sale'
-                ProductTransaction.objects.create(
-                    product=current_product,
-                    transaction_type=transaction_type,
-                    change=-self.quantity if not is_edit else previous_quantity - self.quantity,
-                    quantity_after_transaction=current_product.quantity,
-                    description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number} from {self.invoice.customer.name}"
-                )
-
             # Calculate price details
             if self.product_type == 'normal':
                 self.price = current_product.price if not self.net_price else self.net_price
@@ -176,23 +179,6 @@ class InvoiceItem(models.Model):
             current_product.save()
             # Finally, save the invoice item
             super().save(*args, **kwargs)
-
-    # def delete(self, *args, **kwargs):
-    #     with transaction.atomic():
-    #         # For deletion, always restock
-    #         self.product.quantity += self.quantity
-    #         self.product.save()
-    #
-    #         # Log restock transaction
-    #         ProductTransaction.objects.create(
-    #             product=self.product,
-    #             transaction_type='restock',
-    #             change=self.quantity,
-    #             quantity_after_transaction=self.product.quantity,
-    #             description=f"Restock due to deletion of {self.product_type} invoice item #{self.invoice.number} from {self.invoice.customer.name}"
-    #         )
-    #
-    #         super().delete(*args, **kwargs)
 
 
 # Signals to update total price

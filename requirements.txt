@@ -1,6 +1,0 @@
-Django
-django_tables2
-django-bootstrap-v5
-django-filters
-reportlab
-tablib

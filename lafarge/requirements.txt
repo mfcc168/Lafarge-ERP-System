@@ -1,6 +1,6 @@
 Django
 django_tables2
 django-bootstrap-v5
-django-filters
+django-filter
 reportlab
 tablib
