@@ -46,3 +46,32 @@ class InvoiceAdmin(admin.ModelAdmin):
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         form.instance.save()
+
+    def delete_model(self, request, obj):
+        """
+        Override delete_model to restock products when an invoice is deleted.
+        """
+        for invoice_item in obj.invoiceitem_set.all():
+            product = invoice_item.product
+            product.quantity += invoice_item.quantity
+            product.save()
+
+            # Log the restock transaction
+            if obj.delivery_date:
+                ProductTransaction.objects.create(
+                    product=product,
+                    transaction_type='restock',
+                    change=invoice_item.quantity,
+                    quantity_after_transaction=product.quantity,
+                    description=f"Restock due to deletion of invoice #{obj.number} from {obj.customer.name}"
+                )
+
+        # Delete the invoice
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        """
+        Override delete_queryset to handle bulk deletion in the admin.
+        """
+        for obj in queryset:
+            self.delete_model(request, obj)

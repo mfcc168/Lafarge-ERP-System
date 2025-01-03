@@ -3,9 +3,8 @@
 {% load bootstrap5 %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-3">{{ product.name }} Transactions</h2>
+    <h2 class="mb-3">{{ product.name }}</h2>
     <div class="mb-3">
-        <p><strong>Price:</strong> ${{ product.price }}</p>
         <p><strong>Total Quantity:</strong> {{ product.quantity }}</p>
         <p><strong>Box:</strong> {{ product.box_amount }}</p>
         <p><strong>Remain:</strong> {{ product.box_remain }}</p>
@@ -13,7 +12,7 @@
         <p><strong>Expiry Date:</strong> {{ product.expiry_date }}</p>
     </div>
 
-    <h3 class="mt-4">Transaction History</h3>
+
 
     <!-- Filter Form -->
     <div class="mt-5">
@@ -25,7 +24,7 @@
         {% bootstrap_button 'filter' %}
     </form>
     </div>
-
+    <h3 class="mt-4">Transaction History</h3>
     <br>
     <!-- Table Rendering -->
     {% render_table table %}

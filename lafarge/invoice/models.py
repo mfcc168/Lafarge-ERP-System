@@ -113,7 +113,7 @@ class Invoice(models.Model):
           super().save(*args, **kwargs)
         if not is_new or self.pk:
           self.calculate_total_price()
-          super().save(update_fields=['total_price'])  # Save only the total_price field
+          super().save(*args, **kwargs)
 
     def __str__(self):
         return self.number
@@ -155,14 +155,15 @@ class InvoiceItem(models.Model):
             current_product.quantity = new_quantity
 
             # Log the product transaction
-            transaction_type = 'update'
-            ProductTransaction.objects.create(
-                product=current_product,
-                transaction_type=transaction_type,
-                change=-self.quantity if not is_edit else previous_quantity - self.quantity,
-                quantity_after_transaction=current_product.quantity,
-                description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number}"
-            )
+            if self.invoice.delivery_date:
+                transaction_type = 'sale'
+                ProductTransaction.objects.create(
+                    product=current_product,
+                    transaction_type=transaction_type,
+                    change=-self.quantity if not is_edit else previous_quantity - self.quantity,
+                    quantity_after_transaction=current_product.quantity,
+                    description=f"{self.product_type.capitalize()} transaction in invoice #{self.invoice.number} from {self.invoice.customer.name}"
+                )
 
             # Calculate price details
             if self.product_type == 'normal':
@@ -176,22 +177,22 @@ class InvoiceItem(models.Model):
             # Finally, save the invoice item
             super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        with transaction.atomic():
-            # For deletion, always restock
-            self.product.quantity += self.quantity
-            self.product.save()
-
-            # Log restock transaction
-            ProductTransaction.objects.create(
-                product=self.product,
-                transaction_type='restock',
-                change=self.quantity,
-                quantity_after_transaction=self.product.quantity,
-                description=f"Restock due to deletion of {self.product_type} invoice item {self.invoice.number}"
-            )
-
-            super().delete(*args, **kwargs)
+    # def delete(self, *args, **kwargs):
+    #     with transaction.atomic():
+    #         # For deletion, always restock
+    #         self.product.quantity += self.quantity
+    #         self.product.save()
+    #
+    #         # Log restock transaction
+    #         ProductTransaction.objects.create(
+    #             product=self.product,
+    #             transaction_type='restock',
+    #             change=self.quantity,
+    #             quantity_after_transaction=self.product.quantity,
+    #             description=f"Restock due to deletion of {self.product_type} invoice item #{self.invoice.number} from {self.invoice.customer.name}"
+    #         )
+    #
+    #         super().delete(*args, **kwargs)
 
 
 # Signals to update total price

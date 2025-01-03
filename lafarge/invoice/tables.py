@@ -105,20 +105,42 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
 
 class ProductTransactionTable(tables.Table):
     timestamp = tables.DateTimeColumn(format='Y-m-d H:i')
+    invoice_number = tables.Column(accessor='description', verbose_name='Invoice Number')
+    customer = tables.Column(empty_values=(), verbose_name='Customer')
+    nature_of_transaction = tables.Column(empty_values=(), verbose_name='Nature of Transaction')
+
+    def render_invoice_number(self, record):
+        # Extract invoice number from the description
+        if 'invoice #' in record.description:
+            parts = record.description.split('invoice #')
+            if len(parts) > 1:
+                return parts[1].split(' ')[0].strip()  # Get the number after 'invoice #'
+        return "N/A"
+
+    def render_customer(self, record):
+        # Extract customer name from the description
+        if 'from ' in record.description:
+            parts = record.description.split('from ')
+            if len(parts) > 1:
+                return parts[1].strip()  # Get the part after 'from'
+        return "N/A"
+
+    def render_nature_of_transaction(self, record):
+        return "IN" if record.change > 0 else "OUT"
+
+    def render_change(self, value):
+        # Add a "+" sign for positive changes
+        return f"+{value}" if value > 0 else str(value)
+
 
     class Meta:
         model = ProductTransaction
-        fields = ("change", "quantity_after_transaction", "timestamp", "description")
+        fields = ("invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp", "description")
         attrs = {
             'class': 'table table-striped table-bordered',
-            'th': {
-                '_ordering': {
-                    'orderable': 'sortable',
-                    'ascending': 'ascend',
-                    'descending': 'descend'
-                }
-            }
         }
+
+
 
 class ProductTransactionFilter(FilterSet):
     timestamp_from = DateTimeFilter(field_name='timestamp', lookup_expr='gte', label="Timestamp From")
