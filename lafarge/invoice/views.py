@@ -256,15 +256,20 @@ def product_transaction_detail(request, product_id):
 
 @staff_member_required
 def customers_with_unpaid_invoices(request):
+    # Fetch customers who have at least one unpaid invoice
     customers = Customer.objects.filter(invoice__payment_date__isnull=True).distinct()
     unpaid_invoices = Invoice.get_unpaid_invoices()
+
+    # Filter customer data to include only those with at least one unpaid invoice
     customer_data = [
         {
             "customer": customer,
             "unpaid_invoices": unpaid_invoices.filter(customer=customer),
         }
         for customer in customers
+        if unpaid_invoices.filter(customer=customer).exists()  # Ensure at least one unpaid invoice
     ]
+
     # Calculate the total unpaid amount
     total_unpaid = Invoice.objects.filter(payment_date__isnull=True).aggregate(
         total=Sum('total_price')
@@ -286,6 +291,7 @@ def customers_with_unpaid_invoices(request):
         'customer_data': customer_data,
     }
     return render(request, 'invoice/customers_with_unpaid_invoices.html', context)
+
 
 @staff_member_required
 def unpaid_invoices_by_customer(request, customer_name):
