@@ -5,6 +5,12 @@ from django.dispatch import receiver
 from datetime import timedelta, date
 from django.db.models import Q
 
+class Salesman(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.code
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
@@ -17,16 +23,12 @@ class Customer(models.Model):
     delivery_address = models.TextField(blank=True, null=True)
     show_registration_code = models.BooleanField(default=False)
     show_expiry_date = models.BooleanField(default=False)
+    salesman = models.ForeignKey(Salesman, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
-class Salesman(models.Model):
-    code = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.code
 
 class Deliveryman(models.Model):
     code = models.CharField(max_length=255, unique=True)
@@ -79,7 +81,7 @@ class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
     terms = models.CharField(max_length=50, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE)
+    salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE, null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
@@ -107,6 +109,10 @@ class Invoice(models.Model):
         self.total_price = total
 
     def save(self, *args, **kwargs):
+        # Automatically set salesman from customer if not already set
+        if not self.salesman and self.customer.salesman:
+            self.salesman = self.customer.salesman
+
         is_new = self.pk is None
         previous_delivery_date = None
 
