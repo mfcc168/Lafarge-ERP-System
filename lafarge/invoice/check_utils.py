@@ -1,5 +1,5 @@
 def prefix_check(name):
-    keywords = ["ltd", "dispensary", "limited", "dr"]
+    keywords = ["ltd", "dispensary", "limited", "dr", "centre"]
 
     if any(keyword in name for keyword in keywords):
         return True
