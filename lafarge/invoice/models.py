@@ -16,6 +16,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     care_of = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField()
+    terms = models.CharField(max_length=50, null=True, blank=True)
     office_hour = models.TextField(blank=True, null=True)
     telephone_number = models.CharField(max_length=255, blank=True, null=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
@@ -112,6 +113,9 @@ class Invoice(models.Model):
         # Automatically set salesman from customer if not already set
         if not self.salesman and self.customer.salesman:
             self.salesman = self.customer.salesman
+        # Automatically set terms from customer if not already set
+        if not self.terms and self.customer.terms:
+            self.terms = self.customer.terms
 
         is_new = self.pk is None
         previous_delivery_date = None
