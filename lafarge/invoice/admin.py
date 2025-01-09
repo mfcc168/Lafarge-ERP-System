@@ -41,7 +41,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price')
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
-    readonly_fields = ('total_price',)
+    readonly_fields = ('total_price', 'terms', 'salesman')
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
