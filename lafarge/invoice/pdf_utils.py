@@ -33,9 +33,9 @@ def draw_invoice_page_legacy(pdf, invoice):
         pdf.drawString(100, height - 150 + 2, f"Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(150, height - 160 + 2, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(100, height - 160 + 2, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(150, height - 160 + 2, f"C/O: Dr. {invoice.customer.care_of}")
+            pdf.drawString(100, height - 160 + 2, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 170 + 2
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(100, y_position)
@@ -159,9 +159,9 @@ def draw_invoice_page(pdf, invoice, copy_type):
         pdf.drawString(50, height - 165, f"SOLD TO: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 185, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(50, height - 185, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(100, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
+            pdf.drawString(50, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 205
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
@@ -453,9 +453,9 @@ def draw_delivery_note(pdf, invoice):
         pdf.drawString(50, height - 180, f"Delivery To: Dr. {invoice.customer.delivery_to}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 200, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(50, height - 200, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(100, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
+            pdf.drawString(50, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 220
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
