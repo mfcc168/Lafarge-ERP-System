@@ -25,11 +25,13 @@
     </form>
     </div>
     <h3 class="mt-4">Transaction History</h3>
-    <br>
+    <a href="{% export_url 'xlsx' %}" class="btn btn-primary mt-3">Export to XLSX</a>
+
+    <br><br>
     <!-- Table Rendering -->
     {% render_table table %}
 
-    <a href="{% url 'product_list' %}" class="btn btn-primary mt-3">Back to Product List</a>
+
     <br>
 </div>
 {% endblock %}
