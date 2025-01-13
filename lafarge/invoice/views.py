@@ -233,7 +233,7 @@ def customer_detail(request, customer_name):
 
 @staff_member_required
 def product_list(request):
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('product_name')
     return render(request, 'invoice/product_list.html', {'products': products})
 
 
