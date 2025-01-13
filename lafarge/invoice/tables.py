@@ -104,7 +104,7 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
 
 
 class ProductTransactionTable(tables.Table):
-    timestamp = tables.DateTimeColumn(format='Y-m-d H:i')
+    timestamp = tables.DateTimeColumn(format='Y-m-d')
     invoice_number = tables.Column(accessor='description', verbose_name='Invoice Number')
     customer = tables.Column(empty_values=(), verbose_name='Customer')
     nature_of_transaction = tables.Column(empty_values=(), verbose_name='Nature of Transaction')
@@ -135,7 +135,7 @@ class ProductTransactionTable(tables.Table):
 
     class Meta:
         model = ProductTransaction
-        fields = ("invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp", "description")
+        fields = ("invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp")
         attrs = {
             'class': 'table table-striped table-bordered',
         }

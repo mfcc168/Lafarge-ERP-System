@@ -246,12 +246,19 @@ def product_transaction_detail(request, product_id):
     filterset = ProductTransactionFilter(request.GET, queryset=transactions)
     table = ProductTransactionTable(filterset.qs)
 
+    # Handle export
+    export_format = request.GET.get("_export", None)
+    if export_format:
+        exporter = TableExport(export_format, table)
+        return exporter.response(f"{product.name}_transactions.{export_format}")
+
     return render(request, 'invoice/product_transaction_detail.html', {
         'product': product,
         'transactions': filterset.qs,
         'table': table,
         'filter': filterset
     })
+
 
 
 @staff_member_required
