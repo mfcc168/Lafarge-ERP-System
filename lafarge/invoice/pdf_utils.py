@@ -67,8 +67,8 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(75, height - 100, f"{invoice.terms}")
-    pdf.drawString(75, height - 120, f"{invoice.salesman.code}")
+    pdf.drawString(75, height - 100 + 12, f"{invoice.terms}")
+    pdf.drawString(75, height - 120 + 12, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
