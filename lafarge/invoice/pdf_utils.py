@@ -76,7 +76,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     for item in invoice.invoiceitem_set.all():
         unit_price_display = (
             item.product_type if item.product_type in ["bonus", "sample"]
-            else f"${item.net_price:,.2f} (Nett Price)" if item.net_price
+            else f"${item.net_price:,.2f} (Nett)" if item.net_price
             else f"${item.price:,.2f}"
         )
         unit_price_display += f"\n"
