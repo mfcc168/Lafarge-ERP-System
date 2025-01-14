@@ -28,15 +28,15 @@ def draw_invoice_page_legacy(pdf, invoice):
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(100, height - 150 + 2, f"{invoice.customer.name}")
+        pdf.drawString(100, height - 150, f"{invoice.customer.name}")
     else:
-        pdf.drawString(100, height - 150 + 2, f"Dr. {invoice.customer.name}")
+        pdf.drawString(100, height - 150, f"Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 160 + 2, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(100, height - 160, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(100, height - 160 + 2, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 170 + 2
+            pdf.drawString(100, height - 160, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 170
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(100, y_position)
     text_object.setFont("Helvetica", 10)
@@ -67,8 +67,8 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(75, height - 105, f"{invoice.terms}")
-    pdf.drawString(75, height - 125, f"{invoice.salesman.code}")
+    pdf.drawString(75, height - 100, f"{invoice.terms}")
+    pdf.drawString(75, height - 120, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
