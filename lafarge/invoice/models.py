@@ -27,7 +27,7 @@ class Customer(models.Model):
     salesman = models.ForeignKey(Salesman, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name + (" ("+self.care_of+")" if self.care_of else "")
 
 
 

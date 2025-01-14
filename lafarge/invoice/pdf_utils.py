@@ -68,7 +68,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(75, height - 105, f"{invoice.terms}")
-    pdf.drawString(75, height - 125, f"{invoice.salesman.name}")
+    pdf.drawString(75, height - 125, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
@@ -193,7 +193,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(50, height - 73, f"Date : ")
-    pdf.drawString(50, height - 93, f"Salesman : {invoice.salesman.name}")
+    pdf.drawString(50, height - 93, f"Salesman : {invoice.salesman.code}")
     if copy_type != "Poison Form":
         pdf.drawString(50, height - 113, f"Terms : {invoice.terms}")
 
@@ -299,10 +299,13 @@ def draw_order_form_page(pdf, order):
 
     # Customer information
     pdf.setFont("Helvetica-Bold", 8)
-    if prefix_check(order.customer.name.lower()):
-        pdf.drawString(30, height - 100, f"From: {order.customer.name}")
+    if order.customer.care_of:
+        pdf.drawString(30, height - 100, f"From: Dr. {order.customer.care_of}")
     else:
-        pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
+        if prefix_check(order.customer.name.lower()):
+            pdf.drawString(30, height - 100, f"From: {order.customer.name}")
+        else:
+            pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
     pdf.drawString(30, height - 120, f"To: LAFARGE CO., LTD.")
     pdf.drawString(30, height - 140, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
 
