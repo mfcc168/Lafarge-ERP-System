@@ -13,7 +13,7 @@ class Salesman(models.Model):
         return self.code
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     care_of = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField()
     terms = models.CharField(max_length=50, null=True, blank=True)
@@ -106,7 +106,7 @@ class Invoice(models.Model):
         )
 
     def calculate_total_price(self):
-        total = sum(item.sum_price for item in self.invoiceitem_set.all())
+        total = round(sum(item.sum_price for item in self.invoiceitem_set.all()))
         self.total_price = total
 
     def save(self, *args, **kwargs):
