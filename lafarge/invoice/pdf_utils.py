@@ -368,10 +368,12 @@ def draw_sample_page(pdf, invoice):
     pdf.drawImage(background_image_path, 0, 0, width, height)
 
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(300, height - 120, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
+    pdf.drawString(30, height - 53, f"Invoice No. : {invoice.number}")
+    pdf.drawString(300, height - 120, f"Date: ")
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if invoice.customer.name != "Sample":
         if prefix_check(invoice.customer.name.lower()):
@@ -380,10 +382,10 @@ def draw_sample_page(pdf, invoice):
             pdf.drawString(30, height - 120, f"TO: Dr. {invoice.customer.name}")
         if invoice.customer.care_of:
             if prefix_check(invoice.customer.care_of.lower()):
-                pdf.drawString(30, height - 140, f"C/O: {invoice.customer.care_of}")
+                pdf.drawString(30, height - 130, f"C/O: {invoice.customer.care_of}")
             else:
-                pdf.drawString(30, height - 140, f"C/O: Dr. {invoice.customer.care_of}")
-        y_position = height - 160
+                pdf.drawString(30, height - 130, f"C/O: Dr. {invoice.customer.care_of}")
+        y_position = height - 150
         # Create a TextObject for multi-line address
         text_object = pdf.beginText(30, y_position)
         text_object.setFont("Helvetica", 10)
@@ -397,6 +399,14 @@ def draw_sample_page(pdf, invoice):
 
         pdf.drawText(text_object)
 
+        if invoice.customer.address:
+            pdf.setFont("Helvetica-Bold", 8)
+            pdf.drawString(300, height - 140, f"OFFICE HOUR:")
+            text_object = pdf.beginText(300, height - 150)
+            text_object.setFont("Helvetica", 8)
+            for line in office_hour_lines:
+                text_object.textLine(line)
+            pdf.drawText(text_object)
 
     # Aggregate quantities for products with the same name
     product_quantities = {}
