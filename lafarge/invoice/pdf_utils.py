@@ -86,7 +86,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         if invoice.customer.show_registration_code and item.product.registration_code:
             product_name += f"(Reg. No.: {item.product.registration_code})"
         if invoice.customer.show_expiry_date and item.product.expiry_date:
-            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
+            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
         data.append([
             product_name,
@@ -250,7 +250,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
             if invoice.customer.show_registration_code and item.product.registration_code:
                 product_name += f"(Reg. No.: {item.product.registration_code})"
             if invoice.customer.show_expiry_date and item.product.expiry_date:
-                product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
+                product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
             data.append([
                 f"{item.quantity} {item.product.unit}\n",
@@ -307,7 +307,7 @@ def draw_order_form_page(pdf, order):
         else:
             pdf.drawString(30, height - 100, f"From: Dr. {order.customer.name}")
     pdf.drawString(30, height - 120, f"To: LAFARGE CO., LTD.")
-    pdf.drawString(30, height - 140, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+    pdf.drawString(30, height - 140, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
 
     pdf.drawString(30, height - 180, "This is to place an order for the following medical product(s):")
 
@@ -375,7 +375,7 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     # Customer information
     address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
     if prefix_check(customer.name.lower()):
         pdf.drawString(60, height - 180, f"{customer.name}")
     else:
@@ -470,18 +470,21 @@ def draw_delivery_note(pdf, invoice):
         f"Tel: {invoice.customer.telephone_number or ''}"
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
-    text_object.textLine(f"Order No.: {invoice.order_number}" if invoice.order_number else '')
     pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 10)
     text_object = pdf.beginText(450, y_position)
     text_object.setFont("Helvetica", 10)
 
+    if invoice.order_number:
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(50, height - 53, f"Order No. : {invoice.order_number}")
+
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(50, height - 53, f"Invoice No. : {invoice.number}")
+    pdf.drawString(50, height - 296, f"Invoice No. : {invoice.number}")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%m-%d')}")
+    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
 
     # Define the data for the table
     data = [["Quantity", "Product"]]
@@ -492,7 +495,7 @@ def draw_delivery_note(pdf, invoice):
         if invoice.customer.show_registration_code and item.product.registration_code:
             product_name += f"(Reg. No.: {item.product.registration_code})"
         if invoice.customer.show_expiry_date and item.product.expiry_date:
-            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%m-%d')})"
+            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
         data.append([
             f"{item.quantity} {item.product.unit}\n",
@@ -516,7 +519,7 @@ def draw_delivery_note(pdf, invoice):
     table_width, table_height = table.wrap(0, 0)  # Get actual table height
 
     # Draw the table, positioning it to expand downward
-    table.drawOn(pdf, 50, height - 286 - table_height)
+    table.drawOn(pdf, 50, height - 306 - table_height)
 
     if prefix_check(invoice.customer.delivery_to.lower()):
         pdf.drawString(410, height - 670, f"{invoice.customer.delivery_to}")
