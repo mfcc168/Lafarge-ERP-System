@@ -456,13 +456,13 @@ def draw_delivery_note(pdf, invoice):
         pdf.drawString(50, height - 180, f"Delivery To: Dr. {invoice.customer.delivery_to}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(50, height - 200, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(50, height - 190, f"C/O: {invoice.customer.care_of}")
         else:
-            pdf.drawString(50, height - 200, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 220
+            pdf.drawString(50, height - 190, f"C/O: Dr. {invoice.customer.care_of}")
+    y_position = height - 200
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
-    text_object.setFont("Helvetica", 10)
+    text_object.setFont("Helvetica", 9)
     for line in address_lines:
         text_object.textLine(line)
 
