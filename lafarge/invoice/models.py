@@ -59,7 +59,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + " (Quantity: " + self.quantity +")"
+        return self.name + " (Quantity: " + str(self.quantity) +")"
 
 class ProductTransaction(models.Model):
     TRANSACTION_CHOICES = [
