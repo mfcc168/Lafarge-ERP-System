@@ -45,9 +45,9 @@ class Product(models.Model):
     unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=0)
-    unit_per_box = models.PositiveIntegerField(default=1)  # New field
-    box_amount = models.PositiveIntegerField(default=0, editable=False)  # New field
-    box_remain = models.PositiveIntegerField(default=0, editable=False)  # New field
+    unit_per_box = models.PositiveIntegerField(default=1)
+    box_amount = models.PositiveIntegerField(default=0, editable=False)
+    box_remain = models.PositiveIntegerField(default=0, editable=False)
 
     def save(self, *args, **kwargs):
         # Calculate box_amount and box_remain based on the quantity and unit_per_box
