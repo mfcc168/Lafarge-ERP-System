@@ -181,7 +181,7 @@ class InvoiceItem(models.Model):
             # Calculate price details
             if self.product_type == 'normal':
                 self.price = current_product.price if not self.net_price else self.net_price
-                self.sum_price = self.price * self.quantity
+                self.sum_price = round(self.price * self.quantity)
             else:
                 self.sum_price = 0.00  # For sample and bonus types
 
