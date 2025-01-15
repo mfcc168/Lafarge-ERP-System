@@ -67,8 +67,8 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(75, height - 100 + 12, f"{invoice.terms}")
-    pdf.drawString(75, height - 120 + 12, f"{invoice.salesman.code}")
+    pdf.drawString(75, height - 100 + 7, f"{invoice.terms}")
+    pdf.drawString(75, height - 120 + 7, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
@@ -321,11 +321,11 @@ def draw_order_form_page(pdf, order):
             product_quantities[product_name] = item.quantity
 
     # Prepare table data
-    data = [["Quantity", "Product"]]
+    data = [["Product", "Quantity"]]
     for product_name, total_quantity in product_quantities.items():
         data.append([
-            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
             product_name,
+            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
         ])
 
     # Configure table styles
