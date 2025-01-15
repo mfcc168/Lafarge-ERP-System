@@ -58,8 +58,8 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(470, height - 150 + 12, f"OFFICE HOUR:")
-    text_object = pdf.beginText(470, height - 165 + 2)
+    pdf.drawString(460, height - 150 + 12, f"OFFICE HOUR:")
+    text_object = pdf.beginText(460, height - 165 + 12)
     text_object.setFont("Helvetica", 10)
     for line in office_hour_lines:
         text_object.textLine(line)
@@ -67,8 +67,8 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(75, height - 100 + 5, f"{invoice.terms}")
-    pdf.drawString(75, height - 120 + 5, f"{invoice.salesman.code}")
+    pdf.drawString(65, height - 100 + 5, f"{invoice.terms}")
+    pdf.drawString(65, height - 120 + 5, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
