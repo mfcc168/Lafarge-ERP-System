@@ -54,7 +54,7 @@ class InvoiceTable(tables.Table):
                 }
             }
         }
-        order_by = '-id'
+        order_by = '-number'
         fields = ("number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
 
 
