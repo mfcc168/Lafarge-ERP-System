@@ -15,7 +15,7 @@ from reportlab.pdfgen import canvas
 
 from .models import Customer, Invoice, Salesman
 from .models import Product, ProductTransaction
-from .pdf_utils import draw_invoice_page, draw_order_form_page, draw_statement_page, draw_delivery_note, draw_invoice_page_legacy
+from .pdf_utils import draw_invoice_page, draw_order_form_page, draw_statement_page, draw_delivery_note, draw_invoice_page_legacy, draw_sample_page
 from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
 
 from django_tables2.config import RequestConfig
@@ -140,20 +140,17 @@ def download_invoice_pdf(request, invoice_number):
     # Setup the canvas with the buffer as the file
     pdf = canvas.Canvas(buffer, pagesize=A4)
 
-    # Draw the first page (Original copy)
-    draw_invoice_page(pdf, invoice, "Original")
-    pdf.showPage()  # Start a new page
 
-    # Draw the second page (Customer Copy)
-    draw_invoice_page(pdf, invoice, "Customer Copy")
-    pdf.showPage()  # Start a new page
-
-    # Draw the third page (Company Copy)
-    draw_invoice_page(pdf, invoice, "Company Copy")
-    pdf.showPage()  # Start a new page
-
-    # Draw the Forth page (Poison Form)
     draw_invoice_page(pdf, invoice, "Poison Form")
+    pdf.showPage()
+
+    draw_invoice_page(pdf, invoice, "Original")
+    pdf.showPage()
+
+    draw_invoice_page(pdf, invoice, "Customer Copy")
+    pdf.showPage()
+
+    draw_invoice_page(pdf, invoice, "Company Copy")
 
     # Save the PDF data to the buffer
     pdf.save()
@@ -169,6 +166,33 @@ def download_invoice_pdf(request, invoice_number):
 
     return response
 
+@staff_member_required
+def download_sample_pdf(request, invoice_number):
+    # Get the invoice object
+    sample = get_object_or_404(Invoice, number=invoice_number)
+
+    # Create a buffer to hold the PDF data
+    buffer = io.BytesIO()
+
+    # Setup the canvas with the buffer as the file
+    pdf = canvas.Canvas(buffer, pagesize=A5)
+
+    # Draw the first page (Original copy)
+    draw_sample_page(pdf, sample)
+
+    # Save the PDF data to the buffer
+    pdf.save()
+
+    # Get the PDF content from the buffer
+    buffer.seek(0)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    # Create a response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Order_Form_{sample.number}.pdf"'
+
+    return response
 
 @staff_member_required
 def download_order_form_pdf(request, invoice_number):

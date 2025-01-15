@@ -209,11 +209,11 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 product_quantities[product_name] = item.quantity
 
         # Prepare table data
-        data = [["Quantity", "Product"]]
+        data = [["Product", "Quantity"]]
         for product_name, total_quantity in product_quantities.items():
             data.append([
-                f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
                 product_name,
+                f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
             ])
 
         # Configure table styles
@@ -352,6 +352,85 @@ def draw_order_form_page(pdf, order):
         pdf.drawString(30, height - 390, f"Please confirm by replying to Dr. {order.customer.name}")
     pdf.drawString(30, height - 410, f"Tel:  {order.customer.telephone_number}")
 
+
+def draw_sample_page(pdf, invoice):
+    """
+    Draw the content of an order form page in the PDF (A5 portrait).
+
+    Args:
+        pdf: The ReportLab Canvas object.
+        order: The Order object.
+    """
+    width, height = A5
+
+    # Draw the background image
+    background_image_path = os.path.join(settings.STATIC_ROOT, 'Sample.png')
+    pdf.drawImage(background_image_path, 0, 0, width, height)
+
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.drawString(300, height - 120, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
+
+    # Customer information
+    address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    pdf.setFont("Helvetica-Bold", 10)
+    if invoice.customer.name != "Sample":
+        if prefix_check(invoice.customer.name.lower()):
+            pdf.drawString(30, height - 120, f"TO: {invoice.customer.name}")
+        else:
+            pdf.drawString(30, height - 120, f"TO: Dr. {invoice.customer.name}")
+        if invoice.customer.care_of:
+            if prefix_check(invoice.customer.care_of.lower()):
+                pdf.drawString(30, height - 140, f"C/O: {invoice.customer.care_of}")
+            else:
+                pdf.drawString(30, height - 140, f"C/O: Dr. {invoice.customer.care_of}")
+        y_position = height - 160
+        # Create a TextObject for multi-line address
+        text_object = pdf.beginText(30, y_position)
+        text_object.setFont("Helvetica", 10)
+        for line in address_lines:
+            text_object.textLine(line)
+
+        text_object.textLine(
+            f"Tel: {invoice.customer.telephone_number or ''}"
+            f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
+        )
+
+        pdf.drawText(text_object)
+
+
+    # Aggregate quantities for products with the same name
+    product_quantities = {}
+    for item in invoice.invoiceitem_set.all():
+        product_name = item.product.name
+        if product_name in product_quantities:
+            product_quantities[product_name] += item.quantity
+        else:
+            product_quantities[product_name] = item.quantity
+
+    # Prepare table data
+    data = [["Product", "Quantity"]]
+    for product_name, total_quantity in product_quantities.items():
+        data.append([
+            product_name,
+            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+        ])
+
+    # Configure table styles
+    table = Table(data, colWidths=[50, 250])
+    table.setStyle(TableStyle([
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+    ]))
+
+    # Position the table to expand downward
+    table.wrapOn(pdf, width, height)
+    table_width, table_height = table.wrap(0, 0)  # Get actual table height
+    table.drawOn(pdf, 110, height - 200 - table_height)  # Start lower for downward expansion
 
 
 

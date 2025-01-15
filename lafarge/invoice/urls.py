@@ -16,6 +16,7 @@ urlpatterns = [
     path('invoice/legacy/<str:invoice_number>/download/', views.download_invoice_legacy_pdf, name='download_invoice_legacy_pdf'),
     path('invoice/<str:invoice_number>/download/', views.download_invoice_pdf, name='download_invoice_pdf'),
     path('orderform/<str:invoice_number>/download/', views.download_order_form_pdf, name='download_order_form_pdf'),
+    path('sample/<str:invoice_number>/download/', views.download_sample_pdf, name='download_sample_pdf'),
     path('statement/<str:customer_name>/download/', views.download_statement_pdf, name='download_statement_pdf'),
     path("unpaid-invoices/", views.customers_with_unpaid_invoices, name="unpaid_invoices"),
     path("unpaid-invoices/<str:customer_name>/", views.unpaid_invoices_by_customer, name="customer_unpaid_invoices"),
