@@ -26,20 +26,20 @@ def draw_invoice_page_legacy(pdf, invoice):
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
-    pdf.setFont("Times-Bold", 12)
-    if prefix_check(invoice.customer.name.lower()):
-        pdf.drawString(100, height - 150 + 12, f"{invoice.customer.name}")
-    else:
-        pdf.drawString(100, height - 150 + 12, f"Dr. {invoice.customer.name}")
-    if invoice.customer.care_of:
-        if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(100, height - 160 + 12, f"C/O: {invoice.customer.care_of}")
-        else:
-            pdf.drawString(100, height - 160 + 12, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 172 + 12
-    # Create a TextObject for multi-line address
+
+    y_position = height - 150 + 12
     text_object = pdf.beginText(100, y_position)
     text_object.setFont("Times-Roman", 12)
+    if prefix_check(invoice.customer.name.lower()):
+        text_object.textLine(f"{invoice.customer.name}")
+    else:
+        text_object.textLine(f"Dr. {invoice.customer.name}")
+    if invoice.customer.care_of:
+        if prefix_check(invoice.customer.care_of.lower()):
+            text_object.textLine(f"C/O: {invoice.customer.care_of}")
+        else:
+            text_object.textLine(f"C/O: Dr. {invoice.customer.care_of}")
+
     for line in address_lines:
         text_object.textLine(line)
 
@@ -47,6 +47,9 @@ def draw_invoice_page_legacy(pdf, invoice):
         f"Tel: {invoice.customer.telephone_number or ''}"
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
+    pdf.drawText(text_object)
+
+
     pdf.setFont("Times-Bold", 10)
     if invoice.order_number:
         pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
@@ -54,7 +57,6 @@ def draw_invoice_page_legacy(pdf, invoice):
         pdf.drawString(32, height - 455, f"Delivery To: {invoice.customer.delivery_to}")
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
-    pdf.drawText(text_object)
 
     pdf.setFont("Times-Bold", 12)
     pdf.drawString(462, height - 150 + 12, f"OFFICE HOUR:")
@@ -223,7 +225,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
             ])
 
         # Configure table styles
-        table = Table(data, colWidths=[150, 250])
+        table = Table(data, colWidths=[250, 150])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -242,7 +244,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     else:
         # Define the data for the table
-        data = [["Quantity", "Product", "Unit Price", "Amount"]]
+        data = [["Product", "Quantity", "Unit Price", "Amount"]]
         for item in invoice.invoiceitem_set.all():
             unit_price_display = (
                 item.product_type if item.product_type in ["bonus", "sample"]
@@ -259,17 +261,17 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
             data.append([
-                f"{item.quantity} {item.product.unit}\n",
                 product_name,
+                f"{item.quantity} {item.product.unit}\n",
                 unit_price_display,
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
 
         # Create the table
-        table = Table(data, colWidths=[50, 250, 100, 100])
+        table = Table(data, colWidths=[200, 100, 100, 100])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('FONTSIZE', (0, 1), (-1, -1), 10),
@@ -335,11 +337,11 @@ def draw_order_form_page(pdf, order):
         ])
 
     # Configure table styles
-    table = Table(data, colWidths=[50, 250])
+    table = Table(data, colWidths=[150, 50])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
@@ -432,11 +434,11 @@ def draw_sample_page(pdf, invoice):
         ])
 
     # Configure table styles
-    table = Table(data, colWidths=[50, 250])
+    table = Table(data, colWidths=[150, 50])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
