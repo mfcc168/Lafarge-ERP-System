@@ -19,8 +19,8 @@ def draw_invoice_page_legacy(pdf, invoice):
     width, height = A4
 
     # Draw the background image
-    background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
-    pdf.drawImage(background_image_path, 0, 0, width, height)
+    #background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
+    #pdf.drawImage(background_image_path, 0, 0, width, height)
     pdf.setFont("Times-Bold", 12)
 
     # Customer information
