@@ -54,8 +54,10 @@ class InvoiceTable(tables.Table):
                 }
             }
         }
-        order_by = '-number'
-        fields = ("number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
+        order_by = '-id'
+        fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
+    id = tables.Column(visible=False)  # Hide 'id' from being shown in the frontend
+
 
 
 class InvoiceFilter(FilterSet):
