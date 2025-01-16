@@ -57,14 +57,14 @@ def draw_invoice_page_legacy(pdf, invoice):
         pdf.drawString(32, height - 455, f"Delivery To: {invoice.customer.delivery_to}")
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
-
-    pdf.setFont("Times-Bold", 12)
-    pdf.drawString(462, height - 150 + 12, f"OFFICE HOUR:")
-    text_object = pdf.beginText(462, height - 165 + 12)
-    text_object.setFont("Times-Roman", 10)
-    for line in office_hour_lines:
-        text_object.textLine(line)
-    pdf.drawText(text_object)
+    if office_hour_lines:
+        pdf.setFont("Times-Bold", 12)
+        pdf.drawString(462, height - 150 + 12, f"OFFICE HOUR:")
+        text_object = pdf.beginText(462, height - 165 + 12)
+        text_object.setFont("Times-Roman", 10)
+        for line in office_hour_lines:
+            text_object.textLine(line)
+        pdf.drawText(text_object)
 
     # Salesman and Date
     pdf.setFont("Times-Bold", 10)
@@ -188,13 +188,14 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     pdf.drawText(text_object)
 
-    pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(450, height - 185, f"OFFICE HOUR:")
-    text_object = pdf.beginText(450, y_position)
-    text_object.setFont("Helvetica", 10)
-    for line in office_hour_lines:
-        text_object.textLine(line)
-    pdf.drawText(text_object)
+    if office_hour_lines:
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.drawString(450, height - 185, f"OFFICE HOUR:")
+        text_object = pdf.beginText(450, y_position)
+        text_object.setFont("Helvetica", 10)
+        for line in office_hour_lines:
+            text_object.textLine(line)
+        pdf.drawText(text_object)
 
     pdf.setFont("Helvetica-Bold", 14)
     pdf.drawString(50, height - 53, f"Invoice No. : {invoice.number}")
@@ -407,7 +408,7 @@ def draw_sample_page(pdf, invoice):
 
         pdf.drawText(text_object)
 
-        if invoice.customer.address:
+        if office_hour_lines:
             pdf.setFont("Helvetica-Bold", 8)
             pdf.drawString(300, height - 140, f"OFFICE HOUR:")
             text_object = pdf.beginText(300, height - 150)
@@ -434,7 +435,7 @@ def draw_sample_page(pdf, invoice):
         ])
 
     # Configure table styles
-    table = Table(data, colWidths=[150, 50])
+    table = Table(data, colWidths=[200, 50])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, 0), colors.black),
@@ -448,7 +449,7 @@ def draw_sample_page(pdf, invoice):
     # Position the table to expand downward
     table.wrapOn(pdf, width, height)
     table_width, table_height = table.wrap(0, 0)  # Get actual table height
-    table.drawOn(pdf, 110, height - 200 - table_height)  # Start lower for downward expansion
+    table.drawOn(pdf, 70, height - 200 - table_height)  # Start lower for downward expansion
 
 
 
