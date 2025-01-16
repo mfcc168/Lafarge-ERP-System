@@ -48,10 +48,8 @@ def draw_invoice_page_legacy(pdf, invoice):
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
     if invoice.order_number:
-        #text_object.textLine(f"Order No.: {invoice.order_number}")
         pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
-        #text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}")
         pdf.drawString(32, height - 455, f"Delivery To: {invoice.customer.delivery_to}")
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
@@ -79,21 +77,29 @@ def draw_invoice_page_legacy(pdf, invoice):
             else f"${item.net_price:,.2f} (Nett)" if item.net_price
             else f"${item.price:,.2f}"
         )
-        unit_price_display += f"\n"
+        if invoice.customer.show_registration_code or invoice.customer.show_expiry_date:
+            unit_price_display += f"\n"
 
-        product_name = item.product.name
-        product_name += f"\n"
-        if invoice.customer.show_registration_code and item.product.registration_code:
-            product_name += f"(Reg. No.: {item.product.registration_code})"
-        if invoice.customer.show_expiry_date and item.product.expiry_date:
-            product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
+            product_name = item.product.name
+            product_name += f"\n"
+            if invoice.customer.show_registration_code and item.product.registration_code:
+                product_name += f"(Reg. No.: {item.product.registration_code})"
+            if invoice.customer.show_expiry_date and item.product.expiry_date:
+                product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
-        data.append([
-            product_name,
-            f"{item.quantity} {item.product.unit}\n",
-            unit_price_display,
-            f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
-        ])
+            data.append([
+                product_name,
+                f"{item.quantity} {item.product.unit}\n",
+                unit_price_display,
+                f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
+            ])
+        else:
+            data.append([
+                item.product.name,
+                f"{item.quantity} {item.product.unit}",
+                unit_price_display,
+                f"${item.sum_price:,.2f}" if item.sum_price != 0 else f"-"
+            ])
 
     # Create the table
     table = Table(data, colWidths=[200, 122, 92, 100])
