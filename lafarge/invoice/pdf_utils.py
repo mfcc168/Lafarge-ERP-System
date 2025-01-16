@@ -19,14 +19,14 @@ def draw_invoice_page_legacy(pdf, invoice):
     width, height = A4
 
     # Draw the background image
-    #background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
-    #pdf.drawImage(background_image_path, 0, 0, width, height)
-    pdf.setFont("Helvetica-Bold", 12)
+    background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
+    pdf.drawImage(background_image_path, 0, 0, width, height)
+    pdf.setFont("Times-Bold", 12)
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
-    pdf.setFont("Helvetica-Bold", 10)
+    pdf.setFont("Times-Bold", 12)
     if prefix_check(invoice.customer.name.lower()):
         pdf.drawString(100, height - 150 + 12, f"{invoice.customer.name}")
     else:
@@ -36,10 +36,10 @@ def draw_invoice_page_legacy(pdf, invoice):
             pdf.drawString(100, height - 160 + 12, f"C/O: {invoice.customer.care_of}")
         else:
             pdf.drawString(100, height - 160 + 12, f"C/O: Dr. {invoice.customer.care_of}")
-    y_position = height - 170 + 12
+    y_position = height - 172 + 12
     # Create a TextObject for multi-line address
     text_object = pdf.beginText(100, y_position)
-    text_object.setFont("Helvetica", 10)
+    text_object.setFont("Times-Roman", 12)
     for line in address_lines:
         text_object.textLine(line)
 
@@ -47,6 +47,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         f"Tel: {invoice.customer.telephone_number or ''}"
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
+    pdf.setFont("Times-Bold", 10)
     if invoice.order_number:
         pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
@@ -55,16 +56,16 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     pdf.drawText(text_object)
 
-    pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(460, height - 150 + 12, f"OFFICE HOUR:")
-    text_object = pdf.beginText(460, height - 165 + 12)
-    text_object.setFont("Helvetica", 10)
+    pdf.setFont("Times-Bold", 12)
+    pdf.drawString(462, height - 150 + 12, f"OFFICE HOUR:")
+    text_object = pdf.beginText(462, height - 165 + 12)
+    text_object.setFont("Times-Roman", 10)
     for line in office_hour_lines:
         text_object.textLine(line)
     pdf.drawText(text_object)
 
     # Salesman and Date
-    pdf.setFont("Helvetica-Bold", 10)
+    pdf.setFont("Times-Bold", 10)
     pdf.drawString(65, height - 100 + 5, f"{invoice.terms}")
     pdf.drawString(65, height - 120 + 5, f"{invoice.salesman.code}")
 
@@ -106,9 +107,8 @@ def draw_invoice_page_legacy(pdf, invoice):
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 12),
-        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         #('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ]))
@@ -121,7 +121,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     table.drawOn(pdf, 37, height - 200 - table_height)
 
     # Add total price at the bottom
-    pdf.setFont("Helvetica-Bold", 14)
+    pdf.setFont("Times-Bold", 14)
     pdf.drawString(460, height - 430, f"${invoice.total_price:,.2f}")
 
 def draw_invoice_page(pdf, invoice, copy_type):
