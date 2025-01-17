@@ -585,7 +585,7 @@ def draw_delivery_note(pdf, invoice):
     pdf.drawString(50, height - 296, f"Invoice No. : {invoice.number}")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
+    pdf.drawString(50, height - 105, f"Date: ")
 
     # Define the data for the table
     data = [["Quantity", "Product"]]
