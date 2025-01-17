@@ -36,7 +36,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         text_object.textLine(f"Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            text_object.textLine(f"C/O: {invoice.customer.care_of}")
+            text_object.textLine(f"{invoice.customer.care_of}")
         else:
             text_object.textLine(f"C/O: Dr. {invoice.customer.care_of}")
 
@@ -309,7 +309,10 @@ def draw_order_form_page(pdf, order):
     # Customer information
     pdf.setFont("Helvetica-Bold", 8)
     if order.customer.care_of:
-        pdf.drawString(30, height - 100, f"From: Dr. {order.customer.care_of}")
+        if prefix_check(order.customer.care_of.lower()):
+            pdf.drawString(30, height - 100, f"From: {order.customer.care_of}")
+        else:
+            pdf.drawString(30, height - 100, f"From: Dr. {order.customer.care_of}")
     else:
         if prefix_check(order.customer.name.lower()):
             pdf.drawString(30, height - 100, f"From: {order.customer.name}")
