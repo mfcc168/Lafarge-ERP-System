@@ -148,14 +148,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
         background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice.png')
     pdf.drawImage(background_image_path, 0, 0, width, height)
     pdf.setFont("Helvetica-Bold", 12)
-    # Set title font and position based on the copy type
-    # if copy_type == "Customer Copy" or copy_type == "Company Copy":
-    #     pdf.setFont("Helvetica-Bold", 10)
-    #     pdf.drawString(200, height - 145, copy_type)
-    #
-    # elif copy_type == "Original":
-    #     pdf.setFont("Helvetica-Bold", 10)
-    #     pdf.drawString(200, height - 145, copy_type)
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
@@ -167,7 +159,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         pdf.drawString(50, height - 165, f"SOLD TO: Dr. {invoice.customer.name}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
-            pdf.drawString(50, height - 185, f"C/O: {invoice.customer.care_of}")
+            pdf.drawString(50, height - 185, f"{invoice.customer.care_of}")
         else:
             pdf.drawString(50, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 205
@@ -394,7 +386,7 @@ def draw_sample_page(pdf, invoice):
             pdf.drawString(30, height - 120, f"TO: Dr. {invoice.customer.name}")
         if invoice.customer.care_of:
             if prefix_check(invoice.customer.care_of.lower()):
-                pdf.drawString(30, height - 130, f"C/O: {invoice.customer.care_of}")
+                pdf.drawString(30, height - 130, f"{invoice.customer.care_of}")
             else:
                 pdf.drawString(30, height - 130, f"C/O: Dr. {invoice.customer.care_of}")
         y_position = height - 150
