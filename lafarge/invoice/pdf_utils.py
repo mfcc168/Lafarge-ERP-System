@@ -279,7 +279,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
-        pdf.drawString(400, height - 620, f"Total: ${invoice.total_price:,.2f}")
+        pdf.drawRightString(510, height - 600, f"Total: ${invoice.total_price:,.2f}")
 
 
 def draw_order_form_page(pdf, order):
