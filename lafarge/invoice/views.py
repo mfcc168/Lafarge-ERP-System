@@ -1,7 +1,6 @@
 import io
 
 from django.http import JsonResponse
-from django.db.models import Sum
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import UserPassesTestMixin
