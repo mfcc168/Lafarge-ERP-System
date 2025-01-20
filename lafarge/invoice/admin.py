@@ -1,10 +1,35 @@
 from django.contrib import admin
+from django.db.models import Q
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'care_of', 'address', 'telephone_number')
     search_fields = ('name', 'care_of', 'address', 'telephone_number')
+
+    def get_search_results(self, request, queryset, search_term):
+        # Call the superclass implementation to get the initial queryset
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+
+        if search_term:
+            # Exact matches for name (highest priority)
+            name_matches = queryset.filter(name__icontains=search_term)
+
+            # Partial matches in care_of (next priority)
+            care_of_matches = queryset.filter(care_of__icontains=search_term).exclude(
+                pk__in=name_matches.values_list('pk', flat=True))
+
+            address_matches = queryset.filter(address__icontains=search_term).exclude(
+                pk__in=name_matches.values_list('pk', flat=True))
+
+            telephone_matches = queryset.filter(telephone_number__icontains=search_term).exclude(
+                pk__in=name_matches.values_list('pk', flat=True))
+
+            # Combine name matches first, then care_of matches
+            queryset = name_matches | care_of_matches | address_matches | telephone_matches
+
+        return queryset, use_distinct
+
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):

@@ -146,8 +146,8 @@ class Invoice(models.Model):
 class InvoiceItem(models.Model):
     PRODUCT_TYPE_CHOICES = [
         ('normal', 'Normal'),
-        ('sample', 'Sample'),
         ('bonus', 'Bonus'),
+        ('sample', 'Sample'),
     ]
 
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
