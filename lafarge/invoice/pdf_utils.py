@@ -578,7 +578,7 @@ def draw_delivery_note(pdf, invoice):
     pdf.drawString(50, height - 105, f"Date: ")
 
     # Define the data for the table
-    data = [["Quantity", "Product"]]
+    data = [["Product", "Quantity"]]
     for item in invoice.invoiceitem_set.all():
 
         product_name = item.product.name
@@ -589,8 +589,8 @@ def draw_delivery_note(pdf, invoice):
             product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
 
         data.append([
-            f"{item.quantity} {item.product.unit}\n",
             product_name,
+            f"{item.quantity} {item.product.unit}\n",
         ])
 
     # Create the table
