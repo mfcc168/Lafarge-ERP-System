@@ -18,7 +18,7 @@ class Customer(models.Model):
     address = models.TextField()
     terms = models.CharField(max_length=50, null=True, blank=True)
     office_hour = models.TextField(blank=True, null=True)
-    telephone_number = models.CharField(max_length=255, blank=True, null=True)
+    telephone_number = models.CharField(max_length=255, blank=True, null=True, unique=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     delivery_to = models.CharField(max_length=255, blank=True, null=True)
     delivery_address = models.TextField(blank=True, null=True)
