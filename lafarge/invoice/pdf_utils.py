@@ -371,7 +371,7 @@ def draw_sample_page(pdf, invoice):
 
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(30, height - 53, f"Invoice No. : {invoice.number}")
-    pdf.drawString(300, height - 120, f"Date: ")
+    pdf.drawString(250, height - 120, f"Date: ")
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
