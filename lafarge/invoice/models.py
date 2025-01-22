@@ -44,7 +44,7 @@ class Product(models.Model):
     expiry_date = models.DateField(null=True, blank=True)
     unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    quantity = models.PositiveIntegerField(default=0)
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)  # Changed to DecimalField
     unit_per_box = models.PositiveIntegerField(default=1)
     box_amount = models.PositiveIntegerField(default=0, editable=False)
     box_remain = models.PositiveIntegerField(default=0, editable=False)
@@ -152,7 +152,7 @@ class InvoiceItem(models.Model):
 
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sum_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
