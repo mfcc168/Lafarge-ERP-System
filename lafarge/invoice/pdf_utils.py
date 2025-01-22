@@ -54,7 +54,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     if invoice.order_number:
         pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
-        pdf.drawString(32, height - 455, f"Delivery To: {invoice.customer.delivery_to}")
+        pdf.drawString(32, height - 455, f"Deliver To: {invoice.customer.delivery_to}")
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
     if office_hour_lines:
@@ -176,7 +176,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
     if invoice.order_number:
         text_object.textLine(f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
-        text_object.textLine(f"Delivery To: {invoice.customer.delivery_to}")
+        text_object.textLine(f"Deliver To: {invoice.customer.delivery_to}")
 
     pdf.drawText(text_object)
 
@@ -542,9 +542,9 @@ def draw_delivery_note(pdf, invoice):
     address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if prefix_check(invoice.customer.delivery_to.lower()):
-        pdf.drawString(50, height - 180, f"Delivery To: {invoice.customer.delivery_to}")
+        pdf.drawString(50, height - 180, f"Deliver To: {invoice.customer.delivery_to}")
     else:
-        pdf.drawString(50, height - 180, f"Delivery To: Dr. {invoice.customer.delivery_to}")
+        pdf.drawString(50, height - 180, f"Deliver To: Dr. {invoice.customer.delivery_to}")
     if invoice.customer.care_of:
         if prefix_check(invoice.customer.care_of.lower()):
             pdf.drawString(50, height - 190, f"C/O: {invoice.customer.care_of}")
@@ -594,7 +594,7 @@ def draw_delivery_note(pdf, invoice):
         ])
 
     # Create the table
-    table = Table(data, colWidths=[150, 250])
+    table = Table(data, colWidths=[250, 150])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
