@@ -92,14 +92,14 @@ def draw_invoice_page_legacy(pdf, invoice):
 
             data.append([
                 product_name,
-                f"{item.quantity} {item.product.unit}\n",
+                f"{float(item.quantity):g} {item.product.unit}\n",
                 unit_price_display,
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
         else:
             data.append([
                 item.product.name,
-                f"{item.quantity} {item.product.unit}",
+                f"{float(item.quantity):g} {item.product.unit}",
                 unit_price_display,
                 f"${item.sum_price:,.2f}" if item.sum_price != 0 else f"-"
             ])
@@ -254,7 +254,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
             data.append([
                 product_name,
-                f"{item.quantity} {item.product.unit}\n",
+                f"{float(item.quantity):g} {item.product.unit}\n",
                 unit_price_display,
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
@@ -327,7 +327,7 @@ def draw_order_form_page(pdf, order):
     for product_name, total_quantity in product_quantities.items():
         data.append([
             product_name,
-            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+            f"{float(total_quantity):g} {item.product.unit}",  # Use the unit from the last item processed
         ])
 
     # Configure table styles
@@ -424,7 +424,7 @@ def draw_sample_page(pdf, invoice):
     for product_name, total_quantity in product_quantities.items():
         data.append([
             product_name,
-            f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+            f"{float(total_quantity):g} {item.product.unit}",  # Use the unit from the last item processed
         ])
 
     # Configure table styles
@@ -590,7 +590,7 @@ def draw_delivery_note(pdf, invoice):
 
         data.append([
             product_name,
-            f"{item.quantity} {item.product.unit}\n",
+            f"{float(item.quantity):g} {item.product.unit}\n",
         ])
 
     # Create the table
