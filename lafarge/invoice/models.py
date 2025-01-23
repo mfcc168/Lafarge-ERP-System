@@ -111,11 +111,9 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs):
         # Automatically set salesman from customer if not already set
-        if not self.salesman and self.customer.salesman:
-            self.salesman = self.customer.salesman
+        self.salesman = self.customer.salesman
         # Automatically set terms from customer if not already set
-        if not self.terms and self.customer.terms:
-            self.terms = self.customer.terms
+        self.terms = self.customer.terms
 
         is_new = self.pk is None
         previous_delivery_date = None
