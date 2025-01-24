@@ -59,9 +59,12 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
     if office_hour_lines:
+        office_hour_height = 150
+        if len(str(invoice.customer.name)) >= 40:
+            office_hour_height = 165
         pdf.setFont("Times-Bold", 12)
-        pdf.drawString(462, height - 150 + 12, f"OFFICE HOUR:")
-        text_object = pdf.beginText(462, height - 165 + 12)
+        pdf.drawString(462, height - office_hour_height + 12, f"OFFICE HOUR:")
+        text_object = pdf.beginText(462, height - office_hour_height - 15 + 12)
         text_object.setFont("Times-Roman", 10)
         for line in office_hour_lines:
             text_object.textLine(line)
