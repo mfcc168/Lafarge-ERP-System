@@ -155,6 +155,7 @@ class InvoiceItem(models.Model):
     quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    hide_nett = models.BooleanField(default=False)
     sum_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
