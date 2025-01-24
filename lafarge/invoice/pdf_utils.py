@@ -63,7 +63,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         if len(str(invoice.customer.name)) >= 40:
             office_hour_height = 165
         pdf.setFont("Times-Bold", 12)
-        pdf.drawString(462, height - office_hour_height + 12, f"OFFICE HOUR:")
+        pdf.drawString(462, height - office_hour_height + 12, f"OFFICE HOURS:")
         text_object = pdf.beginText(462, height - office_hour_height - 15 + 12)
         text_object.setFont("Times-Roman", 10)
         for line in office_hour_lines:
@@ -189,7 +189,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     if office_hour_lines:
         pdf.setFont("Helvetica-Bold", 10)
-        pdf.drawString(450, height - 185, f"OFFICE HOUR:")
+        pdf.drawString(450, height - 185, f"OFFICE HOURS:")
         text_object = pdf.beginText(450, y_position)
         text_object.setFont("Helvetica", 10)
         for line in office_hour_lines:
@@ -414,7 +414,7 @@ def draw_sample_page(pdf, invoice):
 
         if office_hour_lines:
             pdf.setFont("Helvetica-Bold", 8)
-            pdf.drawString(300, height - 140, f"OFFICE HOUR:")
+            pdf.drawString(300, height - 140, f"OFFICE HOURS:")
             text_object = pdf.beginText(300, height - 150)
             text_object.setFont("Helvetica", 8)
             for line in office_hour_lines:
