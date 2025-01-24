@@ -1,3 +1,4 @@
+from decimal import Decimal, ROUND_UP
 import os
 from datetime import datetime
 
@@ -75,11 +76,13 @@ def draw_invoice_page_legacy(pdf, invoice):
     # Define the data for the table
     data = [[" ", " ", " ", " "]]
     for item in invoice.invoiceitem_set.all():
+
         unit_price_display = (
             item.product_type if item.product_type in ["bonus", "sample"]
-            else f"${item.net_price:,.2f} (Nett)" if item.net_price
-            else f"${item.price:,.2f}"
+            else f"${(item.net_price/item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)} (Nett)" if item.net_price
+            else f"${(item.price/item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)}"
         )
+
         if invoice.customer.show_registration_code or invoice.customer.show_expiry_date:
             unit_price_display += f"\n"
 
@@ -89,7 +92,6 @@ def draw_invoice_page_legacy(pdf, invoice):
                 product_name += f"(Reg. No.: {item.product.registration_code})"
             if invoice.customer.show_expiry_date and item.product.expiry_date:
                 product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
-
             data.append([
                 product_name,
                 f"{float(item.quantity):g} {item.product.unit}\n",
@@ -214,7 +216,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
         for product_name, total_quantity in product_quantities.items():
             data.append([
                 product_name,
-                f"{total_quantity} {item.product.unit}",  # Use the unit from the last item processed
+                f"{float(total_quantity):g} {item.product.unit}",  # Use the unit from the last item processed
             ])
 
         # Configure table styles
@@ -237,12 +239,15 @@ def draw_invoice_page(pdf, invoice, copy_type):
     else:
         # Define the data for the table
         data = [["Product", "Quantity", "Unit Price", "Amount"]]
+
         for item in invoice.invoiceitem_set.all():
+
             unit_price_display = (
                 item.product_type if item.product_type in ["bonus", "sample"]
-                else f"${item.net_price:,.2f} (Nett Price)" if item.net_price
-                else f"${item.price:,.2f}"
+                else f"${(item.net_price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)} (Nett)" if item.net_price
+                else f"${(item.price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)}"
             )
+
             unit_price_display += f"\n"
 
             product_name = item.product.name
@@ -251,7 +256,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 product_name += f"(Reg. No.: {item.product.registration_code})"
             if invoice.customer.show_expiry_date and item.product.expiry_date:
                 product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
-
             data.append([
                 product_name,
                 f"{float(item.quantity):g} {item.product.unit}\n",

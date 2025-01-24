@@ -4,6 +4,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from datetime import timedelta, date
 from django.db.models import Q
+import math
 
 class Salesman(models.Model):
     code = models.CharField(max_length=255, unique=True)
@@ -44,6 +45,7 @@ class Product(models.Model):
     expiry_date = models.DateField(null=True, blank=True)
     unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    units_per_pack = models.PositiveIntegerField(default=1)
     quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)  # Changed to DecimalField
     unit_per_box = models.PositiveIntegerField(default=1)
     box_amount = models.PositiveIntegerField(default=0, editable=False)
@@ -106,7 +108,7 @@ class Invoice(models.Model):
         )
 
     def calculate_total_price(self):
-        total = round(sum(item.sum_price for item in self.invoiceitem_set.all()))
+        total = math.floor(sum(item.sum_price for item in self.invoiceitem_set.all()))
         self.total_price = total
 
     def save(self, *args, **kwargs):
@@ -179,7 +181,7 @@ class InvoiceItem(models.Model):
             # Calculate price details
             if self.product_type == 'normal':
                 self.price = current_product.price if not self.net_price else self.net_price
-                self.sum_price = round(self.price * self.quantity)
+                self.sum_price = math.floor(self.price / current_product.units_per_pack * self.quantity)
             else:
                 self.sum_price = 0.00  # For sample and bonus types
 
