@@ -287,8 +287,8 @@ def product_transaction_detail(request, product_id):
 @staff_member_required
 def customers_with_unpaid_invoices(request):
     # Fetch customers who have at least one unpaid invoice
-    customers = Customer.objects.filter(invoice__payment_date__isnull=True).distinct()
-    unpaid_invoices = Invoice.get_unpaid_invoices()
+    customers = Customer.objects.filter(invoice__payment_date__isnull=True).distinct().exclude(name="Sample")
+    unpaid_invoices = Invoice.get_unpaid_invoices().exclude(number__startswith="S-")
 
     # Filter customer data to include only those with at least one unpaid invoice
     customer_data = [
