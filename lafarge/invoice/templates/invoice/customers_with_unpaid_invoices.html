@@ -1,12 +1,12 @@
 {% extends "invoice/base.html" %}
-
+{% load custom_filter %}
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Customers with Unpaid Invoices</h1>
 
     <!-- Display Total Unpaid Amount -->
     <div class="alert alert-info" role="alert">
-        <h2>Total Unpaid Amount: <strong>HK$ {{ total_unpaid|floatformat:2 }}</strong></h2>
+        <h2>Total Unpaid Amount: <strong>HK$ {{ total_unpaid|currency }}</strong></h2>
     </div>
 
     <!-- Display Monthly Unpaid Totals -->
@@ -22,7 +22,7 @@
             {% for entry in monthly_unpaid %}
                 <tr>
                     <td>{{ entry.month|date:"F Y" }}</td>
-                    <td>HK$ {{ entry.total|floatformat:2 }}</td>
+                    <td>HK$ {{ entry.total|currency }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -59,7 +59,7 @@
                                     <tr>
                                         <td>{{ invoice.number }}</td>
                                         <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                                        <td>HK$ {{ invoice.total_price|floatformat:2 }}</td>
+                                        <td>HK$ {{ invoice.total_price|currency }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
