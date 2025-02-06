@@ -26,6 +26,7 @@ class Customer(models.Model):
     show_registration_code = models.BooleanField(default=False)
     show_expiry_date = models.BooleanField(default=False)
     salesman = models.ForeignKey(Salesman, on_delete=models.SET_NULL, null=True, blank=True)
+    statement_use_additonal_line = models.TextField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name + (" ("+self.care_of+")" if self.care_of else "")
