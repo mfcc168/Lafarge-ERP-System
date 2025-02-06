@@ -3,6 +3,6 @@ def prefix_check(name):
                 "centre", "center", "clinic", "office",
                 "warehouse", "medic", "pharmacy", "hospital", "store", "medical", "practice"]
 
-    if any(keyword in name for keyword in keywords):
+    if any(keyword in name.split() for keyword in keywords):
         return True
     return False
