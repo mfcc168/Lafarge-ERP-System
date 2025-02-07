@@ -84,8 +84,8 @@ def draw_invoice_page_legacy(pdf, invoice):
             nett_display = " (Nett)"
         unit_price_display = (
             item.product_type if item.product_type in ["bonus", "sample"]
-            else f"${(item.net_price/item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)} {nett_display}" if item.net_price
-            else f"${(item.price/item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)}"
+            else f"${(item.net_price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP):,.2f} {nett_display}" if item.net_price
+            else f"${(item.price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP):,.2f}"
         )
 
         if invoice.customer.show_registration_code or invoice.customer.show_expiry_date:
@@ -251,8 +251,8 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 nett_display = " (Nett)"
             unit_price_display = (
                 item.product_type if item.product_type in ["bonus", "sample"]
-                else f"${(item.net_price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)} {nett_display}" if item.net_price
-                else f"${(item.price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP)}"
+                else f"${(item.net_price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP):,.2f} {nett_display}" if item.net_price
+                else f"${(item.price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP):,.2f}"
             )
 
             unit_price_display += f"\n"
