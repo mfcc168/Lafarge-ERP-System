@@ -109,7 +109,7 @@ class Invoice(models.Model):
         )
 
     def calculate_total_price(self):
-        total = math.floor(sum(item.sum_price for item in self.invoiceitem_set.all()))
+        total = sum(item.sum_price for item in self.invoiceitem_set.all())
         self.total_price = total
 
     def save(self, *args, **kwargs):
@@ -183,7 +183,10 @@ class InvoiceItem(models.Model):
             # Calculate price details
             if self.product_type == 'normal':
                 self.price = current_product.price if not self.net_price else self.net_price
-                self.sum_price = math.floor(self.price / current_product.units_per_pack * self.quantity)
+                if "Licarlo" in self.product.name:
+                    self.sum_price = math.floor(self.price / current_product.units_per_pack * self.quantity)
+                else:
+                    self.sum_price = self.price / current_product.units_per_pack * self.quantity
             else:
                 self.sum_price = 0.00  # For sample and bonus types
 
