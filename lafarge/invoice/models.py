@@ -6,6 +6,12 @@ from datetime import timedelta, date
 from django.db.models import Q
 import math
 
+
+class Forbidden_Word(models.Model):
+    word = models.CharField(max_length=255, unique=True)
+    def __str__(self):
+        return self.word
+
 class Salesman(models.Model):
     code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
