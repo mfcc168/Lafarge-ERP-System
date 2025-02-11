@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Q
-from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction
+from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -30,6 +30,9 @@ class CustomerAdmin(admin.ModelAdmin):
 
         return queryset, use_distinct
 
+@admin.register(Forbidden_Word)
+class Forbidden_WordAdmin(admin.ModelAdmin):
+    list_display = ('word',)
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):
