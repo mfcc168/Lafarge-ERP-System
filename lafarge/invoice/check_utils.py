@@ -6,6 +6,7 @@ def prefix_check(name):
                 "warehouse", "medic", "pharmacy", "hospital", "store", "medical", "practice"]
 
     forbidden_words = Forbidden_Word.objects.values_list('word', flat=True)
-    if any(keyword in name.split() for keyword in keywords) or any(word in name.split() for word in forbidden_words):
-        return True
+    if name:
+        if any(keyword in name.split() for keyword in keywords) or any(word in name.split() for word in forbidden_words):
+            return True
     return False
