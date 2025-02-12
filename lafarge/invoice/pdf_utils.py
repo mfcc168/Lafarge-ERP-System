@@ -476,7 +476,8 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
 
     # Customer information
     address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
-    statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if line.strip()]
+    if customer.statement_use_additonal_line:
+        statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
     if prefix_check(customer.name.lower()):
