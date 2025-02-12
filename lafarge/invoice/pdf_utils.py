@@ -308,7 +308,7 @@ def draw_order_form_page(pdf, order):
     pdf.drawImage(background_image_path, 0, 0, width, height)
 
     # Customer information
-    pdf.setFont("Helvetica-Bold", 8)
+    pdf.setFont("Helvetica-Bold", 10)
     if order.customer.care_of:
         if prefix_check(order.customer.care_of.lower()):
             pdf.drawString(30, height - 100, f"From: {order.customer.care_of}")
