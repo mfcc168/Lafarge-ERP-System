@@ -158,7 +158,7 @@ class InvoiceItem(models.Model):
     ]
 
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, limit_choices_to={'quantity__gt': 0})
     quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
