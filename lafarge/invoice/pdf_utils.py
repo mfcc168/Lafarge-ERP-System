@@ -63,8 +63,8 @@ def draw_invoice_page_legacy(pdf, invoice):
         if len(str(invoice.customer.name)) >= 40:
             office_hour_height = 165
         pdf.setFont("Times-Bold", 12)
-        pdf.drawString(462, height - office_hour_height + 12, f"OFFICE HOURS:")
-        text_object = pdf.beginText(462, height - office_hour_height - 15 + 12)
+        pdf.drawString(458, height - office_hour_height + 12, f"OFFICE HOURS:")
+        text_object = pdf.beginText(458, height - office_hour_height - 15 + 12)
         text_object.setFont("Times-Roman", 10)
         for line in office_hour_lines:
             text_object.textLine(line)
