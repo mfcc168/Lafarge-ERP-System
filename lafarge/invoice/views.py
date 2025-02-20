@@ -23,6 +23,11 @@ from django_tables2.export.export import TableExport
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import *
+
 class StaffMemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_staff
@@ -392,3 +397,9 @@ def download_delivery_note_pdf(request, invoice_number):
     response['Content-Disposition'] = f'attachment; filename="Delivery_Note_{invoice.number}.pdf"'
 
     return response
+
+@api_view(['GET'])
+def ProductView(request):
+    products = Product.objects.all()
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
