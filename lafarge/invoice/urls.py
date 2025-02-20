@@ -20,5 +20,6 @@ urlpatterns = [
     path('statement/<str:customer_name>/download/', views.download_statement_pdf, name='download_statement_pdf'),
     path("unpaid-invoices/", views.customers_with_unpaid_invoices, name="unpaid_invoices"),
     path("unpaid-invoices/<str:customer_name>/", views.unpaid_invoices_by_customer, name="customer_unpaid_invoices"),
+    path("api/products/", views.ProductView, name="ProductView"),
     path('', views.home, name='home'),
 ]

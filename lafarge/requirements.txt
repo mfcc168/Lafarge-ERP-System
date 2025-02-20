@@ -5,3 +5,5 @@ django-filter
 reportlab
 tablib
 tablib[xlsx]
+djangorestframework
+django-cors-headers
