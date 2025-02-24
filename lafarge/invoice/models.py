@@ -28,6 +28,7 @@ class Customer(models.Model):
     telephone_number = models.CharField(max_length=255, blank=True, null=True, unique=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     delivery_to = models.CharField(max_length=255, blank=True, null=True)
+    show_delivery_address = models.BooleanField(default=False)
     delivery_address = models.TextField(blank=True, null=True)
     show_registration_code = models.BooleanField(default=False)
     show_expiry_date = models.BooleanField(default=False)
