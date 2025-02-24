@@ -36,7 +36,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         text_object.textLine(f"{invoice.customer.name}")
     else:
         text_object.textLine(f"Dr. {invoice.customer.name}")
-    if invoice.customer.care_of:
+    if invoice.customer.care_of and not invoice.customer.hide_care_of:
         if prefix_check(invoice.customer.care_of.lower()):
             text_object.textLine(f"{invoice.customer.care_of}")
         else:
