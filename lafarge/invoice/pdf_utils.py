@@ -26,6 +26,7 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
 
     y_position = height - 150 + 12
@@ -51,11 +52,16 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.drawText(text_object)
 
 
-    pdf.setFont("Times-Bold", 10)
+    text_object = pdf.beginText(32, height - 440)
+    text_object.setFont("Times-Roman", 10)
     if invoice.order_number:
-        pdf.drawString(32, height - 445, f"Order No.: {invoice.order_number}")
+        text_object.textLine(f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
-        pdf.drawString(32, height - 455, f"Deliver To: {invoice.customer.delivery_to}")
+        text_object.textLine(f"Deliver To: {invoice.customer.delivery_to}")
+    if invoice.customer.show_delivery_address:
+        for line in delivery_address_lines:
+            text_object.textLine(line)
+    pdf.drawText(text_object)
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
     if office_hour_lines:
