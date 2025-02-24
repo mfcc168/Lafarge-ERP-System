@@ -20,7 +20,8 @@ class Salesman(models.Model):
         return self.code
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    hide_care_of = models.BooleanField(default=False)
     care_of = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField()
     terms = models.CharField(max_length=50, null=True, blank=True)
