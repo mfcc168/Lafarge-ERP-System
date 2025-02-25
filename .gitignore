@@ -1,4 +1,5 @@
 ### Django template
+.env
 *.log
 *.pot
 *.pyc
