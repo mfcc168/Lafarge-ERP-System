@@ -2,6 +2,9 @@ from django.contrib import admin
 
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
 
+admin.site.site_header = "Lafarge Admin"
+admin.site.site_title = "Lafarge Admin Portal"
+admin.site.index_title = "Welcome to Lafarge Admin Panel"
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
