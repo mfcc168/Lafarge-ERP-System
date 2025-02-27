@@ -6,7 +6,10 @@ from django.conf import settings
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, A5
 from reportlab.platypus import Table, TableStyle
+from reportlab.lib.utils import ImageReader
 
+from .encryption import encrypt_customer_id
+from .qrcode import generate_whatsapp_qr_code
 from .check_utils import prefix_check
 
 def draw_invoice_page_legacy(pdf, invoice):
@@ -164,13 +167,14 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if prefix_check(invoice.customer.name.lower()):
         pdf.drawString(50, height - 165, f"SOLD TO: {invoice.customer.name}")
     else:
         pdf.drawString(50, height - 165, f"SOLD TO: Dr. {invoice.customer.name}")
-    if invoice.customer.care_of:
+    if invoice.customer.care_of and not invoice.customer.hide_care_of:
         if prefix_check(invoice.customer.care_of.lower()):
             pdf.drawString(50, height - 185, f"{invoice.customer.care_of}")
         else:
@@ -190,6 +194,9 @@ def draw_invoice_page(pdf, invoice, copy_type):
         text_object.textLine(f"Order No.: {invoice.order_number}")
     if invoice.customer.delivery_to:
         text_object.textLine(f"Deliver To: {invoice.customer.delivery_to}")
+    if invoice.customer.show_delivery_address:
+        for line in delivery_address_lines:
+            text_object.textLine(line)
 
     pdf.drawText(text_object)
 
@@ -298,6 +305,10 @@ def draw_invoice_page(pdf, invoice, copy_type):
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawRightString(510, height - 600, f"Total: ${invoice.total_price:,.2f}")
 
+        encrypted_customer_id = encrypt_customer_id(invoice.customer.id)
+        qr_code_image = generate_whatsapp_qr_code("61028531", encrypted_customer_id)
+        qr_code_reader = ImageReader(qr_code_image)
+        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75 )
 
 def draw_order_form_page(pdf, order):
     """

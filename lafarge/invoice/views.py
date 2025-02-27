@@ -14,7 +14,12 @@ from reportlab.pdfgen import canvas
 
 from .models import Customer, Invoice, Salesman
 from .models import Product, ProductTransaction
-from .pdf_utils import draw_invoice_page, draw_order_form_page, draw_statement_page, draw_delivery_note, draw_invoice_page_legacy, draw_sample_page
+from .pdf_generation.invoice import draw_invoice_page
+from .pdf_generation.invoice_legacy import draw_invoice_page_legacy
+from .pdf_generation.delivery_note import draw_delivery_note
+from .pdf_generation.order_form import draw_order_form_page
+from .pdf_generation.sample import draw_sample_page
+from .pdf_generation.statement import draw_statement_page
 from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
 
 from django_tables2.config import RequestConfig
@@ -22,6 +27,11 @@ from django_tables2.export.export import TableExport
 
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import *
 
 class StaffMemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -392,3 +402,9 @@ def download_delivery_note_pdf(request, invoice_number):
     response['Content-Disposition'] = f'attachment; filename="Delivery_Note_{invoice.number}.pdf"'
 
     return response
+
+@api_view(['GET'])
+def ProductView(request):
+    products = Product.objects.all()
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
