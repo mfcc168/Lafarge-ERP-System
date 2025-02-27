@@ -7,3 +7,7 @@ tablib
 tablib[xlsx]
 djangorestframework
 django-cors-headers
+Fernet
+qrcode[pil]
+cryptography
+python-dotenv
