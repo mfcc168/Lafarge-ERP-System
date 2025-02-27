@@ -1,16 +1,16 @@
-from decimal import Decimal, ROUND_UP
 import os
-from datetime import datetime
+from decimal import Decimal, ROUND_UP
 
 from django.conf import settings
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, A5
-from reportlab.platypus import Table, TableStyle
+from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Table, TableStyle
 
+from ..check_utils import prefix_check
 from ..encryption import encrypt_customer_id
 from ..qrcode import generate_whatsapp_qr_code
-from ..check_utils import prefix_check
+
 
 def draw_invoice_page(pdf, invoice, copy_type):
     """
@@ -178,4 +178,4 @@ def draw_invoice_page(pdf, invoice, copy_type):
         encrypted_customer_id = encrypt_customer_id(invoice.customer.id)
         qr_code_image = generate_whatsapp_qr_code(str(os.getenv('PHONE_NUMBER')), encrypted_customer_id)
         qr_code_reader = ImageReader(qr_code_image)
-        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75 )
+        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75)

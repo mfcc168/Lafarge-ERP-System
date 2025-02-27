@@ -1,37 +1,32 @@
 import io
 
-from django.http import JsonResponse
-from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
+from django_tables2.config import RequestConfig
+from django_tables2.export.export import TableExport
 from reportlab.lib.pagesizes import A4, A5
 from reportlab.pdfgen import canvas
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from .models import Customer, Invoice, Salesman
-from .models import Product, ProductTransaction
+from .pdf_generation.delivery_note import draw_delivery_note
 from .pdf_generation.invoice import draw_invoice_page
 from .pdf_generation.invoice_legacy import draw_invoice_page_legacy
-from .pdf_generation.delivery_note import draw_delivery_note
 from .pdf_generation.order_form import draw_order_form_page
 from .pdf_generation.sample import draw_sample_page
 from .pdf_generation.statement import draw_statement_page
-from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
-
-from django_tables2.config import RequestConfig
-from django_tables2.export.export import TableExport
-
-from django.db.models.functions import TruncMonth
-from django.db.models import Sum
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from .serializers import *
+from .tables import InvoiceTable, CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable, \
+    ProductTransactionTable, ProductTransactionFilter, SalesmanInvoiceTable
+
 
 class StaffMemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -42,10 +37,12 @@ class StaffMemberRequiredMixin(UserPassesTestMixin):
 def home(request):
     return render(request, 'invoice/home.html')
 
+
 @staff_member_required
 def salesman_list(request):
     salesmen = Salesman.objects.all()
     return render(request, 'invoice/salesman_list.html', {'salesmen': salesmen})
+
 
 @staff_member_required
 def salesman_detail(request, salesman_id):
@@ -71,14 +68,15 @@ def salesman_detail(request, salesman_id):
         'filter': filter,
     })
 
+
 def salesman_monthly_sales(request, salesman_id):
     # Get current year and start of each month in the year
     current_year = timezone.now().year
     monthly_sales = (
         Invoice.objects.filter(salesman_id=salesman_id, payment_date__year=current_year)
-        .values('payment_date__month')  # Group by month
-        .annotate(monthly_total=Sum('total_price'))  # Sum total_price per month
-        .order_by('payment_date__month')
+            .values('payment_date__month')  # Group by month
+            .annotate(monthly_total=Sum('total_price'))  # Sum total_price per month
+            .order_by('payment_date__month')
     )
 
     # Prepare data for the chart
@@ -91,6 +89,7 @@ def salesman_monthly_sales(request, salesman_id):
         'months': ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         'sales': months,
     })
+
 
 @method_decorator(staff_member_required, name='dispatch')
 class InvoiceListView(StaffMemberRequiredMixin, SingleTableMixin, FilterView):
@@ -110,6 +109,7 @@ def invoice_detail(request, invoice_number):
         'invoice': invoice
     }
     return render(request, 'invoice/invoice_detail.html', context)
+
 
 @staff_member_required
 def download_invoice_legacy_pdf(request, invoice_number):
@@ -138,6 +138,7 @@ def download_invoice_legacy_pdf(request, invoice_number):
 
     return response
 
+
 @staff_member_required
 def download_invoice_pdf(request, invoice_number):
     # Get the invoice object
@@ -148,7 +149,6 @@ def download_invoice_pdf(request, invoice_number):
 
     # Setup the canvas with the buffer as the file
     pdf = canvas.Canvas(buffer, pagesize=A4)
-
 
     draw_invoice_page(pdf, invoice, "Poison Form")
     pdf.showPage()
@@ -174,6 +174,7 @@ def download_invoice_pdf(request, invoice_number):
     response['Content-Disposition'] = f'attachment; filename="Invoice_{invoice.number}.pdf"'
 
     return response
+
 
 @staff_member_required
 def download_sample_pdf(request, invoice_number):
@@ -202,6 +203,7 @@ def download_sample_pdf(request, invoice_number):
     response['Content-Disposition'] = f'attachment; filename="Order_Form_{sample.number}.pdf"'
 
     return response
+
 
 @staff_member_required
 def download_order_form_pdf(request, invoice_number):
@@ -293,7 +295,6 @@ def product_transaction_detail(request, product_id):
     })
 
 
-
 @staff_member_required
 def customers_with_unpaid_invoices(request):
     # Fetch customers who have at least one unpaid invoice
@@ -338,12 +339,11 @@ def unpaid_invoices_by_customer(request, customer_name):
     customer = get_object_or_404(Customer, name=customer_name)
     unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
 
-
-
     return render(request, "invoice/unpaid_invoices_by_customer.html", {
         "customer": customer,
         "unpaid_invoices": unpaid_invoices,
     })
+
 
 @staff_member_required
 def download_statement_pdf(request, customer_name):
@@ -403,8 +403,23 @@ def download_delivery_note_pdf(request, invoice_number):
 
     return response
 
+
 @api_view(['GET'])
 def ProductView(request):
     products = Product.objects.all()
     serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def InvoiceView(request):
+    invoices = Invoice.objects.all()
+    serializer = InvoiceSerializer(invoices, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def CustomerView(request):
+    customers = Customer.objects.all()
+    serializer = CustomerSerializer(customers, many=True)
     return Response(serializer.data)

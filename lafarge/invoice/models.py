@@ -1,16 +1,19 @@
+import math
+from datetime import timedelta
+
 from django.db import models, transaction
-from django.utils import timezone
+from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from datetime import timedelta, date
-from django.db.models import Q
-import math
+from django.utils import timezone
 
 
 class Forbidden_Word(models.Model):
     word = models.CharField(max_length=255, unique=True)
+
     def __str__(self):
         return self.word
+
 
 class Salesman(models.Model):
     code = models.CharField(max_length=255, unique=True)
@@ -18,6 +21,7 @@ class Salesman(models.Model):
 
     def __str__(self):
         return self.code
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
@@ -37,8 +41,7 @@ class Customer(models.Model):
     statement_use_additonal_line = models.TextField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return self.name + (" ("+self.care_of+")" if self.care_of else "")
-
+        return self.name + (" (" + self.care_of + ")" if self.care_of else "")
 
 
 class Deliveryman(models.Model):
@@ -47,6 +50,7 @@ class Deliveryman(models.Model):
 
     def __str__(self):
         return self.code
+
 
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -70,7 +74,8 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + " (Quantity: " + str(self.quantity) +")"
+        return self.name + " (Quantity: " + str(self.quantity) + ")"
+
 
 class ProductTransaction(models.Model):
     TRANSACTION_CHOICES = [
@@ -88,6 +93,7 @@ class ProductTransaction(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.transaction_type} ({self.change}) on {self.timestamp}"
+
 
 class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
@@ -111,8 +117,8 @@ class Invoice(models.Model):
 
         return Invoice.objects.filter(
             Q(payment_date__isnull=True) & (
-                Q(delivery_date__lte=threshold_date) |
-                Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
+                    Q(delivery_date__lte=threshold_date) |
+                    Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
             )
         )
 
@@ -149,7 +155,6 @@ class Invoice(models.Model):
                     description=f"{item.product_type.capitalize()} transaction in invoice #{self.number} from {self.customer.name}",
                     timestamp=self.delivery_date
                 )
-
 
 
 class InvoiceItem(models.Model):

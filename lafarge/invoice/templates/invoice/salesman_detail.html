@@ -22,7 +22,7 @@
     {% load render_table from django_tables2 %}
     <br>
     {% render_table table %}
-        <!-- Chart Container -->
+    <!-- Chart Container -->
     <div class="mt-5">
         <canvas id="monthlySalesChart" width="400" height="200"></canvas>
     </div>
@@ -62,5 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
 });
+
 </script>
 {% endblock %}

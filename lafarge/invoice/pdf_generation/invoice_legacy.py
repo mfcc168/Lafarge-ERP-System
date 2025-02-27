@@ -1,16 +1,11 @@
 from decimal import Decimal, ROUND_UP
-import os
-from datetime import datetime
 
-from django.conf import settings
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, A5
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import Table, TableStyle
-from reportlab.lib.utils import ImageReader
 
-from ..encryption import encrypt_customer_id
-from ..qrcode import generate_whatsapp_qr_code
 from ..check_utils import prefix_check
+
 
 def draw_invoice_page_legacy(pdf, invoice):
     """
@@ -23,8 +18,8 @@ def draw_invoice_page_legacy(pdf, invoice):
     width, height = A4
 
     # Draw the background image
-    #background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
-    #pdf.drawImage(background_image_path, 0, 0, width, height)
+    # background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
+    # pdf.drawImage(background_image_path, 0, 0, width, height)
     pdf.setFont("Times-Bold", 12)
 
     # Customer information
@@ -53,7 +48,6 @@ def draw_invoice_page_legacy(pdf, invoice):
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
     pdf.drawText(text_object)
-
 
     text_object = pdf.beginText(32, height - 440)
     text_object.setFont("Times-Roman", 10)
@@ -128,7 +122,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
         ('FONTSIZE', (0, 0), (-1, -1), 11),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        #('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        # ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ]))
 
     # Position the table

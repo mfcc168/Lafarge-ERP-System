@@ -1,5 +1,7 @@
-import qrcode
 from io import BytesIO
+
+import qrcode
+
 
 def generate_whatsapp_qr_code(phone_number, encrypted_customer_id):
     # Create the WhatsApp URL with the phone number and encrypted customer ID

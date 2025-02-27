@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.db.models import Q
+
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
+
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -30,19 +31,23 @@ class CustomerAdmin(admin.ModelAdmin):
 
         return queryset, use_distinct
 
+
 @admin.register(Forbidden_Word)
 class Forbidden_WordAdmin(admin.ModelAdmin):
     list_display = ('word',)
+
 
 @admin.register(Salesman)
 class SalesmanAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
     search_fields = ('code', 'name')
 
+
 @admin.register(Deliveryman)
 class DeliverymanAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
     search_fields = ('code', 'name')
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -50,17 +55,20 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     readonly_fields = ('box_amount', 'box_remain')  # Make box_amount and box_remain read-only
 
+
 @admin.register(ProductTransaction)
 class ProductTransactionAdmin(admin.ModelAdmin):
     list_display = ('product', 'transaction_type', 'change', 'quantity_after_transaction', 'timestamp', 'description')
     search_fields = ('product__name', 'transaction_type', 'description')
     list_filter = ('transaction_type', 'timestamp')
 
+
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
     extra = 0  # Number of extra forms to display
     readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
-    fields = ('product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price', 'product_type')  # Include product_type field
+    fields = (
+    'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price', 'product_type')  # Include product_type field
 
 
 @admin.register(Invoice)

@@ -5,22 +5,22 @@
     <div class="table-responsive">
         <table class="table table-hover table-bordered">
             <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                </tr>
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+            </tr>
             </thead>
             <tbody>
-                {% for salesman in salesmen %}
-                <tr>
-                    <td>
-                        <a href="{% url 'salesman_detail' salesman.id %}" class="text-decoration-none">
-                            {{ salesman.name }}
-                        </a>
-                    </td>
-                    <td>{{ salesman.code }}</td>
-                </tr>
-                {% endfor %}
+            {% for salesman in salesmen %}
+            <tr>
+                <td>
+                    <a href="{% url 'salesman_detail' salesman.id %}" class="text-decoration-none">
+                        {{ salesman.name }}
+                    </a>
+                </td>
+                <td>{{ salesman.code }}</td>
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

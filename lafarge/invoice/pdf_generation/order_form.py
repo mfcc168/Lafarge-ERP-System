@@ -1,16 +1,13 @@
-from decimal import Decimal, ROUND_UP
 import os
 from datetime import datetime
 
 from django.conf import settings
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, A5
+from reportlab.lib.pagesizes import A5
 from reportlab.platypus import Table, TableStyle
-from reportlab.lib.utils import ImageReader
 
-from ..encryption import encrypt_customer_id
-from ..qrcode import generate_whatsapp_qr_code
 from ..check_utils import prefix_check
+
 
 def draw_order_form_page(pdf, order):
     """

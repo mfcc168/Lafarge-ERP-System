@@ -1,16 +1,17 @@
-from decimal import Decimal, ROUND_UP
 import os
 from datetime import datetime
+from decimal import Decimal, ROUND_UP
 
 from django.conf import settings
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, A5
-from reportlab.platypus import Table, TableStyle
 from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Table, TableStyle
 
+from .check_utils import prefix_check
 from .encryption import encrypt_customer_id
 from .qrcode import generate_whatsapp_qr_code
-from .check_utils import prefix_check
+
 
 def draw_invoice_page_legacy(pdf, invoice):
     """
@@ -23,8 +24,8 @@ def draw_invoice_page_legacy(pdf, invoice):
     width, height = A4
 
     # Draw the background image
-    #background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
-    #pdf.drawImage(background_image_path, 0, 0, width, height)
+    # background_image_path = os.path.join(settings.STATIC_ROOT, 'Invoice_Legacy.png')
+    # pdf.drawImage(background_image_path, 0, 0, width, height)
     pdf.setFont("Times-Bold", 12)
 
     # Customer information
@@ -53,7 +54,6 @@ def draw_invoice_page_legacy(pdf, invoice):
         f"{f' ({invoice.customer.contact_person})' if invoice.customer.contact_person else ''}"
     )
     pdf.drawText(text_object)
-
 
     text_object = pdf.beginText(32, height - 440)
     text_object.setFont("Times-Roman", 10)
@@ -128,7 +128,7 @@ def draw_invoice_page_legacy(pdf, invoice):
         ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
         ('FONTSIZE', (0, 0), (-1, -1), 11),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        #('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        # ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ]))
 
     # Position the table
@@ -141,6 +141,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     # Add total price at the bottom
     pdf.setFont("Times-Bold", 14)
     pdf.drawString(460, height - 430, f"${invoice.total_price:,.2f}")
+
 
 def draw_invoice_page(pdf, invoice, copy_type):
     """
@@ -308,7 +309,8 @@ def draw_invoice_page(pdf, invoice, copy_type):
         encrypted_customer_id = encrypt_customer_id(invoice.customer.id)
         qr_code_image = generate_whatsapp_qr_code("61028531", encrypted_customer_id)
         qr_code_reader = ImageReader(qr_code_image)
-        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75 )
+        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75)
+
 
 def draw_order_form_page(pdf, order):
     """
@@ -473,8 +475,6 @@ def draw_sample_page(pdf, invoice):
     table.drawOn(pdf, 70, height - 200 - table_height)  # Start lower for downward expansion
 
 
-
-
 def draw_statement_page(pdf, customer, unpaid_invoices):
     """
     Draw the content of an invoice page in the PDF.
@@ -490,12 +490,12 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     background_image_path = os.path.join(settings.STATIC_ROOT, 'Statement.png')
     pdf.drawImage(background_image_path, 0, 0, width, height)
 
-
     # Customer information
     address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
     statement_use_additonal_lines = ""
     if customer.statement_use_additonal_line:
-        statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if line.strip()]
+        statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if
+                                         line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
     if prefix_check(customer.name.lower()):
@@ -516,8 +516,6 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     for line in statement_use_additonal_lines:
         text_object.textLine(line)
     pdf.drawText(text_object)
-
-
 
     # Table for Invoice Items
     # Define the data for the table

@@ -1,16 +1,13 @@
-from decimal import Decimal, ROUND_UP
 import os
 from datetime import datetime
 
 from django.conf import settings
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, A5
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import Table, TableStyle
-from reportlab.lib.utils import ImageReader
 
-from ..encryption import encrypt_customer_id
-from ..qrcode import generate_whatsapp_qr_code
 from ..check_utils import prefix_check
+
 
 def draw_statement_page(pdf, customer, unpaid_invoices):
     """
@@ -27,12 +24,12 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     background_image_path = os.path.join(settings.STATIC_ROOT, 'Statement.png')
     pdf.drawImage(background_image_path, 0, 0, width, height)
 
-
     # Customer information
     address_lines = [line.strip() for line in customer.address.split("\n") if line.strip()]
     statement_use_additonal_lines = ""
     if customer.statement_use_additonal_line:
-        statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if line.strip()]
+        statement_use_additonal_lines = [line.strip() for line in customer.statement_use_additonal_line.split("\n") if
+                                         line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(50, height - 105, f"Date: {datetime.today().strftime('%Y-%b-%d')}")
     if prefix_check(customer.name.lower()):
@@ -53,8 +50,6 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     for line in statement_use_additonal_lines:
         text_object.textLine(line)
     pdf.drawText(text_object)
-
-
 
     # Table for Invoice Items
     # Define the data for the table

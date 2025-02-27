@@ -1,12 +1,12 @@
 import django_tables2 as tables
 from django_filters import FilterSet, CharFilter, DateFilter, DateTimeFilter
+from django_tables2.export.views import ExportMixin
 from django_tables2.utils import A
 
 from .models import Customer
 from .models import Invoice
 from .models import ProductTransaction
 
-from django_tables2.export.views import ExportMixin
 
 class CustomerTable(tables.Table):
     name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
@@ -56,8 +56,8 @@ class InvoiceTable(tables.Table):
         }
         order_by = '-id'
         fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
-    id = tables.Column(visible=False)  # Hide 'id' from being shown in the frontend
 
+    id = tables.Column(visible=False)  # Hide 'id' from being shown in the frontend
 
 
 class InvoiceFilter(FilterSet):
@@ -134,14 +134,13 @@ class ProductTransactionTable(tables.Table):
         # Add a "+" sign for positive changes
         return f"+{value}" if value > 0 else str(value)
 
-
     class Meta:
         model = ProductTransaction
-        fields = ("invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp")
+        fields = (
+        "invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp")
         attrs = {
             'class': 'table table-striped table-bordered',
         }
-
 
 
 class ProductTransactionFilter(FilterSet):
@@ -151,6 +150,7 @@ class ProductTransactionFilter(FilterSet):
     class Meta:
         model = ProductTransaction
         fields = []  # List only non-model fields to avoid duplication
+
 
 class SalesmanInvoiceTable(ExportMixin, tables.Table):
     number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
@@ -182,7 +182,6 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
                 }
             }
         }
-
 
     # Custom column to calculate the total amount
     def render_total_amount(self, record):

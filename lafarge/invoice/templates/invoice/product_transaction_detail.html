@@ -13,16 +13,15 @@
     </div>
 
 
-
     <!-- Filter Form -->
     <div class="mt-5">
-    <form action="" method="get" class="form">
-        <div class="row g-3">
-            {% bootstrap_form filter.form layout='inline' %}
-        </div>
-        <br>
-        {% bootstrap_button 'filter' %}
-    </form>
+        <form action="" method="get" class="form">
+            <div class="row g-3">
+                {% bootstrap_form filter.form layout='inline' %}
+            </div>
+            <br>
+            {% bootstrap_button 'filter' %}
+        </form>
     </div>
     <h3 class="mt-4">Transaction History</h3>
     <a href="{% export_url 'xlsx' %}" class="btn btn-primary mt-3">Export to XLSX</a>

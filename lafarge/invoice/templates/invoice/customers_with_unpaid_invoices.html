@@ -13,18 +13,18 @@
     <h3 class="mt-4">Monthly Unpaid Totals</h3>
     <table class="table table-bordered table-striped table-hover mt-3">
         <thead class="table-dark">
-            <tr>
-                <th scope="col">Month</th>
-                <th scope="col">Total Unpaid</th>
-            </tr>
+        <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Total Unpaid</th>
+        </tr>
         </thead>
         <tbody>
-            {% for entry in monthly_unpaid %}
-                <tr>
-                    <td>{{ entry.month|date:"F Y" }}</td>
-                    <td>HK$ {{ entry.total|currency }}</td>
-                </tr>
-            {% endfor %}
+        {% for entry in monthly_unpaid %}
+        <tr>
+            <td>{{ entry.month|date:"F Y" }}</td>
+            <td>HK$ {{ entry.total|currency }}</td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 
@@ -32,41 +32,41 @@
     <h3 class="mt-5">Customers and Unpaid Invoices</h3>
     <table class="table table-bordered table-striped table-hover mt-3">
         <thead class="table-dark">
-            <tr>
-                <th scope="col">Customer Name</th>
-                <th scope="col">Unpaid Invoices</th>
-            </tr>
+        <tr>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Unpaid Invoices</th>
+        </tr>
         </thead>
         <tbody>
-            {% for entry in customer_data %}
-                <tr>
-                    <td>
-                        <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none">
-                            {{ entry.customer.name }}
-                        </a>
-                    </td>
-                    <td>
-                        <table class="table table-sm table-bordered">
-                            <thead class="table-secondary">
-                                <tr>
-                                    <th scope="col">Invoice No.</th>
-                                    <th scope="col">Delivery Date</th>
-                                    <th scope="col">Total Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for invoice in entry.unpaid_invoices %}
-                                    <tr>
-                                        <td>{{ invoice.number }}</td>
-                                        <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                                        <td>HK$ {{ invoice.total_price|currency }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            {% endfor %}
+        {% for entry in customer_data %}
+        <tr>
+            <td>
+                <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none">
+                    {{ entry.customer.name }}
+                </a>
+            </td>
+            <td>
+                <table class="table table-sm table-bordered">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">Invoice No.</th>
+                        <th scope="col">Delivery Date</th>
+                        <th scope="col">Total Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for invoice in entry.unpaid_invoices %}
+                    <tr>
+                        <td>{{ invoice.number }}</td>
+                        <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
+                        <td>HK$ {{ invoice.total_price|currency }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

@@ -1,5 +1,6 @@
 from .models import Forbidden_Word
 
+
 def prefix_check(name):
     keywords = ["ltd", "dispensary", "limited", "dr",
                 "centre", "center", "clinic", "office",

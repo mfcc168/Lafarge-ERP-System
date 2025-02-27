@@ -5,20 +5,20 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>Invoice Number</th>
-            <th>Delivery Date</th>
-            <th>Total Price</th>
-        </tr>
+    <tr>
+        <th>Invoice Number</th>
+        <th>Delivery Date</th>
+        <th>Total Price</th>
+    </tr>
     </thead>
     <tbody>
-        {% for invoice in unpaid_invoices %}
-        <tr>
-            <td>{{ invoice.number }}</td>
-            <td>{{ invoice.delivery_date }}</td>
-            <td>{{ invoice.total_price }}</td>
-        </tr>
-        {% endfor %}
+    {% for invoice in unpaid_invoices %}
+    <tr>
+        <td>{{ invoice.number }}</td>
+        <td>{{ invoice.delivery_date }}</td>
+        <td>{{ invoice.total_price }}</td>
+    </tr>
+    {% endfor %}
     </tbody>
 </table>
 
