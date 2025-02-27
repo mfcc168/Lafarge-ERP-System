@@ -57,7 +57,7 @@ def draw_order_form_page(pdf, order):
     for product_name, total_quantity in product_quantities.items():
         data.append([
             product_name,
-            f"{float(total_quantity):g} {item.product.unit}",  # Use the unit from the last item processed
+            f"{float(total_quantity):,g} {item.product.unit}",  # Use the unit from the last item processed
         ])
 
     # Configure table styles

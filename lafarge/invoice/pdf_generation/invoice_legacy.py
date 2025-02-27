@@ -108,14 +108,14 @@ def draw_invoice_page_legacy(pdf, invoice):
                 product_name += f" (Exp.: {item.product.expiry_date.strftime('%Y-%b-%d')})"
             data.append([
                 product_name,
-                f"{float(item.quantity):g} {item.product.unit}\n",
+                f"{float(item.quantity):,g} {item.product.unit}\n",
                 unit_price_display,
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
         else:
             data.append([
                 item.product.name,
-                f"{float(item.quantity):g} {item.product.unit}",
+                f"{float(item.quantity):,g} {item.product.unit}",
                 unit_price_display,
                 f"${item.sum_price:,.2f}" if item.sum_price != 0 else f"-"
             ])
