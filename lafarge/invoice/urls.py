@@ -25,5 +25,6 @@ urlpatterns = [
     path("api/products/", views.ProductView, name="ProductView"),
     path("api/invoices/", views.InvoiceView, name="InvoiceView"),
     path("api/customers/", views.CustomerView, name="CustomerView"),
+    path('api/update-delivery-date/', views.UpdateDeliveryDateView.as_view(), name='update-delivery-date'),
     path('', views.home, name='home'),
 ]

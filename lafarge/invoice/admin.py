@@ -1,5 +1,7 @@
 from django.contrib import admin
-
+from django.db.models import Case, When, Value, IntegerField
+from django.db import transaction
+import math
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
 
 admin.site.site_header = "Lafarge Admin"
@@ -72,6 +74,26 @@ class InvoiceItemInline(admin.TabularInline):
     readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
     fields = (
     'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price', 'product_type')  # Include product_type field
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "product":
+            # Get all products and split them into two groups
+            products_gt_zero = Product.objects.filter(quantity__gt=0).order_by('name')
+            products_eq_zero = Product.objects.filter(quantity=0).order_by('name')
+
+            # Combine the two querysets and annotate them for sorting
+            combined_queryset = (products_gt_zero | products_eq_zero).annotate(
+                sort_order=Case(
+                    When(quantity=0, then=Value(1)),  # Products with quantity = 0 get a higher sort order
+                    default=Value(0),  # Products with quantity > 0 get a lower sort order
+                    output_field=IntegerField(),
+                )
+            ).order_by('sort_order', 'name')  # Sort by sort_order first, then by name
+
+            # Set the combined queryset as the queryset for the product field
+            kwargs["queryset"] = combined_queryset
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Invoice)
