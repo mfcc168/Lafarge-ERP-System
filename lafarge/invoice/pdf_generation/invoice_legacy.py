@@ -3,6 +3,7 @@ from decimal import Decimal, ROUND_UP
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import Table, TableStyle
+from reportlab.graphics.barcode import code128
 
 from ..check_utils import prefix_check
 
@@ -135,3 +136,11 @@ def draw_invoice_page_legacy(pdf, invoice):
     # Add total price at the bottom
     pdf.setFont("Times-Bold", 14)
     pdf.drawString(460, height - 430, f"${invoice.total_price:,.2f}")
+
+    # Generate barcode from invoice number
+    barcode = code128.Code128(invoice.number, barWidth=2.465, barHeight=10)
+
+    # Position the barcode at the top-right of the page
+    barcode_x = 14  # Adjust position as needed
+    barcode_y = height - 524
+    barcode.drawOn(pdf, barcode_x, barcode_y)
