@@ -52,8 +52,6 @@ def salesman_detail(request, salesman_id):
 
     # Initialize filter with request data
     filter = InvoiceFilter(request.GET, queryset=invoices)
-    filter.form.fields.pop('delivery_date', None)
-    filter.form.fields.pop('delivery_date_to', None)
     filter.form.fields.pop('salesman', None)
     table = SalesmanInvoiceTable(filter.qs)  # Use filtered queryset
 
