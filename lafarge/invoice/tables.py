@@ -157,6 +157,7 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
                                attrs={'a': {'class': 'text-decoration-none'}})
     customer = tables.Column(accessor='customer.name', verbose_name='Customer Name')
     payment_date = tables.DateColumn(verbose_name="Payment Date")
+    delivery_date = tables.DateColumn(verbose_name="Delivery Date")
     total_amount = tables.Column(empty_values=(), verbose_name="Total Amount")
     items = tables.TemplateColumn(
         template_code='''
@@ -171,7 +172,7 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
 
     class Meta:
         model = Invoice
-        fields = ("number", "customer", "items", "payment_date")
+        fields = ("number", "customer", "items", "payment_date", "delivery_date")
         attrs = {
             'class': 'table table-striped table-bordered',
             'th': {
