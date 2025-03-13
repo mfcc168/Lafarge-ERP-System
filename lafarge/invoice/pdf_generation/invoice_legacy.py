@@ -141,6 +141,6 @@ def draw_invoice_page_legacy(pdf, invoice):
     barcode = code128.Code128(invoice.number, barWidth=1.2, barHeight=10)
 
     # Position the barcode at the top of the page
-    barcode_x = 250
+    barcode_x = 200
     barcode_y = height - 20
     barcode.drawOn(pdf, barcode_x, barcode_y)

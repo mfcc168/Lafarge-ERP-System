@@ -6,6 +6,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table, TableStyle
+from reportlab.graphics.barcode import code128
 
 from ..check_utils import prefix_check
 from ..encryption import encrypt_customer_id
@@ -179,3 +180,10 @@ def draw_invoice_page(pdf, invoice, copy_type):
         qr_code_image = generate_whatsapp_qr_code(str(os.getenv('PHONE_NUMBER')), encrypted_customer_id)
         qr_code_reader = ImageReader(qr_code_image)
         pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75)
+
+        barcode = code128.Code128(invoice.number, barWidth=1.2, barHeight=10)
+
+        # Position the barcode at the top of the page
+        barcode_x = 200
+        barcode_y = height - 20
+        barcode.drawOn(pdf, barcode_x, barcode_y)
