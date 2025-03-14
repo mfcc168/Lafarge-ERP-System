@@ -43,6 +43,9 @@
             <td>
                 <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none">
                     {{ entry.customer.name }}
+                    {% if entry.customer.care_of %}
+                        ({{ entry.customer.care_of }})
+                    {% endif %}
                 </a>
             </td>
             <td>
@@ -64,6 +67,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <b>Total Unpaid: HK$ {{ entry.total_unpaid|currency }}</b>
             </td>
         </tr>
         {% endfor %}

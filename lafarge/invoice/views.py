@@ -296,28 +296,40 @@ def product_transaction_detail(request, product_id):
 
 @staff_member_required
 def customers_with_unpaid_invoices(request):
-    # Fetch customers who have at least one unpaid invoice
-    customers = Customer.objects.filter(invoice__payment_date__isnull=True).distinct().exclude(name="Sample")
-    unpaid_invoices = Invoice.get_unpaid_invoices().exclude(number__startswith="S-")
+    # Fetch customers who have at least one unpaid invoice with delivery_date not null
+    customers = Customer.objects.filter(
+        invoice__payment_date__isnull=True,
+        invoice__delivery_date__isnull=False
+    ).distinct().exclude(name="Sample")
+
+    # Fetch unpaid invoices with delivery_date not null
+    unpaid_invoices = Invoice.objects.filter(
+        payment_date__isnull=True,
+        delivery_date__isnull=False
+    ).exclude(number__startswith="S-")
 
     # Filter customer data to include only those with at least one unpaid invoice
-    customer_data = [
-        {
-            "customer": customer,
-            "unpaid_invoices": unpaid_invoices.filter(customer=customer),
-        }
-        for customer in customers
-        if unpaid_invoices.filter(customer=customer).exists()  # Ensure at least one unpaid invoice
-    ]
+    customer_data = []
+    for customer in customers:
+        customer_unpaid_invoices = unpaid_invoices.filter(customer=customer)
+        if customer_unpaid_invoices.exists():  # Ensure at least one unpaid invoice
+            # Calculate the total unpaid amount for this customer
+            customer_total_unpaid = customer_unpaid_invoices.aggregate(
+                total=Sum('total_price')
+            )['total'] or 0  # Default to 0 if no unpaid invoices
 
-    # Calculate the total unpaid amount
-    total_unpaid = Invoice.objects.filter(payment_date__isnull=True).aggregate(
-        total=Sum('total_price')
-    )['total'] or 0  # Default to 0 if no unpaid invoices
+            customer_data.append({
+                "customer": customer,
+                "unpaid_invoices": customer_unpaid_invoices,
+                "total_unpaid": customer_total_unpaid,
+            })
 
-    # Calculate monthly unpaid totals
+    # Calculate the total unpaid amount for all invoices with delivery_date not null
+    total_unpaid = unpaid_invoices.aggregate(total=Sum('total_price'))['total'] or 0
+
+    # Calculate monthly unpaid totals for invoices with delivery_date not null
     monthly_unpaid = (
-        Invoice.objects.filter(payment_date__isnull=True)
+        unpaid_invoices
             .annotate(month=TruncMonth('delivery_date'))
             .values('month')
             .annotate(total=Sum('total_price'))
