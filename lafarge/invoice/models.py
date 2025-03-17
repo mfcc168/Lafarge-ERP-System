@@ -96,12 +96,21 @@ class ProductTransaction(models.Model):
 
 
 class Invoice(models.Model):
+    PAYMENT_TYPE_CHOICES = [
+        ('cheque', 'Cheque'),
+        ('cash', 'Cash'),
+        ('fps', 'Fps'),
+        ('credit(cq)', 'Credit Cheque'),
+    ]
     number = models.CharField(max_length=50, unique=True)
     terms = models.CharField(max_length=50, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE, null=True, blank=True)
+    deliveryman = models.ForeignKey(Deliveryman, on_delete=models.CASCADE, null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES, null=True, blank=True)
+    cheque_detail = models.CharField(max_length=50, null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     order_number = models.CharField(max_length=50, null=True, blank=True)

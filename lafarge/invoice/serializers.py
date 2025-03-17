@@ -19,3 +19,9 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+
+
+class DeliverymanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deliveryman
+        fields = '__all__'
