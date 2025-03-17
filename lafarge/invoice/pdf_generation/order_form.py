@@ -40,21 +40,24 @@ def draw_order_form_page(pdf, order):
 
     pdf.drawString(30, height - 180, "This is to place an order for the following medical product(s):")
 
-    # Aggregate quantities for products with the same name
+    # Aggregate quantities for products with the same name but different units separately
     product_quantities = {}
+
     for item in order.invoiceitem_set.all():
-        product_name = item.product.name.split('(')[0].strip()  # strip lot no.
-        if product_name in product_quantities:
-            product_quantities[product_name] += item.quantity
+        product_name = item.product.name.split('(')[0].strip()  # Strip lot no.
+        key = (product_name, item.product.unit)  # Differentiate by unit
+
+        if key in product_quantities:
+            product_quantities[key] += item.quantity
         else:
-            product_quantities[product_name] = item.quantity
+            product_quantities[key] = item.quantity
 
     # Prepare table data
     data = [["Product", "Quantity"]]
-    for product_name, total_quantity in product_quantities.items():
+    for (product_name, unit), total_quantity in product_quantities.items():
         data.append([
             product_name,
-            f"{float(total_quantity):,g} {item.product.unit}",  # Use the unit from the last item processed
+            f"{float(total_quantity):,g} {unit}",  # Ensure correct unit is displayed
         ])
 
     # Configure table styles
