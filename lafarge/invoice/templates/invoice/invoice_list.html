@@ -1,22 +1,38 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
+
 {% block content %}
-<div class="mt-5">
-    <h2>Invoice List</h2>
-    <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'monthly_preview' %}'">
-        Monthly Invoices
-    </button>
-    {% if filter %}
-    <form action="" method="get" class="form">
-        <div class="row g-3">
-            {% bootstrap_form filter.form layout='inline' %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="mb-4 text-primary">Invoice List</h2>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'monthly_preview' %}'">
+                    <i class="bi bi-calendar-check"></i> Monthly Invoices
+                </button>
+            </div>
+
+            {% if filter %}
+            <div class="bg-light p-3 rounded mb-4">
+                <form action="" method="get">
+                    <div class="row row-cols-lg-auto g-2 align-items-center">
+                        {% bootstrap_form filter.form layout='inline' %}
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-funnel"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+            <div>
+            {% load render_table from django_tables2 %}
+            <table class="table table-striped table-hover table-bordered table-sm align-middle"/>
+                {% render_table table %}
+            </div>
         </div>
-        <br>
-        {% bootstrap_button 'filter' %}
-    </form>
-    <br>
-    {% endif %}
-    {% load render_table from django_tables2 %}
-    {% render_table table %}
+    </div>
 </div>
 {% endblock %}

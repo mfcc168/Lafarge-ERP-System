@@ -1,23 +1,38 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
-{% block content %}
-<div class="mt-5">
-    <h2>Customer List</h2>
-    <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='{% url 'unpaid_invoices' %}'">
-        Unpaid Invoices
-    </button>
 
-    {% if filter %}
-    <form action="" method="get" class="form">
-        <div class="row g-3">
-            {% bootstrap_form filter.form layout='inline' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="mb-4 text-primary">Customer List</h2>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'unpaid_invoices' %}'">
+                    <i class="bi bi-exclamation-circle"></i> Unpaid Invoices
+                </button>
+            </div>
+
+            {% if filter %}
+            <div class="bg-light p-3 rounded mb-4">
+                <form action="" method="get">
+                    <div class="row row-cols-lg-auto g-2 align-items-center">
+                        {% bootstrap_form filter.form layout='inline' %}
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-funnel"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+            {% load render_table from django_tables2 %}
+            <div class="table-responsive">
+                {% render_table table %}
+            </div>
         </div>
-        <br>
-        {% bootstrap_button 'filter' %}
-    </form>
-    <br>
-    {% endif %}
-    {% load render_table from django_tables2 %}
-    {% render_table table %}
+    </div>
 </div>
 {% endblock %}

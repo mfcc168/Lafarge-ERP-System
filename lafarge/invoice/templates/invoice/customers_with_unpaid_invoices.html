@@ -1,77 +1,93 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
+
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Customers with Unpaid Invoices</h1>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h1 class="mb-4 text-primary">Customers with Unpaid Invoices</h1>
 
-    <!-- Display Total Unpaid Amount -->
-    <div class="alert alert-info" role="alert">
-        <h2>Total Unpaid Amount: <strong>HK$ {{ total_unpaid|currency }}</strong></h2>
-    </div>
+            <!-- Total Unpaid Amount -->
+            <div class="alert alert-info rounded-3 p-3 text-center" role="alert">
+                <h2 class="mb-0">Total Unpaid Amount: <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong></h2>
+            </div>
 
-    <!-- Display Monthly Unpaid Totals -->
-    <h3 class="mt-4">Monthly Unpaid Totals</h3>
-    <table class="table table-bordered table-striped table-hover mt-3">
-        <thead class="table-dark">
-        <tr>
-            <th scope="col">Month</th>
-            <th scope="col">Total Unpaid</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for entry in monthly_unpaid %}
-        <tr>
-            <td>{{ entry.month|date:"F Y" }}</td>
-            <td>HK$ {{ entry.total|currency }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            <!-- Monthly Unpaid Totals -->
+            <div class="bg-primary-subtle p-3 rounded-3 mb-4 shadow-sm">
+                <h3 class="text-dark">Monthly Unpaid Totals</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover rounded-3">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Unpaid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in monthly_unpaid %}
+                            <tr>
+                                <td>{{ entry.month|date:"F Y" }}</td>
+                                <td><strong>HK$ {{ entry.total|currency }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <!-- Display the list of customers -->
-    <h3 class="mt-5">Customers and Unpaid Invoices</h3>
-    <table class="table table-bordered table-striped table-hover mt-3">
-        <thead class="table-dark">
-        <tr>
-            <th scope="col">Customer Name</th>
-            <th scope="col">Unpaid Invoices</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for entry in customer_data %}
-        <tr>
-            <td>
-                <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none">
-                    {{ entry.customer.name }}
-                    {% if entry.customer.care_of %}
-                        ({{ entry.customer.care_of }})
-                    {% endif %}
-                </a>
-            </td>
-            <td>
-                <table class="table table-sm table-bordered">
-                    <thead class="table-secondary">
-                    <tr>
-                        <th scope="col">Invoice No.</th>
-                        <th scope="col">Delivery Date</th>
-                        <th scope="col">Total Price</th>
-                    </tr>
+
+            <!-- Customers and Unpaid Invoices -->
+            <h3 class="mt-4 text-secondary">Customers and Unpaid Invoices</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle rounded-3">
+                    <thead class="table-dark text-white">
+                        <tr>
+                            <th style="width: 25%;">Customer Name</th>
+                            <th style="width: 75%;">Unpaid Invoices</th>
+                        </tr>
                     </thead>
-                    <tbody>
-                    {% for invoice in entry.unpaid_invoices %}
-                    <tr>
-                        <td>{{ invoice.number }}</td>
-                        <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                        <td>HK$ {{ invoice.total_price|currency }}</td>
-                    </tr>
-                    {% endfor %}
+                    <tbody class="table-group-divider">
+                        {% for entry in customer_data %}
+                        <tr>
+                            <!-- Customer Name -->
+                            <td class="fw-bold">
+                                <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none text-primary">
+                                    {{ entry.customer.name }}
+                                </a>
+                                {% if entry.customer.care_of %}
+                                    <br><small class="text-muted">({{ entry.customer.care_of }})</small>
+                                {% endif %}
+                            </td>
+
+                            <!-- Unpaid Invoices -->
+                            <td>
+                                <table class="table table-sm table-borderless mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Invoice No.</th>
+                                            <th>Delivery Date</th>
+                                            <th>Total Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for invoice in entry.unpaid_invoices %}
+                                        <tr>
+                                            <td>{{ invoice.number }}</td>
+                                            <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
+                                            <td><strong>HK$ {{ invoice.total_price|currency }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <p class="fw-bold mt-2 text-danger">Total Unpaid: HK$ {{ entry.total_unpaid|currency }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
-                <b>Total Unpaid: HK$ {{ entry.total_unpaid|currency }}</b>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}

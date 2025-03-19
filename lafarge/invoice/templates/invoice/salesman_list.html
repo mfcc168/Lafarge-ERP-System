@@ -1,28 +1,21 @@
 {% extends 'invoice/base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-3">Salesman List</h2>
-    <div class="table-responsive">
-        <table class="table table-hover table-bordered">
-            <thead class="table-dark">
-            <tr>
-                <th>Name</th>
-                <th>Code</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for salesman in salesmen %}
-            <tr>
-                <td>
-                    <a href="{% url 'salesman_detail' salesman.id %}" class="text-decoration-none">
-                        {{ salesman.name }}
+    <h2 class="mb-4">Salesman List</h2>
+    <div class="row">
+        {% for salesman in salesmen %}
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ salesman.name }}</h5>
+                    <p class="card-text text-muted">Code: {{ salesman.code }}</p>
+                    <a href="{% url 'salesman_detail' salesman.id %}" class="btn btn-primary">
+                        View Details
                     </a>
-                </td>
-                <td>{{ salesman.code }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

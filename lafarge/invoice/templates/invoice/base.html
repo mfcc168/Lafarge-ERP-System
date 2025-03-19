@@ -9,81 +9,124 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
         .table thead th a {
-            color: black;
+        color: black;
+        text-decoration: none;
+        position: relative;
+            }
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: width 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            color: white;
             text-decoration: none;
-            position: relative;
+            padding: 10px 20px;
+            display: block;
+            font-size: 16px;
+            transition: 0.3s;
         }
-            /* Base style for sortable columns */
-        th.sortable {
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar .sidebar-header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            padding-bottom: 10px;
+        }
+
+        .sidebar .nav-item i {
+            margin-right: 10px;
+        }
+
+        /* Main Content Area */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        /* Collapsed Sidebar */
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            font-size: 16px;
+        }
+
+        .content.collapsed {
+            margin-left: 80px;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: absolute;
+            top: 15px;
+            right: -20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
             cursor: pointer;
-            position: relative;
+            border-radius: 5px;
+            transition: 0.3s;
         }
 
-        /* Sorting indicator for ascending order */
-        th.ascend::after {
-            content: "▲"; /* Up arrow */
-            position: absolute;
-            right: 8px;
-            font-size: 12px;
-            color: #007bff;
+        .sidebar-toggle:hover {
+            background: #0056b3;
         }
-
-        /* Sorting indicator for descending order */
-        th.descend::after {
-            content: "▼"; /* Down arrow */
-            position: absolute;
-            right: 8px;
-            bottom: 5px;
-            font-size: 12px;
-            color: #007bff;
-        }
-
     </style>
-
 </head>
 <body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">Lafarge Invoice App</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'product_list' %}">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'salesman_list' %}">Salesmen</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'customer_list' %}">Customers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'invoice_list' %}">Invoices</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                </li>
-            </ul>
-        </div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-header">
+        Lafarge Invoice
     </div>
-</nav>
+    <a href="{% url 'home' %}" class="nav-item"><i class="bi bi-house-door"></i> <span>Home</span></a>
+    <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
+    <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
+    <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
+    <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
+    <a href="{% url 'admin:index' %}" class="nav-item"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
+</div>
 
 <!-- Main Content -->
-<div class="container mt-4">
+<div class="content" id="content">
     {% block content %}
     {% endblock %}
 </div>
 
-<!-- Footer -->
+<!-- Sidebar Toggle Script -->
+<script>
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        document.getElementById("content").classList.toggle("collapsed");
+    }
+</script>
 
 {% bootstrap_javascript %}
 </body>
