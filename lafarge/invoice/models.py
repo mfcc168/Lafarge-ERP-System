@@ -54,6 +54,7 @@ class Deliveryman(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    name_alias = models.CharField(max_length=255, null=True, blank=True)
     registration_code = models.CharField(max_length=255, blank=True, null=True)
     expiry_date = models.DateField(null=True, blank=True)
     unit = models.CharField(max_length=255, blank=True, null=True)

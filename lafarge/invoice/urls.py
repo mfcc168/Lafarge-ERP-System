@@ -9,7 +9,7 @@ from .views.customer_page_views import (
     customers_with_unpaid_invoices, unpaid_invoices_by_customer
 )
 from .views.home_page_views import home
-from .views.invoice_page_views import InvoiceListView, invoice_detail
+from .views.invoice_page_views import InvoiceListView, invoice_detail, monthly_preview, monthly_report
 from .views.pdf_download_views import (
     download_delivery_note_pdf, download_invoice_legacy_pdf,
     download_invoice_pdf, download_order_form_pdf,
@@ -41,6 +41,8 @@ urlpatterns = [
     # Invoices
     path('invoices/', InvoiceListView.as_view(), name='invoice_list'),
     path('invoice/<str:invoice_number>/', invoice_detail, name='invoice_detail'),
+    path("invoices/monthly/", monthly_preview, name="monthly_preview"),
+    path("invoices/monthly/<int:year>/<int:month>/", monthly_report, name="monthly_report"),
 
     # PDF Downloads
     path('delivery-note/<str:invoice_number>/download/', download_delivery_note_pdf, name='download_delivery_note_pdf'),

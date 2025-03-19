@@ -1,0 +1,64 @@
+{% extends "invoice/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Monthly Report - {{ month }}/{{ year }}</h2>
+
+    {% for week_num, data in weeks.items %}
+        {% with valid_invoices=data.invoices|dictsort:"total_price" %}
+        {% if valid_invoices|length > 0 %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Week {{ week_num }}</h5>
+                <span class="fw-bold">Total: ${{ data.total|floatformat:2 }}</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Delivery Date</th>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th>Salesman</th>
+                                <th>Total Price</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in valid_invoices %}
+                            {% if invoice.total_price > 0 %}
+                            <tr>
+                                <td>{{ invoice.delivery_date }}</td>
+                                <td><a href="{% url 'invoice_detail' invoice.number %}" class="text-decoration-none">{{ invoice.number }}</a></td>
+                                <td>{{ invoice.customer.name }}</td>
+                                <td>{{ invoice.salesman.name }}</td>
+                                <td>${{ invoice.total_price|floatformat:2 }}</td>
+                                <td>
+                                    <ul class="list-unstyled mb-0">
+                                        {% for item in invoice.items %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    {% endfor %}
+
+    {% if monthly_total > 0 %}
+    <div class="alert alert-success text-center">
+        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|floatformat:2 }}</strong></h4>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No invoices found for this month.</div>
+    {% endif %}
+</div>
+{% endblock %}
