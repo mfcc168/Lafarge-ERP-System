@@ -1,6 +1,6 @@
 {% extends "invoice/base.html" %}
 {% load bootstrap5 %}
-
+{% load custom_filter %}
 {% block content %}
 <section class="py-3 py-md-5">
     <div class="container">
@@ -29,7 +29,7 @@
                                 <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
                                     <td>{{ invoice.number }}</td>
                                     <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                                    <td class="text-end fw-bold text-danger">HK$ {{ invoice.total_price }}</td>
+                                    <td class="text-end fw-bold text-danger">HK$ {{ invoice.total_price|currency }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>

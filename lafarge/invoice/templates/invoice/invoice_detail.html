@@ -1,6 +1,6 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
-
+{% load custom_filter %}
 {% block content %}
 <section class="py-3 py-md-5">
     <div class="container">
@@ -51,10 +51,10 @@
                                 {% for item in invoice.invoiceitem_set.all %}
                                 <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
                                     <td>{{ item.quantity }} {{ item.product.unit }}</td>
-                                    <td class="fw-semibold">{{ item.product.name }}</td>
+                                    <td class="fw-semibold product-name">{{ item.product.name }}</td>
                                     {% if item.product_type == "normal" %}
                                     <td class="text-end">HK$ {{ item.price }}</td>
-                                    <td class="text-end fw-bold text-success">HK$ {{ item.sum_price }}</td>
+                                    <td class="text-end fw-bold text-success">HK$ {{ item.sum_price|currency }}</td>
                                     {% else %}
                                     <td class="text-end text-danger">{{ item.product_type }}</td>
                                     <td class="text-end">-</td>
@@ -63,7 +63,7 @@
                                 {% endfor %}
                                 <tr class="fw-bold bg-secondary text-white">
                                     <td colspan="3" class="text-end">Total</td>
-                                    <td class="text-end">HK$ {{ invoice.total_price }}</td>
+                                    <td class="text-end">HK$ {{ invoice.total_price|currency }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -146,6 +146,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.product-name {
+    max-width: 150px;
+    word-break: break-word;
+    white-space: normal;
 }
 </style>
 

@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.safestring import mark_safe
 from django_filters import FilterSet, CharFilter, DateFilter, DateTimeFilter
 from django_tables2.export.views import ExportMixin
 from django_tables2.utils import A
@@ -6,6 +7,7 @@ from django_tables2.utils import A
 from .models import Customer
 from .models import Invoice
 from .models import ProductTransaction
+from .templatetags.custom_filter import currency
 
 
 class CustomerTable(tables.Table):
@@ -54,6 +56,9 @@ class InvoiceTable(tables.Table):
 
     customer = tables.Column(attrs={"td": {"class": "column-customer"}})  # Add a CSS class
 
+    def render_total_price(self, value):
+        return mark_safe(f"${currency(value)}")  # Apply the currency format
+
     class Meta:
         model = Invoice
         attrs = {
@@ -70,7 +75,6 @@ class InvoiceTable(tables.Table):
         fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
 
     id = tables.Column(visible=False)  # Hide 'id' from being shown
-
 
 
 class InvoiceFilter(FilterSet):
@@ -103,6 +107,9 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
         ''',
         verbose_name="Items"
     )
+
+    def render_total_price(self, value):
+        return mark_safe(f"${currency(value)}")  # Apply the currency format
 
     class Meta:
         model = Invoice
@@ -151,7 +158,7 @@ class ProductTransactionTable(tables.Table):
     class Meta:
         model = ProductTransaction
         fields = (
-        "invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp")
+            "invoice_number", "customer", "nature_of_transaction", "change", "quantity_after_transaction", "timestamp")
         attrs = {
             'class': 'table table-striped table-bordered',
         }

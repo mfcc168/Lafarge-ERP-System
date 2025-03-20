@@ -1,5 +1,5 @@
 {% extends "invoice/base.html" %}
-
+{% load custom_filter %}
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Monthly Invoice Summary</h2>
@@ -17,7 +17,7 @@
                                 </a>
                             </h5>
                             <p class="card-text fw-bold text-secondary">
-                                Total: ${{ month.total|floatformat:2 }}
+                                Total: ${{ month.total|currency }}
                             </p>
                         </div>
                     </div>
