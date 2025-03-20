@@ -1,0 +1,33 @@
+{% extends "invoice/base.html" %}
+
+{% block content %}
+<h2>Transaction History for {{ product.name }}</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Invoice Number</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Quantity Change</th>
+            <th>Type</th>
+            <th>Remaining Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+        <tr>
+            <td><a href="{% url 'invoice_detail' transaction.invoice_number %}">{{ transaction.invoice_number }}</a></td>
+            <td>{{ transaction.customer }}</td>
+            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.quantity }}</td>
+            <td>{{ transaction.product_type }}</td>
+            <td>{{ transaction.remaining_stock }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'product_list' %}" class="btn btn-secondary">Back to Products</a>
+
+{% endblock %}

@@ -19,7 +19,7 @@ from .views.salesman_page_views import (
     salesman_list, salesman_detail, salesman_monthly_sales
 )
 from .views.product_page_views import (
-    product_list, product_transaction_detail
+    product_list, product_transaction_detail, product_transaction_view
 )
 
 urlpatterns = [
@@ -37,6 +37,7 @@ urlpatterns = [
     # Products
     path('products/', product_list, name='product_list'),
     path('products/<int:product_id>/', product_transaction_detail, name='product_transaction_detail'),
+    path("product/<int:product_id>/transactions/", product_transaction_view, name="product_transactions"),
 
     # Invoices
     path('invoices/', InvoiceListView.as_view(), name='invoice_list'),
