@@ -106,6 +106,7 @@ class Invoice(models.Model):
     number = models.CharField(max_length=50, unique=True)
     terms = models.CharField(max_length=50, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    sample_customer = models.CharField(max_length=50, null=True, blank=True)
     salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE, null=True, blank=True)
     deliveryman = models.ForeignKey(Deliveryman, on_delete=models.CASCADE, null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True)

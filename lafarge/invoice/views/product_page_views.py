@@ -1,4 +1,7 @@
+from collections import defaultdict
+
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import F
 from django.shortcuts import render, get_object_or_404
 from django_tables2.export.export import TableExport
 
@@ -40,27 +43,52 @@ def product_transaction_view(request, product_id):
 
     # Fetch transactions sorted by date (oldest first)
     transactions = InvoiceItem.objects.filter(product=product).select_related("invoice").order_by(
-        "invoice__delivery_date", "id")
+        F("invoice__delivery_date").asc(nulls_last=True),  # Sort delivered first, undelivered last
+        "invoice__id",
+        "id"
+    )
 
     transactions_data = []
-
-    # Calculate the initial stock before the first transaction
     initial_stock = product.quantity + sum(item.quantity for item in transactions)
+    remaining_stock = initial_stock
 
-    remaining_stock = initial_stock  # Start from calculated initial stock
+    # Group transactions by invoice number
+    grouped_transactions = defaultdict(lambda: {
+        "customer": "",
+        "sample_customer": "",
+        "date": "",
+        "quantity": 0,
+        "remaining_stock": None
+    })
 
     for item in transactions:
-        quantity_change = -item.quantity  # All transactions reduce stock
+        invoice_number = item.invoice.number
+        quantity_change = -item.quantity
+        remaining_stock += quantity_change
 
-        remaining_stock += quantity_change  # Deduct from remaining stock
+        grouped_transactions[invoice_number]["customer"] = item.invoice.customer.name if item.invoice.customer else ""
+        grouped_transactions[invoice_number][
+            "sample_customer"] = item.invoice.sample_customer if item.invoice.sample_customer else ""  # No `.name` needed
+        grouped_transactions[invoice_number]["date"] = (
+            item.invoice.delivery_date if item.invoice.delivery_date else "To Be Delivered"
+        )
+        grouped_transactions[invoice_number]["quantity"] += quantity_change
 
+        # Store the lowest remaining stock for this invoice
+        if grouped_transactions[invoice_number]["remaining_stock"] is None or remaining_stock < \
+                grouped_transactions[invoice_number]["remaining_stock"]:
+            grouped_transactions[invoice_number]["remaining_stock"] = remaining_stock
+
+    # Convert grouped data into a list
+    for invoice_number, data in grouped_transactions.items():
         transactions_data.append({
-            "invoice_number": item.invoice.number,
-            "customer": item.invoice.customer.name,
-            "date": item.invoice.delivery_date,
-            "quantity": quantity_change,
+            "invoice_number": invoice_number,
+            "customer": data["sample_customer"] if data["sample_customer"] else data["customer"],
+            # Prioritize sample_customer
+            "date": data["date"],
+            "quantity": data["quantity"],
             "product_type": "OUT",
-            "remaining_stock": remaining_stock,
+            "remaining_stock": data["remaining_stock"],
         })
 
     context = {
