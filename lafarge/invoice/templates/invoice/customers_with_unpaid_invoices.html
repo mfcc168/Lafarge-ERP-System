@@ -9,7 +9,9 @@
 
             <!-- Total Unpaid Amount -->
             <div class="alert alert-warning rounded-3 p-4 text-center shadow-sm">
-                <h2 class="mb-0">Total Unpaid Amount: <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong></h2>
+                <h2 class="mb-0">Total Unpaid Amount:
+                    <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong>
+                </h2>
             </div>
 
             <!-- Monthly Unpaid Totals -->
@@ -47,12 +49,11 @@
                     </thead>
                     <tbody>
                         {% for entry in customer_data %}
-                        <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                        <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}"
+                            data-href="{% url 'customer_unpaid_invoices' entry.customer.name %}">
                             <!-- Customer Name -->
                             <td class="fw-bold">
-                                <a href="{% url 'customer_unpaid_invoices' entry.customer.name %}" class="text-decoration-none text-primary">
-                                    {{ entry.customer.name }}
-                                </a>
+                                {{ entry.customer.name }}
                                 {% if entry.customer.care_of %}
                                     <br><small class="text-muted">({{ entry.customer.care_of }})</small>
                                 {% endif %}
@@ -113,24 +114,26 @@
 }
 
 /* Hover Effect */
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
+.table-hover tbody tr:hover, .clickable-row:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Light blue */
+    cursor: pointer;
 }
 
-/* Softer Background */
-.bg-light {
-    background-color: #f8f9fa !important;
-}
-
-/* Card Styling */
-.card {
-    border-radius: 12px !important;
-}
-
-/* Align Unpaid Total Right */
-.text-end {
-    text-align: right;
+/* Clickable Row */
+.clickable-row {
+    transition: background-color 0.2s ease-in-out;
 }
 </style>
+
+<!-- JavaScript for Clickable Rows -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".clickable-row").forEach(row => {
+        row.addEventListener("click", function () {
+            window.location.href = this.dataset.href;
+        });
+    });
+});
+</script>
 
 {% endblock %}

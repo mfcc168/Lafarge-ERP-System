@@ -15,80 +15,80 @@
             </div>
 
             {% if filter %}
-<div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
-    <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection">
-        <i class="bi bi-funnel"></i> Show Filters
-    </button>
+            <div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
+                <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection">
+                    <i class="bi bi-funnel"></i> Show Filters
+                </button>
 
-    <div class="collapse" id="filterSection">
-        <form action="" method="get">
-            <div class="row g-3">
-                <!-- Customer Filter -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Customer</label>
-                    {{ filter.form.customer_name }}
-                </div>
+                <div class="collapse" id="filterSection">
+                    <form action="" method="get">
+                        <div class="row g-3">
+                            <!-- Customer Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Customer</label>
+                                {{ filter.form.customer_name }}
+                            </div>
 
-                <!-- Care Of Filter -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Care Of</label>
-                    {{ filter.form.customer_care_of }}
-                </div>
+                            <!-- Care Of Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Care Of</label>
+                                {{ filter.form.customer_care_of }}
+                            </div>
 
-                <!-- Invoice Number  -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Invoice Number</label>
-                    {{ filter.form.number }}
-                </div>
+                            <!-- Invoice Number  -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Invoice Number</label>
+                                {{ filter.form.number }}
+                            </div>
 
 
 
-                <!-- Delivery Date Filters -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Delivery Date (From)</label>
-                    {{ filter.form.delivery_date }}
-                </div>
+                            <!-- Delivery Date Filters -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Delivery Date (From)</label>
+                                {{ filter.form.delivery_date }}
+                            </div>
 
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Delivery Date (To)</label>
-                    {{ filter.form.delivery_date_to }}
-                </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Delivery Date (To)</label>
+                                {{ filter.form.delivery_date_to }}
+                            </div>
 
-                <!-- Salesman Filters -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Salesman</label>
-                    {{ filter.form.salesman }}
-                </div>
+                            <!-- Salesman Filters -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Salesman</label>
+                                {{ filter.form.salesman }}
+                            </div>
 
-                <!-- Payment Date Filters -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Payment Date (From)</label>
-                    {{ filter.form.payment_date }}
-                </div>
+                            <!-- Payment Date Filters -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Payment Date (From)</label>
+                                {{ filter.form.payment_date }}
+                            </div>
 
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Payment Date (To)</label>
-                    {{ filter.form.payment_date_to }}
-                </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Payment Date (To)</label>
+                                {{ filter.form.payment_date_to }}
+                            </div>
 
-                <!-- Filter & Reset Buttons -->
-                <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel"></i> Apply Filters
-                    </button>
-                    <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i> Reset
-                    </a>
+                            <!-- Filter & Reset Buttons -->
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-funnel"></i> Apply Filters
+                                </button>
+                                <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </div>
-</div>
-{% endif %}
+            {% endif %}
 
 
             <div class="table-responsive rounded-3">
-                <table class="table table-hover table-striped align-middle border-0 rounded-3">
+                <table class="table table-hover table-striped align-middle border-0 rounded-3 invoice-table">
                     {% render_table table %}
                 </table>
             </div>
@@ -154,5 +154,22 @@ td.column-customer, th[data-orderable*="customer"] {
     background-color: #f8f9fa !important; /* Softer background */
 }
 </style>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".invoice-table tbody tr").forEach(row => {
+        const link = row.querySelector("a"); // Find the existing invoice number link
+        if (link) {
+            row.style.cursor = "pointer"; // Make the cursor a pointer
+            row.addEventListener("click", () => {
+                window.location.href = link.href; // Redirect to invoice detail
+            });
 
+            // Ensure that clicking on a link doesn't trigger the row click event
+            row.querySelectorAll("a").forEach(a => {
+                a.addEventListener("click", (e) => e.stopPropagation());
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

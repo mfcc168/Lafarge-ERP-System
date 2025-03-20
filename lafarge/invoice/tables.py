@@ -3,6 +3,7 @@ from django.utils.safestring import mark_safe
 from django_filters import FilterSet, CharFilter, DateFilter, DateTimeFilter
 from django_tables2.export.views import ExportMixin
 from django_tables2.utils import A
+from django.utils.html import escape
 
 from .models import Customer
 from .models import Invoice
@@ -49,7 +50,7 @@ class CustomerFilter(FilterSet):
 
 class InvoiceTable(tables.Table):
     number = tables.LinkColumn(
-        'invoice_detail', args=[A('number')],
+        'invoice_detail', args=[tables.A('number')],
         text=lambda record: record.number,
     )
 
@@ -57,20 +58,20 @@ class InvoiceTable(tables.Table):
 
     def render_number(self, value):
         """Render total_price with formatting"""
-        return mark_safe(f'<span class="text-decoration-none fw-bold text-primary">#{value}</span>')
+        return mark_safe(f'<span class="text-decoration-none fw-bold text-primary">#{escape(value)}</span>')
 
     def render_salesman(self, value):
         """Render salesman as a badge"""
-        return mark_safe(f'<span class="badge bg-secondary text-white">{value.code}</span>')
+        return mark_safe(f'<span class="badge bg-secondary text-white">{escape(value.code)}</span>')
 
     def render_total_price(self, value):
         """Render total_price with formatting"""
-        return mark_safe(f'<span class="text-end fw-bold text-success">${currency(value)}</span>')
+        return mark_safe(f'<span class="text-end fw-bold text-success">${escape(value)}</span>')
 
     class Meta:
         model = Invoice
         attrs = {
-            'class': 'table table-striped table-bordered',
+            'class': 'table table-hover table-striped align-middle border-0 rounded-3 invoice-table',
             'th': {
                 '_ordering': {
                     'orderable': 'sortable',
