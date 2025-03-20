@@ -66,7 +66,7 @@ class InvoiceTable(tables.Table):
 
     def render_total_price(self, value):
         """Render total_price with formatting"""
-        return mark_safe(f'<span class="text-end fw-bold text-success">${escape(value)}</span>')
+        return mark_safe(f'<span class="text-end fw-bold text-success">${escape(currency(value))}</span>')
 
     class Meta:
         model = Invoice
