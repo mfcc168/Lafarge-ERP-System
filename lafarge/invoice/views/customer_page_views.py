@@ -26,8 +26,12 @@ def customer_detail(request, customer_name):
     invoices = Invoice.objects.filter(customer=customer)
 
     # Apply filter to the invoices queryset
-    filterset = InvoiceFilter(request.GET, queryset=invoices)
-    table = CustomerInvoiceTable(filterset.qs)
+    filter = InvoiceFilter(request.GET, queryset=invoices)
+    filter.form.fields.pop('number', None)
+    filter.form.fields.pop('salesman', None)
+    filter.form.fields.pop('customer_care_of', None)
+    filter.form.fields.pop('customer_name', None)
+    table = CustomerInvoiceTable(filter.qs)
     RequestConfig(request).configure(table)
 
     # Check for export format in request and handle CSV export
@@ -39,7 +43,7 @@ def customer_detail(request, customer_name):
     context = {
         'customer': customer,
         'table': table,
-        'filter': filterset,
+        'filter': filter,
     }
     return render(request, 'invoice/customer_detail.html', context)
 

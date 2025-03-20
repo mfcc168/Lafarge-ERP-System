@@ -100,37 +100,63 @@ class InvoiceFilter(FilterSet):
 
 
 class CustomerInvoiceTable(ExportMixin, tables.Table):
-    number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
-                               attrs={'a': {'class': 'text-decoration-none'}})
-    total_price = tables.Column(verbose_name='Total Price')
-    salesman = tables.Column(verbose_name='Salesman')
-    delivery_date = tables.DateColumn(verbose_name='Delivery Date')
-    payment_date = tables.DateColumn(verbose_name='Payment Date')
+    number = tables.LinkColumn(
+        'invoice_detail',
+        args=[A('number')],
+        text=lambda record: record.number,
+        attrs={'a': {'class': 'text-decoration-none fw-bold text-primary'}}
+    )
+
+    total_price = tables.Column(
+        verbose_name='Total Price',
+        attrs={'td': {'class': 'text-end text-danger fw-bold'}}
+    )
+
+    delivery_date = tables.DateColumn(
+        verbose_name='Delivery Date',
+        attrs={'td': {'class': 'text-center'}}
+    )
+
+    payment_date = tables.DateColumn(
+        verbose_name='Payment Date',
+        attrs={'td': {'class': 'text-center'}}
+    )
+
     items = tables.TemplateColumn(
         template_code='''
             <ul class="list-unstyled mb-0">
                 {% for item in record.invoiceitem_set.all %}
-                    <li>{{ item.product.name }}: {{ item.quantity }} {{ item.product.unit }} @ ${{ item.price }} ({{ item.product_type }})</li>
+                    <li class="small text-muted">
+                        <span class="fw-bold">{{ item.product.name }}</span>: 
+                        {{ item.quantity }}  @ 
+                        {% if item.product_type == "normal" %}
+                            <span class="text-primary">${{ item.price }}</span>
+                        {% else %}
+                            ({{ item.product_type }})
+                        {% endif %}
+                    </li>
                 {% endfor %}
             </ul>
         ''',
-        verbose_name="Items"
+        verbose_name="Items",
+        attrs={'td': {'class': 'small'}}
     )
 
     def render_total_price(self, value):
-        return mark_safe(f"${currency(value)}")  # Apply the currency format
+        return mark_safe(f"<span class='text-danger fw-bold'>${currency(value)}</span>")  # Apply the currency format
 
     class Meta:
         model = Invoice
-        fields = ("number", "total_price", "salesman", "delivery_date", "payment_date")
+        fields = ("number", "total_price", "delivery_date", "payment_date", "items")
         attrs = {
-            'class': 'table table-striped table-bordered',
+            'class': 'table table-hover table-striped shadow-sm rounded-3 bg-white border',
             'th': {
                 '_ordering': {
-                    'orderable': 'sortable',  # Instead of `orderable`
-                    'ascending': 'ascend',  # Instead of `asc`
-                    'descending': 'descend'  # Instead of `desc`
-                }
+                    'orderable': 'sortable',
+                    'ascending': 'ascend',
+                    'descending': 'descend'
+                },
+                'class': 'bg-light text-dark text-uppercase'
             }
         }
 
@@ -183,37 +209,68 @@ class ProductTransactionFilter(FilterSet):
 
 
 class SalesmanInvoiceTable(ExportMixin, tables.Table):
-    number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
-                               attrs={'a': {'class': 'text-decoration-none'}})
-    customer = tables.Column(accessor='customer.name', verbose_name='Customer Name')
-    payment_date = tables.DateColumn(verbose_name="Payment Date")
-    delivery_date = tables.DateColumn(verbose_name="Delivery Date")
-    total_amount = tables.Column(empty_values=(), verbose_name="Total Amount")
+    number = tables.LinkColumn(
+        'invoice_detail', args=[A('number')],
+        text=lambda record: record.number,
+        attrs={'a': {'class': 'text-decoration-none fw-bold text-primary'}}
+    )
+
+    customer = tables.Column(
+        accessor='customer.name',
+        verbose_name='Customer Name',
+        attrs={'td': {'class': 'fw-bold'}}
+    )
+
+    payment_date = tables.DateColumn(
+        verbose_name="Payment Date",
+        attrs={'td': {'class': 'text-center'}}
+    )
+
+    delivery_date = tables.DateColumn(
+        verbose_name="Delivery Date",
+        attrs={'td': {'class': 'text-center'}}
+    )
+
+    total_amount = tables.Column(
+        empty_values=(),
+        verbose_name="Total Amount",
+        attrs={'td': {'class': 'text-end text-danger fw-bold'}}
+    )
+
     items = tables.TemplateColumn(
         template_code='''
-            <ul class="list-unstyled mb-0">
-                {% for item in record.invoiceitem_set.all %}
-                    <li>{{ item.product.name }}: {{ item.quantity }} @ ${{ item.price }} ({{ item.product_type }})</li>
-                {% endfor %}
-            </ul>
+        <ul class="list-unstyled mb-0">
+            {% for item in record.invoiceitem_set.all %}
+                <li class="small text-muted">
+                    <strong>{{ item.product.name }}</strong>: 
+                    {{ item.quantity }} {{ item.product.unit }} @ 
+                    {% if item.product_type == "normal" %}
+                        <span class="text-primary">${{ item.price }}</span>
+                    {% else %}
+                        ({{ item.product_type }})
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
         ''',
-        verbose_name="Items"
+        verbose_name="Items",
+        attrs={'td': {'class': 'small'}}
     )
+
+    def render_total_amount(self, record):
+        return mark_safe(f"<span class='text-danger fw-bold'>${sum(item.sum_price for item in record.invoiceitem_set.all()):,.2f}</span>")
 
     class Meta:
         model = Invoice
-        fields = ("number", "customer", "items", "payment_date", "delivery_date")
+        fields = ("number", "customer", "items", "payment_date", "delivery_date", "total_amount")
         attrs = {
-            'class': 'table table-striped table-bordered',
+            'class': 'table table-hover table-striped shadow-sm rounded-3 bg-white border',
             'th': {
                 '_ordering': {
                     'orderable': 'sortable',
                     'ascending': 'ascend',
                     'descending': 'descend'
-                }
+                },
+                'class': 'bg-light text-dark text-uppercase'
             }
         }
-
-    # Custom column to calculate the total amount
-    def render_total_amount(self, record):
-        return sum(item.sum_price for item in record.invoiceitem_set.all())

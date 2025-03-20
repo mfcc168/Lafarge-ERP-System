@@ -4,53 +4,73 @@
 {% load render_table from django_tables2 %}
 
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <h2 class="text-uppercase text-primary">{{ salesman.name }}'s Sales Records</h2>
 
-<div class="container mt-4">
-    <!-- Salesman Name -->
-    <div class="text-center mb-4">
-        <h1 class="fw-bold">{{ salesman.name }}'s Sales Records</h1>
-    </div>
 
-    <!-- Filter Section -->
-    <div class="card shadow-sm border-0 p-4">
-        <h4 class="mb-3"><i class="bi bi-funnel"></i> Filter Invoices</h4>
-        <form action="" method="get">
-            <div class="row g-3">
-                {% bootstrap_form filter.form layout='inline' %}
+
+            <!-- Filter Section -->
+            <h3 class="mt-4 text-secondary">Invoice Records</h3>
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+                <form action="" method="get" class="form">
+                    <div class="row g-3">
+                        {% bootstrap_form filter.form layout='inline' %}
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="bi bi-funnel"></i> Apply Filter
+                    </button>
+                </form>
             </div>
-            <div class="mt-3">
-                {% bootstrap_button 'Filter' %}
+
+            <!-- Export & Back Buttons -->
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{% export_url 'xlsx' %}" class="btn btn-success">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export to XLSX
+                </a>
+                <a href="{% url 'salesman_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Salesman List
+                </a>
             </div>
-        </form>
-    </div>
 
-    <!-- Export Button -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-        <h3><i class="bi bi-receipt"></i> Invoices</h3>
-        <a href="{% export_url 'xlsx' %}" class="btn btn-success">
-            <i class="bi bi-file-earmark-excel"></i> Export to XLSX
-        </a>
-    </div>
-
-    <!-- Invoice Table -->
-    <div class="card shadow-sm border-0 p-4 mt-3">
-        {% render_table table %}
-    </div>
-
-
-
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-        <a href="{% url 'salesman_list' %}" class="btn btn-primary">
-            <i class="bi bi-arrow-left-circle"></i> Back to Salesman List
-        </a>
+            <!-- Invoice Table -->
+            <div class="table-responsive">
+                {% render_table table %}
+            </div>
+        </div>
     </div>
 </div>
 
-
-
-
-
+<!-- Custom Styles -->
+<style>
+.table th, .table td {
+    text-align: left !important;
+    vertical-align: middle !important;
+    padding: 12px 16px;
+}
+.table th a {
+    text-decoration: none !important;
+    color: #333 !important;
+    font-weight: bold;
+}
+.table th a:hover {
+    color: #555 !important;
+}
+.card {
+    border-radius: 12px !important;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    cursor: pointer;
+}
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+}
+</style>
 
 {% endblock %}
