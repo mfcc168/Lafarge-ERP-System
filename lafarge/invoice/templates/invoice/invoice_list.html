@@ -1,9 +1,10 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
+{% load render_table from django_tables2 %}
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 rounded-3 p-3">
         <div class="card-body">
             <h2 class="mb-4 text-primary">Invoice List</h2>
 
@@ -14,25 +15,144 @@
             </div>
 
             {% if filter %}
-            <div class="bg-light p-3 rounded mb-4">
-                <form action="" method="get">
-                    <div class="row row-cols-lg-auto g-2 align-items-center">
-                        {% bootstrap_form filter.form layout='inline' %}
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-outline-primary">
-                                <i class="bi bi-funnel"></i> Filter
-                            </button>
-                        </div>
-                    </div>
-                </form>
+<div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
+    <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection">
+        <i class="bi bi-funnel"></i> Show Filters
+    </button>
+
+    <div class="collapse" id="filterSection">
+        <form action="" method="get">
+            <div class="row g-3">
+                <!-- Customer Filter -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Customer</label>
+                    {{ filter.form.customer_name }}
+                </div>
+
+                <!-- Care Of Filter -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Care Of</label>
+                    {{ filter.form.customer_care_of }}
+                </div>
+
+                <!-- Invoice Number  -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Invoice Number</label>
+                    {{ filter.form.number }}
+                </div>
+
+
+
+                <!-- Delivery Date Filters -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Delivery Date (From)</label>
+                    {{ filter.form.delivery_date }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Delivery Date (To)</label>
+                    {{ filter.form.delivery_date_to }}
+                </div>
+
+                <!-- Salesman Filters -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Salesman</label>
+                    {{ filter.form.salesman }}
+                </div>
+
+                <!-- Payment Date Filters -->
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Payment Date (From)</label>
+                    {{ filter.form.payment_date }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Payment Date (To)</label>
+                    {{ filter.form.payment_date_to }}
+                </div>
+
+                <!-- Filter & Reset Buttons -->
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Reset
+                    </a>
+                </div>
             </div>
-            {% endif %}
-            <div>
-            {% load render_table from django_tables2 %}
-            <table class="table table-striped table-hover table-bordered table-sm align-middle"/>
-                {% render_table table %}
+        </form>
+    </div>
+</div>
+{% endif %}
+
+
+            <div class="table-responsive rounded-3">
+                <table class="table table-hover table-striped align-middle border-0 rounded-3">
+                    {% render_table table %}
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+
+/* Make form fields more readable */
+.bg-light input, .bg-light select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Improve spacing */
+.form-label {
+    margin-bottom: 4px;
+}
+
+/* Hide the default date picker icon */
+input[type="date"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 10px;
+}
+
+
+
+td.column-customer, th[data-orderable*="customer"] {
+    max-width: 200px; /* Adjust this width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    border: none !important;  /* Remove all harsh table borders */
+    padding: 12px 16px;        /* Add more breathing space */
+}
+
+.table a {
+    color: #555 !important; /* Slightly darker on hover */
+    text-decoration: none !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Soft hover effect */
+}
+
+.card {
+    border-radius: 12px !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important; /* Softer background */
+}
+</style>
+
 {% endblock %}

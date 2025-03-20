@@ -1,20 +1,22 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
+{% load render_table from django_tables2 %}
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 rounded-3 p-3">
         <div class="card-body">
             <h2 class="mb-4 text-primary">Customer List</h2>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'unpaid_invoices' %}'">
+                <button type="button" class="btn btn-primary"
+                        onclick="window.location.href='{% url 'unpaid_invoices' %}'">
                     <i class="bi bi-exclamation-circle"></i> Unpaid Invoices
                 </button>
             </div>
 
             {% if filter %}
-            <div class="bg-light p-3 rounded mb-4">
+            <div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
                 <form action="" method="get">
                     <div class="row row-cols-lg-auto g-2 align-items-center">
                         {% bootstrap_form filter.form layout='inline' %}
@@ -28,11 +30,62 @@
             </div>
             {% endif %}
 
-            {% load render_table from django_tables2 %}
-            <div class="table-responsive">
-                {% render_table table %}
+            <div class="table-responsive rounded-3">
+                <table class="table table-hover table-striped align-middle border-0 rounded-3">
+                    {% render_table table %}
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Improve table styling */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    border: none !important; /* Remove all harsh table borders */
+    padding: 12px 16px; /* Add more breathing space */
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Soft hover effect */
+}
+
+.table a {
+    color: #555 !important; /* Subtle link color */
+    text-decoration: none !important;
+}
+/* Make sure office hours properly */
+td.column-office-hour {
+    white-space: pre-line; /* Allow text to break lines */
+    word-wrap: break-word; /* Ensure long words wrap properly */
+    max-width: 150px; /* Adjust width if needed */
+}
+td.column-telephone-number {
+    white-space: pre-line; /* Allow text to break lines */
+    word-wrap: break-word; /* Ensure long words wrap properly */
+    max-width: 100px; /* Adjust width if needed */
+}
+/* Limit Customer Name & Address Column Width */
+td.column-name, td.column-address, td.column-care-of{
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card {
+    border-radius: 12px !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important; /* Softer background */
+}
+
+</style>
+
 {% endblock %}

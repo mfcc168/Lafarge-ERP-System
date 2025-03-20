@@ -9,18 +9,25 @@ from .models import ProductTransaction
 
 
 class CustomerTable(tables.Table):
-    name = tables.LinkColumn('customer_detail', args=[A('name')], text=lambda record: record.name,
-                             attrs={'a': {'class': 'text-decoration-none'}})
+    name = tables.LinkColumn(
+        'customer_detail', args=[A('name')],
+        text=lambda record: record.name,
+        attrs={'a': {'class': 'text-decoration-none'}, 'td': {'class': 'column-name'}}
+    )
+    care_of = tables.Column(attrs={"td": {"class": "column-care-of"}})  # Truncate care of
+    address = tables.Column(attrs={"td": {"class": "column-address"}})  # Truncate address
+    office_hour = tables.Column(attrs={"td": {"class": "column-office-hour"}})  # Enable wrapping
+    telephone_number = tables.Column(attrs={"td": {"class": "column-telephone-number"}})  # Enable wrapping
 
     class Meta:
         model = Customer
         attrs = {
-            'class': 'table table-striped table-bordered',
+            'class': 'table table-hover table-striped border-0 shadow-sm rounded-3',
             'th': {
                 '_ordering': {
-                    'orderable': 'sortable',  # Instead of `orderable`
-                    'ascending': 'ascend',  # Instead of `asc`
-                    'descending': 'descend'  # Instead of `desc`
+                    'orderable': 'sortable',
+                    'ascending': 'ascend',
+                    'descending': 'descend'
                 }
             }
         }
@@ -39,8 +46,13 @@ class CustomerFilter(FilterSet):
 
 
 class InvoiceTable(tables.Table):
-    number = tables.LinkColumn('invoice_detail', args=[A('number')], text=lambda record: record.number,
-                               attrs={'a': {'class': 'text-decoration-none'}})
+    number = tables.LinkColumn(
+        'invoice_detail', args=[A('number')],
+        text=lambda record: record.number,
+        attrs={'a': {'class': 'text-decoration-none'}}
+    )
+
+    customer = tables.Column(attrs={"td": {"class": "column-customer"}})  # Add a CSS class
 
     class Meta:
         model = Invoice
@@ -48,20 +60,22 @@ class InvoiceTable(tables.Table):
             'class': 'table table-striped table-bordered',
             'th': {
                 '_ordering': {
-                    'orderable': 'sortable',  # Instead of `orderable`
-                    'ascending': 'ascend',  # Instead of `asc`
-                    'descending': 'descend'  # Instead of `desc`
+                    'orderable': 'sortable',
+                    'ascending': 'ascend',
+                    'descending': 'descend'
                 }
             }
         }
         order_by = '-id'
         fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
 
-    id = tables.Column(visible=False)  # Hide 'id' from being shown in the frontend
+    id = tables.Column(visible=False)  # Hide 'id' from being shown
+
 
 
 class InvoiceFilter(FilterSet):
     customer_name = CharFilter(field_name='customer__name', lookup_expr='icontains', label="Customer Name")
+    customer_care_of = CharFilter(field_name='customer__care_of', lookup_expr='icontains', label="Care Of")
     delivery_date = DateFilter(field_name='delivery_date', lookup_expr='gte', label="Delivery Date (From)")
     delivery_date_to = DateFilter(field_name='delivery_date', lookup_expr='lte', label="Delivery Date (To)")
     payment_date = DateFilter(field_name='payment_date', lookup_expr='gte', label="Payment Date (From)")

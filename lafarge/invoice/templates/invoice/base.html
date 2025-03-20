@@ -12,11 +12,6 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <style>
-        .table thead th a {
-        color: black;
-        text-decoration: none;
-        position: relative;
-            }
         /* Sidebar Styles */
         .sidebar {
             height: 100vh;
@@ -104,7 +99,7 @@
 <div class="sidebar" id="sidebar">
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     <div class="sidebar-header">
-        Lafarge Invoice
+        Lafarge
     </div>
     <a href="{% url 'home' %}" class="nav-item"><i class="bi bi-house-door"></i> <span>Home</span></a>
     <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
@@ -127,7 +122,6 @@
         document.getElementById("content").classList.toggle("collapsed");
     }
 </script>
-
 {% bootstrap_javascript %}
 </body>
 </html>

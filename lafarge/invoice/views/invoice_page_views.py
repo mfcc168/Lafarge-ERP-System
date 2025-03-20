@@ -1,6 +1,8 @@
-from datetime import datetime, timedelta
+import re
 from collections import defaultdict
+from datetime import datetime, timedelta
 from decimal import Decimal
+
 from dateutil.relativedelta import relativedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
@@ -12,7 +14,7 @@ from django.utils.timezone import now
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
-from ..models import Invoice, InvoiceItem
+from ..models import Invoice
 from ..tables import InvoiceTable, InvoiceFilter
 
 
@@ -72,7 +74,9 @@ def monthly_report(request, year, month):
     first_day = make_aware(datetime(int(year), int(month), 1))
     last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
 
-    invoices = Invoice.objects.filter(delivery_date__range=(first_day, last_day)).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+    invoices = Invoice.objects.filter(delivery_date__range=(first_day, last_day)).prefetch_related(
+        "invoiceitem_set", "invoiceitem_set__product"
+    )
 
     weeks = {
         1: {"invoices": [], "total": Decimal("0.00")},
@@ -88,16 +92,21 @@ def monthly_report(request, year, month):
         weeks[week_number]["total"] += invoice.total_price
         monthly_total += invoice.total_price
 
-        # Group invoice items by product name and lot number, but keep quantities separate
-        grouped_items = defaultdict(list)  # Store quantities as a list instead of summing them
+        # Group invoice items by product name without the lot number
+        grouped_items = defaultdict(list)
 
         for item in invoice.invoiceitem_set.all():
             if item.product:
-                key = f"{item.product.name}"
-                grouped_items[key].append(str(item.quantity))  # Keep individual quantities as strings
+                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+                grouped_items[clean_name].append(str(item.quantity))
 
         # Convert grouped items to a formatted list
         invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
 
-    return render(request, "invoice/monthly_report.html",
-                  {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total})
+
+
+    return render(
+        request,
+        "invoice/monthly_report.html",
+        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total},
+    )

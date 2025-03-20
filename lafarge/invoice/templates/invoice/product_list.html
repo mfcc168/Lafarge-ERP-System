@@ -1,48 +1,49 @@
 {% extends 'invoice/base.html' %}
 {% load humanize %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Product List</h2>
-    <div class="row g-4">  <!-- Added Bootstrap's gap utility (g-4) to add spacing -->
+    <h2 class="mb-4 text-primary text-uppercase">Product List</h2>
+
+    <div class="row g-3">  <!-- Spaced-out rows -->
         {% for product in products %}
-        <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
-            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white w-100 d-flex flex-column">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm p-4 rounded-3 bg-white d-flex flex-column">
                 <div class="card-body d-flex flex-column">
-                    <!-- Title with Smaller Font -->
-                    <h6 class="card-title fw-bold text-dark text-truncate"
-                        style="font-size: 0.95rem; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <!-- Product Title -->
+                    <h5 class="card-title fw-bold text-dark mb-2">
                         <a href="{% url 'product_transaction_detail' product.id %}"
-                           class="text-decoration-none text-dark d-block">
+                           class="text-decoration-none text-dark">
                             {{ product.name }}
                         </a>
-                    </h6>
+                    </h5>
 
-                    <!-- Modern Two-Column Layout with Flexbox -->
-                    <div class="row flex-grow-1 gy-2">  <!-- Added gy-2 to add space between rows -->
-                        <div class="col-6">
-                            <p class="text-muted d-flex justify-content-between" style="font-size: 0.85rem;">
+                    <!-- Product Details: Two-column layout -->
+                    <div class="row gy-2">
+                        <div class="col-md-6">
+                            <p class="text-muted d-flex justify-content-between fs-6">
                                 <span><i class="bi bi-tag"></i> Price:</span>
-                                <span>${{ product.price }}</span>
+                                <span class="fw-bold text-dark">${{ product.price }}</span>
                             </p>
-                            <p class="text-muted d-flex justify-content-between" style="font-size: 0.85rem;">
+                            <p class="text-muted d-flex justify-content-between fs-6">
                                 <span><i class="bi bi-box"></i> Box Amount:</span>
-                                <span>{{ product.box_amount }}</span>
+                                <span class="fw-bold">{{ product.box_amount }}</span>
                             </p>
                         </div>
-                        <div class="col-6">
-                            <p class="text-muted d-flex justify-content-between" style="font-size: 0.85rem;">
+                        <div class="col-md-6">
+                            <p class="text-muted d-flex justify-content-between fs-6">
                                 <span><i class="bi bi-layers"></i> Quantity:</span>
-                                <span>{{ product.quantity|intcomma }}</span>
+                                <span class="fw-bold">{{ product.quantity|intcomma }}</span>
                             </p>
-                            <p class="text-muted d-flex justify-content-between" style="font-size: 0.85rem;">
+                            <p class="text-muted d-flex justify-content-between fs-6">
                                 <span><i class="bi bi-box-seam"></i> Box Remain:</span>
-                                <span>{{ product.box_remain }}</span>
+                                <span class="fw-bold">{{ product.box_remain }}</span>
                             </p>
                         </div>
                     </div>
 
-                    <!-- Card Footer for Additional Info -->
-                    <div class="border-top pt-2 mt-2 text-muted" style="font-size: 0.80rem;">
+                    <!-- Footer with Registration Code & Expiry -->
+                    <div class="border-top pt-3 mt-3 text-muted fs-6">
                         <p class="mb-1 text-truncate">
                             <i class="bi bi-upc-scan"></i> <strong>Reg. Code:</strong> {{ product.registration_code }}
                         </p>
@@ -56,4 +57,32 @@
         {% endfor %}
     </div>
 </div>
+
+<style>
+/* Modern Styling */
+h2 {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Font Adjustments */
+.fs-6 {
+    font-size: 1rem;
+}
+
+.text-muted {
+    font-size: 0.95rem;
+}
+</style>
+
 {% endblock %}
