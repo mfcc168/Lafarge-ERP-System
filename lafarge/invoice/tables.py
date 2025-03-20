@@ -51,13 +51,21 @@ class InvoiceTable(tables.Table):
     number = tables.LinkColumn(
         'invoice_detail', args=[A('number')],
         text=lambda record: record.number,
-        attrs={'a': {'class': 'text-decoration-none'}}
     )
 
-    customer = tables.Column(attrs={"td": {"class": "column-customer"}})  # Add a CSS class
+    customer = tables.Column(attrs={"td": {"class": "column-customer"}})
+
+    def render_number(self, value):
+        """Render total_price with formatting"""
+        return mark_safe(f'<span class="text-decoration-none fw-bold text-primary">#{value}</span>')
+
+    def render_salesman(self, value):
+        """Render salesman as a badge"""
+        return mark_safe(f'<span class="badge bg-secondary text-white">{value.code}</span>')
 
     def render_total_price(self, value):
-        return mark_safe(f"${currency(value)}")  # Apply the currency format
+        """Render total_price with formatting"""
+        return mark_safe(f'<span class="text-end fw-bold text-success">${currency(value)}</span>')
 
     class Meta:
         model = Invoice
