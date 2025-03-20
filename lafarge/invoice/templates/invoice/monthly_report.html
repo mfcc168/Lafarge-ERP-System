@@ -1,5 +1,5 @@
 {% extends "invoice/base.html" %}
-
+{% load custom_filter %}
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -7,12 +7,12 @@
     </div>
 
     {% for week_num, data in weeks.items %}
-        {% with valid_invoices=data.invoices|dictsort:"total_price" %}
+        {% with valid_invoices=data.invoices|dictsort:"delivery_date" %}
         {% if valid_invoices|length > 0 %}
         <div class="card shadow-sm mb-4 border-0 rounded-3">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-dark">Week {{ week_num }}</h5>
-                <span class="fs-5 fw-bold text-muted">Total: ${{ data.total|floatformat:2 }}</span>
+                <span class="fs-5 fw-bold text-muted">Total: ${{ data.total|currency }}</span>
             </div>
             <div class="card-body bg-white rounded-bottom">
                 <div class="table-responsive">
@@ -39,7 +39,7 @@
                                 </td>
                                 <td class="fw-semibold">{{ invoice.customer.name }}</td>
                                 <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
-                                <td class="text-end fw-bold text-success">${{ invoice.total_price|floatformat:2 }}</td>
+                                <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
                                 <td>
                                     <ul class="list-unstyled mb-0 small">
                                         {% for item in invoice.items %}
@@ -61,7 +61,7 @@
 
     {% if monthly_total > 0 %}
     <div class="alert alert-secondary text-center mt-4 shadow-sm">
-        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|floatformat:2 }}</strong></h4>
+        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|currency }}</strong></h4>
     </div>
     {% else %}
     <div class="alert alert-light border text-center mt-4 shadow-sm">
