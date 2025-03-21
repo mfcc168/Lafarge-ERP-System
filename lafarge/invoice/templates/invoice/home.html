@@ -1,15 +1,243 @@
-{% extends 'invoice/base.html' %}
-
+{% extends "invoice/base.html" %}
 {% block content %}
-<div class="text-center">
-    <h1 class="display-4 mt-5">Lafarge Invoice App</h1>
-    <p class="lead mt-3">Manage products, salesmen, customers, and invoices with ease.</p>
+<div class="container-fluid mt-4">
+    <h2 class="text-center mb-4">Dashboard</h2>
 
-    <div class="mt-4">
-        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg mx-2">View Products</a>
-        <a href="{% url 'salesman_list' %}" class="btn btn-danger btn-lg mx-2">View Salesmen</a>
-        <a href="{% url 'customer_list' %}" class="btn btn-secondary btn-lg mx-2">View Customers</a>
-        <a href="{% url 'invoice_list' %}" class="btn btn-success btn-lg mx-2">View Invoices</a>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <!-- Sales Trend -->
+        <div class="col">
+            <div class="card shadow-sm border-left-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-center"><i class="bi bi-graph-up"></i> Sales Trend</h5>
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales by Salesman -->
+        <div class="col">
+            <div class="card shadow-sm border-left-success">
+                <div class="card-body">
+                    <h5 class="card-title text-center"><i class="bi bi-person-lines-fill"></i> Sales by Salesman</h5>
+                    <canvas id="salesmanChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Insights -->
+        <div class="col">
+            <div class="card shadow-sm border-left-warning">
+                <div class="card-body">
+                    <h5 id="productTitle" class="card-title text-center"><i class="bi bi-box"></i> Product Insights</h5>
+                    <canvas id="productChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Invoices -->
+    <div class="mt-5">
+        <h3 class="text-center mb-3">Invoices Delivered Today</h3>
+        <div class="card-body bg-white rounded-bottom">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="bg-light text-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Salesman</th>
+                        <th class="text-end">Price</th>
+                        <th>Items</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for invoice in invoices_today %}
+                    <tr class="{% cycle 'table-row-light' 'table-row-dark' %}"
+                        data-href="{% url 'invoice_detail' invoice.number %}"
+                        style="cursor: pointer;">
+                        <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.number %}"
+                               class="text-decoration-none fw-bold text-primary">
+                                #{{ invoice.number }}
+                            </a>
+                        </td>
+                        <td class="fw-semibold">{{ invoice.customer.name }}</td>
+                        <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
+                        <td class="text-end fw-bold text-success">${{ invoice.total_price }}</td>
+                        <td>
+                            <ul class="list-unstyled mb-0 small">
+                                {% for item in invoice.items %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No invoices delivered today.</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("tr[data-href]").forEach(row => {
+        row.addEventListener("click", function () {
+            window.location.href = this.getAttribute("data-href");
+        });
+    });
+});
+
+async function fetchData() {
+    try {
+        const response = await fetch("{% url 'sales_data' %}");
+        const data = await response.json();
+
+        console.log("API Response:", data);
+
+        if (!data.sales_per_month || !data.sales_by_salesman) {
+            console.error("API response is missing required fields:", data);
+            return;
+        }
+
+        const monthNames = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        const months = data.sales_per_month.map(item => monthNames[item.month]);
+        const sales = data.sales_per_month.map(item => item.total_sales);
+
+        const salesmen = data.sales_by_salesman.map(item => item.salesman__name);
+        const salesAmounts = data.sales_by_salesman.map(item => item.total_sales);
+
+        // Sales Trend Chart
+        new Chart(document.getElementById("salesChart"), {
+            type: "line",
+            data: {
+                labels: months,
+                datasets: [{
+                    label: "Total Sales",
+                    data: sales,
+                    borderColor: "#007bff",
+                    backgroundColor: "rgba(0, 123, 255, 0.2)",
+                    fill: true
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+        // Update Sales by Salesman Chart Title
+                document.querySelector(".border-left-success .card-title").innerHTML =
+                    `<i class="bi bi-person-lines-fill"></i> Sales by Salesman (${data.last_month_name})`;
+        // Sales by Salesman Chart
+        new Chart(document.getElementById("salesmanChart"), {
+            type: "bar",
+            data: {
+                labels: salesmen,
+                datasets: [{
+                    label: "Sales Amount",
+                    data: salesAmounts,
+                    backgroundColor: "rgba(40, 167, 69, 0.6)",
+                    borderColor: "rgba(40, 167, 69, 1)",
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+
+fetchData();
+
+async function fetchProductInsights() {
+    try {
+        const response = await fetch("{% url 'product_insights' %}");
+        const data = await response.json();
+
+        if (!data.product_sales || !data.last_month_name) {
+            console.error("API response is missing required fields:", data);
+            return;
+        }
+
+        // Update the title with the previous month's name
+        document.getElementById("productTitle").innerHTML = `<i class="bi bi-box"></i> Product Insights (${data.last_month_name})`;
+
+        const products = data.product_sales.map(item => item.invoiceitem__product__name);
+        const quantities = data.product_sales.map(item => item.total_quantity);
+
+        new Chart(document.getElementById("productChart"), {
+            type: "doughnut",
+            data: {
+                labels: products,
+                datasets: [{
+                    label: "Total Quantity Sold",
+                    data: quantities,
+                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+                    borderColor: "#fff",
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+    } catch (error) {
+        console.error("Error fetching product insights:", error);
+    }
+}
+
+fetchProductInsights();
+
+
+
+</script>
+
+<style>
+    tr[data-href] {
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    tr[data-href]:hover {
+        background-color: #f8f9fa; /* Light gray background on hover */
+    }
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card-title {
+        font-weight: bold;
+    }
+    .shadow-sm {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+    .border-left-primary {
+        border-left: 5px solid #007bff;
+    }
+    .border-left-success {
+        border-left: 5px solid #28a745;
+    }
+    .border-left-warning {
+        border-left: 5px solid #ffc107;
+    }
+    canvas {
+        width: 100% !important;
+        height: 250px !important;
+    }
+
+
+
+</style>
+
 {% endblock %}
