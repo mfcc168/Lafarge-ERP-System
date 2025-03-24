@@ -68,7 +68,7 @@ class ProductTransactionAdmin(admin.ModelAdmin):
     list_filter = ('transaction_type', 'timestamp')
 
 
-class InvoiceItemInline(admin.TabularInline):
+class InvoiceItemInline(admin.StackedInline):
     model = InvoiceItem
     extra = 0  # Number of extra forms to display
     readonly_fields = ('sum_price', 'price')  # Make sum_price read-only

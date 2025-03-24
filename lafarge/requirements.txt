@@ -12,3 +12,4 @@ qrcode[pil]
 cryptography
 python-dotenv
 python-dateutil
+django-jazzmin
