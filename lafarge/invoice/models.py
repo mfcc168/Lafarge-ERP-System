@@ -111,6 +111,7 @@ class Invoice(models.Model):
     deliveryman = models.ForeignKey(Deliveryman, on_delete=models.CASCADE, null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True)
     payment_date = models.DateField(null=True, blank=True)
+    deposit_date = models.DateField(null=True, blank=True)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES, null=True, blank=True)
     cheque_detail = models.CharField(max_length=50, null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')

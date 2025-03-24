@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.timezone import localdate
 from django.utils.timezone import now
-
+from django.utils.timezone import make_aware
+from datetime import datetime
 from ..models import Invoice
 
 logger = logging.getLogger(__name__)
@@ -18,30 +19,29 @@ logger = logging.getLogger(__name__)
 
 @staff_member_required
 def home(request):
+    start_date = make_aware(datetime(2025, 3, 1))
     today = localdate()
     invoices_today = Invoice.objects.filter(delivery_date=today)
 
-    modified_invoices = []  # Store modified invoice data
+    # Get invoices that have a payment_date but no deposit_date
+    pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True, payment_date__gte=start_date)
 
-    for invoice in invoices_today:
-        grouped_items = defaultdict(list)
-        for item in invoice.invoiceitem_set.all():
-            if item.product:
-                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
-                grouped_items[clean_name].append(str(item.quantity))
+    # Calculate total pending deposit amount
+    total_pending_deposit = pending_deposits.aggregate(Sum('total_price'))['total_price__sum'] or 0
 
-        modified_invoices.append({
-            'delivery_date': invoice.delivery_date,
-            'number': invoice.number,
-            'customer': invoice.customer,
-            'salesman': invoice.salesman,
-            'total_price': invoice.total_price,
-            'items': [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
-        })
+    # Calculate payment type totals
+    payment_type_totals = pending_deposits.values('payment_method').annotate(total=Sum('total_price'))
+
+    # Convert to dictionary for easier template access
+    payment_totals_dict = {entry['payment_method']: entry['total'] for entry in payment_type_totals}
 
     return render(request, 'invoice/home.html', {
-        'invoices_today': modified_invoices
+        'invoices_today': invoices_today,
+        'pending_deposits': pending_deposits,
+        'total_pending_deposit': total_pending_deposit,
+        'payment_totals_dict': payment_totals_dict,  # Pass to template
     })
+
 
 
 @staff_member_required
