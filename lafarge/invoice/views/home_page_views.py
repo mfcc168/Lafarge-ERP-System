@@ -35,8 +35,25 @@ def home(request):
     # Convert to dictionary for easier template access
     payment_totals_dict = {entry['payment_method']: entry['total'] for entry in payment_type_totals}
 
+    modified_invoices = []
+    for invoice in invoices_today:
+        grouped_items = defaultdict(list)
+        for item in invoice.invoiceitem_set.all():
+            if item.product:
+                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+                grouped_items[clean_name].append(str(item.quantity))
+
+        modified_invoices.append({
+            'delivery_date': invoice.delivery_date,
+            'number': invoice.number,
+            'customer': invoice.customer,
+            'salesman': invoice.salesman,
+            'total_price': invoice.total_price,
+            'items': [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+        })
+
     return render(request, 'invoice/home.html', {
-        'invoices_today': invoices_today,
+        'invoices_today': modified_invoices,
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,
         'payment_totals_dict': payment_totals_dict,  # Pass to template
