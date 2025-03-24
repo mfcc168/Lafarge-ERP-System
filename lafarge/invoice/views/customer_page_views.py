@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
@@ -108,3 +110,27 @@ def unpaid_invoices_by_customer(request, customer_name):
         "customer": customer,
         "unpaid_invoices": unpaid_invoices,
     })
+
+@staff_member_required
+def unpaid_invoices_by_month_detail(request, year_month):
+    # Convert 'YYYY-MM' string to a datetime object
+    try:
+        selected_month = datetime.strptime(year_month, "%Y-%m")
+    except ValueError:
+        return render(request, 'invoice/error.html', {"message": "Invalid month format"})
+
+    # Fetch invoices for the given month
+    unpaid_invoices = Invoice.objects.filter(
+        payment_date__isnull=True,
+        delivery_date__year=selected_month.year,
+        delivery_date__month=selected_month.month
+    ).exclude(number__startswith="S-")
+
+    total_unpaid = unpaid_invoices.aggregate(Sum('total_price'))['total_price__sum'] or 0
+
+    context = {
+        'year_month': selected_month.strftime("%B %Y"),
+        'unpaid_invoices': unpaid_invoices,
+        'total_unpaid': total_unpaid,
+    }
+    return render(request, 'invoice/unpaid_invoices_by_month_detail.html', context)

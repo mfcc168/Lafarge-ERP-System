@@ -27,8 +27,12 @@
                         </thead>
                         <tbody>
                             {% for entry in monthly_unpaid %}
-                            <tr>
-                                <td>{{ entry.month|date:"F Y" }}</td>
+                            <tr class="clickable-row" data-href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}">
+                                <td>
+                                    <a href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}" class="text-primary text-decoration-none">
+                                        {{ entry.month|date:"F Y" }}
+                                    </a>
+                                </td>
                                 <td class="text-end fw-bold text-danger">HK$ {{ entry.total|currency }}</td>
                             </tr>
                             {% endfor %}

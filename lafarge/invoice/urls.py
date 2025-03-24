@@ -6,7 +6,7 @@ from .views.api_views import (
 )
 from .views.customer_page_views import (
     CustomerListView, customer_detail,
-    customers_with_unpaid_invoices, unpaid_invoices_by_customer
+    customers_with_unpaid_invoices, unpaid_invoices_by_customer, unpaid_invoices_by_month_detail
 )
 from .views.home_page_views import home, sales_data, product_insights_data
 from .views.invoice_page_views import InvoiceListView, invoice_detail, monthly_preview, monthly_report
@@ -33,6 +33,7 @@ urlpatterns = [
     path('customer/<str:customer_name>/', customer_detail, name='customer_detail'),
     path('unpaid-invoices/', customers_with_unpaid_invoices, name='unpaid_invoices'),
     path('unpaid-invoices/<str:customer_name>/', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
+    path('unpaid-invoices-by-month/<str:year_month>/', unpaid_invoices_by_month_detail, name='unpaid_invoices_by_month_detail'),
 
     # Products
     path('products/', product_list, name='product_list'),

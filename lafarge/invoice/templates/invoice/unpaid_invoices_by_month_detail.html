@@ -1,0 +1,83 @@
+{% extends "invoice/base.html" %}
+{% load bootstrap5 %}
+{% load custom_filter %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <h2 class="mb-4 text-uppercase text-primary">Unpaid Invoices for {{ year_month }}</h2>
+
+            <!-- Total Unpaid Amount -->
+            <div class="alert alert-warning rounded-3 p-4 text-center shadow-sm">
+                <h2 class="mb-0">Total Unpaid Amount:
+                    <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong>
+                </h2>
+            </div>
+
+            <!-- Unpaid Invoices Table -->
+            <div class="table-responsive">
+                <table class="table align-middle shadow-sm rounded-3">
+                    <thead class="table-dark text-white">
+                        <tr>
+                            <th>Invoice Number</th>
+                            <th>Customer</th>
+                            <th>Delivery Date</th>
+                            <th class="text-end">Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in unpaid_invoices %}
+                        <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}">
+                            <td>{{ invoice.number }}</td>
+                            <td>{{ invoice.customer.name }}</td>
+                            <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
+                            <td class="text-end fw-bold text-danger">HK$ {{ invoice.total_price|currency }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No unpaid invoices for this month.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Additional Styling -->
+<style>
+/* Table Styling */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+/* Table Headers */
+.table th {
+    padding: 12px 16px;
+}
+
+/* Alternating Row Colors */
+.table-row-light {
+    background-color: #f9f9f9 !important;
+}
+
+.table-row-dark {
+    background-color: #ffffff !important;
+}
+
+/* Hover Effect */
+.table-hover tbody tr:hover, .clickable-row:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Light blue */
+    cursor: pointer;
+}
+
+/* Clickable Row */
+.clickable-row {
+    transition: background-color 0.2s ease-in-out;
+}
+</style>
+{% endblock %}
