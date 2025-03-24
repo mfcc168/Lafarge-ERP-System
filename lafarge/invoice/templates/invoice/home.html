@@ -113,8 +113,20 @@
                         </td>
                         <td class="fw-semibold">{{ invoice.customer.name }}</td>
                         <td class="text-nowrap">{{ invoice.payment_date }}</td>
-                        <td>{{ invoice.payment_method }}</td>
-                        <td>{% if invoice.payment_method == "cheque" %}{{ invoice.cheque_detail }}{% else %}-{% endif %}</td>
+                        <td>
+                        {% if invoice.payment_method == "cash" %}
+                            <i class="bi bi-cash-coin text-warning"></i> Cash
+                        {% elif invoice.payment_method == "cheque" %}
+                            <i class="bi bi-cash text-warning"></i> Cheque
+                        {% elif invoice.payment_method == "fps" %}
+                            <i class="bi bi-wallet2 text-warning"></i> FPS
+                        {% elif invoice.payment_method == "credit(cq)" %}
+                            <i class="bi bi-credit-card text-warning"></i> Credit Cheque
+                        {% else %}
+                            {{ invoice.payment_method }}
+                        {% endif %}
+                        </td>
+                        <td>{% if invoice.payment_method == "cheque" %}<span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span>{% else %}-{% endif %}</td>
                         <td class="text-end fw-bold text-danger">${{ invoice.total_price|currency }}</td>
                     </tr>
                     {% empty %}
