@@ -38,7 +38,7 @@ def download_invoice_legacy_pdf(request, invoice_number):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Invoice_Legacy_{invoice.number}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Invoice_Legacy_{invoice.number}.pdf"'
 
     return response
 
@@ -75,7 +75,7 @@ def download_invoice_pdf(request, invoice_number):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Invoice_{invoice.number}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Invoice_{invoice.number}.pdf"'
 
     return response
 
@@ -104,7 +104,7 @@ def download_sample_pdf(request, invoice_number):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Order_Form_{sample.number}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Order_Form_{sample.number}.pdf"'
 
     return response
 
@@ -133,7 +133,7 @@ def download_order_form_pdf(request, invoice_number):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Order_Form_{order_form.number}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Order_Form_{order_form.number}.pdf"'
 
     return response
 
@@ -163,7 +163,7 @@ def download_statement_pdf(request, customer_name):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Statement_{customer.name}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Statement_{customer.name}.pdf"'
 
     return response
 
@@ -192,6 +192,6 @@ def download_delivery_note_pdf(request, invoice_number):
 
     # Create a response with PDF content
     response = HttpResponse(pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Delivery_Note_{invoice.number}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="Delivery_Note_{invoice.number}.pdf"'
 
     return response

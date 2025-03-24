@@ -76,23 +76,23 @@
                 <div class="sticky-buttons">
                     {% if invoice.customer.name != "Sample" %}
                         <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.location.href='{% url 'download_invoice_legacy_pdf' invoice.number %}'">
+                                onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
                             <i class="bi bi-file-earmark-text me-2"></i> Invoice
                         </button>
                         <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.location.href='{% url 'download_order_form_pdf' invoice.number %}'">
+                                onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
                             <i class="bi bi-file-earmark me-2"></i> Order Form
                         </button>
                         {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
                             <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                    onclick="window.location.href='{% url 'download_delivery_note_pdf' invoice.number %}'">
+                                    onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
                                 <i class="bi bi-truck me-2"></i> Delivery Note
                             </button>
                         {% endif %}
                     {% endif %}
                     {% if invoice.customer.name == "Sample" %}
                         <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.location.href='{% url 'download_sample_pdf' invoice.number %}'">
+                                onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
                             <i class="bi bi-search me-2"></i> Sample
                         </button>
                     {% endif %}
@@ -101,6 +101,7 @@
         </div>
     </div>
 </section>
+
 
 <style>
 /* Table Styling */
