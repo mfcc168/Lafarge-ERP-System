@@ -4,7 +4,10 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.utils.decorators import method_decorator
 from django_tables2.export.export import TableExport
+from django_tables2.views import SingleTableMixin
+from django_filters.views import FilterView
 
 from ..models import Salesman, Invoice
 from ..tables import InvoiceFilter, SalesmanInvoiceTable
@@ -16,27 +19,21 @@ def salesman_list(request):
     return render(request, 'invoice/salesman_list.html', {'salesmen': salesmen})
 
 
-@staff_member_required
-def salesman_detail(request, salesman_id):
-    salesman = get_object_or_404(Salesman, id=salesman_id)
-    invoices = Invoice.objects.filter(salesman=salesman)
+@method_decorator(staff_member_required, name='dispatch')
+class SalesmanInvoiceView(SingleTableMixin, FilterView):
+    table_class = SalesmanInvoiceTable
+    model = Invoice
+    template_name = "invoice/salesman_detail.html"
+    filterset_class = InvoiceFilter
 
-    # Initialize filter with request data
-    filter = InvoiceFilter(request.GET, queryset=invoices)
-    filter.form.fields.pop('salesman', None)
-    table = SalesmanInvoiceTable(filter.qs)  # Use filtered queryset
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        invoices = self.get_queryset()  # Get filtered queryset
 
-    # Handle export
-    export_format = request.GET.get("_export", None)
-    if export_format:
-        exporter = TableExport(export_format, table)
-        return exporter.response(f"{salesman.name}_invoices.{export_format}")
+        # Get salesman from the first invoice if any exist
+        context['salesman'] = invoices.first().salesman if invoices.exists() else None
 
-    return render(request, 'invoice/salesman_detail.html', {
-        'salesman': salesman,
-        'table': table,
-        'filter': filter,
-    })
+        return context
 
 
 def salesman_monthly_sales(request, salesman_id):
