@@ -1,9 +1,9 @@
 import django_tables2 as tables
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django_filters import FilterSet, CharFilter, DateFilter, DateTimeFilter
 from django_tables2.export.views import ExportMixin
 from django_tables2.utils import A
-from django.utils.html import escape
 
 from .models import Customer
 from .models import Invoice
@@ -34,6 +34,7 @@ class CustomerTable(tables.Table):
                 }
             }
         }
+        order_by = 'name'
         fields = ("name", "care_of", "address", "office_hour", "telephone_number")
 
 
@@ -258,7 +259,8 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
     )
 
     def render_total_amount(self, record):
-        return mark_safe(f"<span class='text-danger fw-bold'>${sum(item.sum_price for item in record.invoiceitem_set.all()):,.2f}</span>")
+        return mark_safe(
+            f"<span class='text-danger fw-bold'>${sum(item.sum_price for item in record.invoiceitem_set.all()):,.2f}</span>")
 
     class Meta:
         model = Invoice
