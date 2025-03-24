@@ -114,7 +114,7 @@
                         <td class="fw-semibold">{{ invoice.customer.name }}</td>
                         <td class="text-nowrap">{{ invoice.payment_date }}</td>
                         <td>{{ invoice.payment_method }}</td>
-                        <td>{% if invoice.payment_method == "Cheque" %}{{ invoice.cheque_detail }}{% else %}-{% endif %}</td>
+                        <td>{% if invoice.payment_method == "cheque" %}{{ invoice.cheque_detail }}{% else %}-{% endif %}</td>
                         <td class="text-end fw-bold text-danger">${{ invoice.total_price|currency }}</td>
                     </tr>
                     {% empty %}
