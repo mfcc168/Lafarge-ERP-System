@@ -24,8 +24,8 @@
                                 <span class="fw-bold text-dark">${{ product.price }}</span>
                             </p>
                             <p class="text-muted d-flex justify-content-between fs-6">
-                                <span><i class="bi bi-box"></i> Box Amount:</span>
-                                <span class="fw-bold">{{ product.box_amount }}</span>
+                                <span><i class="bi bi-box"></i> Unopened Total:</span>
+                                <span class="fw-bold">{{ product.box_amount }} boxes x {{product.unit_per_box}} units</span>
                             </p>
                         </div>
                         <div class="col-md-6">
@@ -34,7 +34,7 @@
                                 <span class="fw-bold">{{ product.quantity|intcomma }}</span>
                             </p>
                             <p class="text-muted d-flex justify-content-between fs-6">
-                                <span><i class="bi bi-box-seam"></i> Box Remain:</span>
+                                <span><i class="bi bi-box-seam"></i> Opened Box Remain Units:</span>
                                 <span class="fw-bold">{{ product.box_remain }}</span>
                             </p>
                         </div>
