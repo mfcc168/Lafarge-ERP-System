@@ -153,7 +153,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 JAZZMIN_SETTINGS = {
     "topmenu_links": [
-        {"name": "View Lafarge Dashboard", "url": "/", "permissions": ["auth.view_user"]},  # Visible to logged-in users
+        {"name": "View Lafarge Dashboard", "url": "/", "new_window": False, "permissions": []},
     ],
     "site_title": "Lafarge Admin",
     "site_header": "Lafarge Admin",
