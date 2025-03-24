@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @staff_member_required
 def home(request):
-    start_date = make_aware(datetime(2025, 3, 1))
+    start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
     invoices_today = Invoice.objects.filter(delivery_date=today)
 
