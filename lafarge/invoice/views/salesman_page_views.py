@@ -70,7 +70,10 @@ def salesman_monthly_preview(request, salesman_id):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     latest_invoice = Invoice.objects.filter(salesman=salesman, delivery_date__isnull=False).order_by(
         '-delivery_date').first()
-
+    breadcrumbs = [
+        {"name": "Salesmen", "url": reverse("salesman_list")},
+        {"name": salesman.name, "url": reverse("salesman_monthly_preview", kwargs={"salesman_id": salesman.id})},
+    ]
     if latest_invoice:
         today = latest_invoice.delivery_date
     else:
@@ -98,7 +101,7 @@ def salesman_monthly_preview(request, salesman_id):
                                kwargs={'salesman_id': salesman.id, 'year': year, 'month': month}),
             })
 
-    return render(request, 'invoice/salesman_monthly_preview.html', {'months': months, 'salesman': salesman})
+    return render(request, 'invoice/salesman_monthly_preview.html', {'months': months, 'salesman': salesman, "breadcrumbs": breadcrumbs})
 
 
 @staff_member_required
@@ -106,7 +109,11 @@ def salesman_monthly_report(request, salesman_id, year, month):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     first_day = make_aware(datetime(int(year), int(month), 1))
     last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
-
+    breadcrumbs = [
+        {"name": "Salesmen", "url": reverse("salesman_list")},
+        {"name": salesman.name, "url": reverse("salesman_monthly_preview", kwargs={"salesman_id": salesman.id})},
+        {"name": f"{year}-{month} Report", "url": ""},
+    ]
     invoices = Invoice.objects.filter(
         salesman=salesman, delivery_date__range=(first_day, last_day)
     ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
@@ -136,5 +143,5 @@ def salesman_monthly_report(request, salesman_id, year, month):
     return render(
         request,
         "invoice/salesman_monthly_report.html",
-        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total, "salesman": salesman},
+        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total, "salesman": salesman, "breadcrumbs": breadcrumbs},
     )
