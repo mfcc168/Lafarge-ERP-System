@@ -40,31 +40,31 @@
                     <div class="table-responsive">
                         <table class="table align-middle border-0">
                             <thead class="bg-light text-dark">
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Product</th>
-                                    <th class="text-end">Unit Price</th>
-                                    <th class="text-end">Amount</th>
-                                </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Product</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {% for item in invoice.invoiceitem_set.all %}
-                                <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
-                                    <td>{{ item.quantity }} {{ item.product.unit }}</td>
-                                    <td class="fw-semibold product-name">{{ item.product.name }}</td>
-                                    {% if item.product_type == "normal" %}
-                                    <td class="text-end">HK$ {{ item.price }}</td>
-                                    <td class="text-end fw-bold text-success">HK$ {{ item.sum_price|currency }}</td>
-                                    {% else %}
-                                    <td class="text-end text-danger">{{ item.product_type }}</td>
-                                    <td class="text-end">-</td>
-                                    {% endif %}
-                                </tr>
-                                {% endfor %}
-                                <tr class="fw-bold bg-secondary text-white">
-                                    <td colspan="3" class="text-end">Total</td>
-                                    <td class="text-end">HK$ {{ invoice.total_price|currency }}</td>
-                                </tr>
+                            {% for item in invoice.invoiceitem_set.all %}
+                            <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                                <td>{{ item.quantity }} {{ item.product.unit }}</td>
+                                <td class="fw-semibold product-name">{{ item.product.name }}</td>
+                                {% if item.product_type == "normal" %}
+                                <td class="text-end">HK$ {{ item.price }}</td>
+                                <td class="text-end fw-bold text-success">HK$ {{ item.sum_price|currency }}</td>
+                                {% else %}
+                                <td class="text-end text-danger">{{ item.product_type }}</td>
+                                <td class="text-end">-</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            <tr class="fw-bold bg-secondary text-white">
+                                <td colspan="3" class="text-end">Total</td>
+                                <td class="text-end">HK$ {{ invoice.total_price|currency }}</td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -75,26 +75,26 @@
             <div class="col-auto d-none d-lg-block">
                 <div class="sticky-buttons">
                     {% if invoice.customer.name != "Sample" %}
-                        <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
-                            <i class="bi bi-file-earmark-text me-2"></i> Invoice
-                        </button>
-                        <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
-                            <i class="bi bi-file-earmark me-2"></i> Order Form
-                        </button>
-                        {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
-                            <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                    onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
-                                <i class="bi bi-truck me-2"></i> Delivery Note
-                            </button>
-                        {% endif %}
+                    <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-file-earmark-text me-2"></i> Invoice
+                    </button>
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-file-earmark me-2"></i> Order Form
+                    </button>
+                    {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-truck me-2"></i> Delivery Note
+                    </button>
+                    {% endif %}
                     {% endif %}
                     {% if invoice.customer.name == "Sample" %}
-                        <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                                onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
-                            <i class="bi bi-search me-2"></i> Sample
-                        </button>
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-search me-2"></i> Sample
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -158,6 +158,7 @@
     word-break: break-word;
     white-space: normal;
 }
+
 </style>
 
 {% endblock %}

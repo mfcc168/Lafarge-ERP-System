@@ -57,9 +57,6 @@ def product_transaction_view(request, product_id):
     # The initial stock would be remaining stock + total transaction quantity
     initial_stock = remaining_stock + total_transaction_quantity
 
-    # Reverse calculate the import quantity (the quantity that would bring stock to the initial amount)
-    import_quantity = initial_stock - remaining_stock
-
     # Add the import transaction as the first row (if import data exists)
     if product.import_date and product.import_invoice_number:
         transactions_data.append({

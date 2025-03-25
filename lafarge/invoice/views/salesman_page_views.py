@@ -101,7 +101,8 @@ def salesman_monthly_preview(request, salesman_id):
                                kwargs={'salesman_id': salesman.id, 'year': year, 'month': month}),
             })
 
-    return render(request, 'invoice/salesman_monthly_preview.html', {'months': months, 'salesman': salesman, "breadcrumbs": breadcrumbs})
+    return render(request, 'invoice/salesman_monthly_preview.html',
+                  {'months': months, 'salesman': salesman, "breadcrumbs": breadcrumbs})
 
 
 @staff_member_required
@@ -143,5 +144,6 @@ def salesman_monthly_report(request, salesman_id, year, month):
     return render(
         request,
         "invoice/salesman_monthly_report.html",
-        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total, "salesman": salesman, "breadcrumbs": breadcrumbs},
+        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total, "salesman": salesman,
+         "breadcrumbs": breadcrumbs},
     )

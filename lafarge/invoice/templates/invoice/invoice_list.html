@@ -9,14 +9,16 @@
             <h2 class="mb-4 text-primary">Invoice List</h2>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'monthly_preview' %}'">
+                <button type="button" class="btn btn-primary"
+                        onclick="window.location.href='{% url 'monthly_preview' %}'">
                     <i class="bi bi-calendar-check"></i> Monthly Invoices
                 </button>
             </div>
 
             {% if filter %}
             <div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
-                <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection">
+                <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#filterSection">
                     <i class="bi bi-funnel"></i> Show Filters
                 </button>
 
@@ -40,7 +42,6 @@
                                 <label class="form-label fw-bold">Invoice Number</label>
                                 {{ filter.form.number }}
                             </div>
-
 
 
                             <!-- Delivery Date Filters -->
@@ -164,6 +165,7 @@ td.column-customer, th[data-orderable*="customer"] {
 .bg-light {
     background-color: #f8f9fa !important; /* Softer background */
 }
+
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -182,5 +184,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
 </script>
 {% endblock %}

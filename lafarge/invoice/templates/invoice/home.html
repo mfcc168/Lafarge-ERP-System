@@ -114,19 +114,21 @@
                         <td class="fw-semibold">{{ invoice.customer.name }}</td>
                         <td class="text-nowrap">{{ invoice.payment_date }}</td>
                         <td>
-                        {% if invoice.payment_method == "cash" %}
+                            {% if invoice.payment_method == "cash" %}
                             <i class="bi bi-cash-coin text-warning"></i> Cash
-                        {% elif invoice.payment_method == "cheque" %}
+                            {% elif invoice.payment_method == "cheque" %}
                             <i class="bi bi-cash text-warning"></i> Cheque
-                        {% elif invoice.payment_method == "fps" %}
+                            {% elif invoice.payment_method == "fps" %}
                             <i class="bi bi-wallet2 text-warning"></i> FPS
-                        {% elif invoice.payment_method == "credit(cq)" %}
+                            {% elif invoice.payment_method == "credit(cq)" %}
                             <i class="bi bi-credit-card text-warning"></i> Credit Cheque
-                        {% else %}
+                            {% else %}
                             {{ invoice.payment_method }}
-                        {% endif %}
+                            {% endif %}
                         </td>
-                        <td>{% if invoice.payment_method == "cheque" %}<span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span>{% else %}-{% endif %}</td>
+                        <td>{% if invoice.payment_method == "cheque" %}<span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span>{%
+                            else %}-{% endif %}
+                        </td>
                         <td class="text-end fw-bold text-danger">${{ invoice.total_price|currency }}</td>
                     </tr>
                     {% empty %}
@@ -136,18 +138,18 @@
                     {% endfor %}
                     </tbody>
                     <tfoot>
-                        {% for payment_type, total in payment_totals_dict.items %}
-                        {% if payment_type %}
-                        <tr class="fw-semibold">
-                            <td colspan="5" class="text-end">{{ payment_type|title }} Total:</td>
-                            <td class="text-end text-primary">${{ total|currency }}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                        <tr class="fw-bold">
-                            <td colspan="5" class="text-end">Total:</td>
-                            <td class="text-end text-danger">${{ total_pending_deposit|currency }}</td>
-                        </tr>
+                    {% for payment_type, total in payment_totals_dict.items %}
+                    {% if payment_type %}
+                    <tr class="fw-semibold">
+                        <td colspan="5" class="text-end">{{ payment_type|title }} Total:</td>
+                        <td class="text-end text-primary">${{ total|currency }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    <tr class="fw-bold">
+                        <td colspan="5" class="text-end">Total:</td>
+                        <td class="text-end text-danger">${{ total_pending_deposit|currency }}</td>
+                    </tr>
                     </tfoot>
 
 
@@ -155,7 +157,6 @@
             </div>
         </div>
     </div>
-
 
 
 </div>
@@ -272,6 +273,7 @@ fetchProductInsights();
 
 
 
+
 </script>
 
 <style>
@@ -308,6 +310,7 @@ fetchProductInsights();
         width: 100% !important;
         height: 250px !important;
     }
+
 
 
 

@@ -103,8 +103,6 @@ def monthly_report(request, year, month):
         # Convert grouped items to a formatted list
         invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
 
-
-
     return render(
         request,
         "invoice/monthly_report.html",

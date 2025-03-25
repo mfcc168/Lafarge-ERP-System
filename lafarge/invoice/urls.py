@@ -15,11 +15,11 @@ from .views.pdf_download_views import (
     download_invoice_pdf, download_order_form_pdf,
     download_sample_pdf, download_statement_pdf
 )
-from .views.salesman_page_views import (
-    salesman_list, SalesmanInvoiceView, salesman_monthly_sales, salesman_monthly_preview, salesman_monthly_report
-)
 from .views.product_page_views import (
     product_list, product_transaction_detail, product_transaction_view
+)
+from .views.salesman_page_views import (
+    salesman_list, SalesmanInvoiceView, salesman_monthly_sales, salesman_monthly_preview, salesman_monthly_report
 )
 
 urlpatterns = [

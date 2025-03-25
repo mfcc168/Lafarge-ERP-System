@@ -111,6 +111,7 @@ def unpaid_invoices_by_customer(request, customer_name):
         "unpaid_invoices": unpaid_invoices,
     })
 
+
 @staff_member_required
 def unpaid_invoices_by_month_detail(request, year_month):
     # Convert 'YYYY-MM' string to a datetime object

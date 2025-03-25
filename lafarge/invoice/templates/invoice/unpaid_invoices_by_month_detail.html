@@ -19,26 +19,26 @@
             <div class="table-responsive">
                 <table class="table align-middle shadow-sm rounded-3">
                     <thead class="table-dark text-white">
-                        <tr>
-                            <th>Invoice Number</th>
-                            <th>Customer</th>
-                            <th>Delivery Date</th>
-                            <th class="text-end">Total Price</th>
-                        </tr>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Customer</th>
+                        <th>Delivery Date</th>
+                        <th class="text-end">Total Price</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for invoice in unpaid_invoices %}
-                        <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}">
-                            <td>{{ invoice.number }}</td>
-                            <td>{{ invoice.customer.name }}</td>
-                            <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                            <td class="text-end fw-bold text-danger">HK$ {{ invoice.total_price|currency }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">No unpaid invoices for this month.</td>
-                        </tr>
-                        {% endfor %}
+                    {% for invoice in unpaid_invoices %}
+                    <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}">
+                        <td>{{ invoice.number }}</td>
+                        <td>{{ invoice.customer.name }}</td>
+                        <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
+                        <td class="text-end fw-bold text-danger">HK$ {{ invoice.total_price|currency }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No unpaid invoices for this month.</td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -79,5 +79,6 @@
 .clickable-row {
     transition: background-color 0.2s ease-in-out;
 }
+
 </style>
 {% endblock %}

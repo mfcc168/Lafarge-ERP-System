@@ -20,22 +20,24 @@
                 <div class="table-responsive">
                     <table class="table align-middle shadow-sm rounded-3">
                         <thead class="table-dark text-white">
-                            <tr>
-                                <th>Month</th>
-                                <th class="text-end">Total Unpaid</th>
-                            </tr>
+                        <tr>
+                            <th>Month</th>
+                            <th class="text-end">Total Unpaid</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {% for entry in monthly_unpaid %}
-                            <tr class="clickable-row" data-href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}">
-                                <td>
-                                    <a href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}" class="text-primary text-decoration-none">
-                                        {{ entry.month|date:"F Y" }}
-                                    </a>
-                                </td>
-                                <td class="text-end fw-bold text-danger">HK$ {{ entry.total|currency }}</td>
-                            </tr>
-                            {% endfor %}
+                        {% for entry in monthly_unpaid %}
+                        <tr class="clickable-row"
+                            data-href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}">
+                            <td>
+                                <a href="{% url 'unpaid_invoices_by_month_detail' entry.month|date:'Y-m' %}"
+                                   class="text-primary text-decoration-none">
+                                    {{ entry.month|date:"F Y" }}
+                                </a>
+                            </td>
+                            <td class="text-end fw-bold text-danger">HK$ {{ entry.total|currency }}</td>
+                        </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -46,47 +48,48 @@
             <div class="table-responsive">
                 <table class="table align-middle shadow-sm rounded-3">
                     <thead class="table-dark text-white">
-                        <tr>
-                            <th style="width: 30%;">Customer Name</th>
-                            <th style="width: 70%;">Unpaid Invoices</th>
-                        </tr>
+                    <tr>
+                        <th style="width: 30%;">Customer Name</th>
+                        <th style="width: 70%;">Unpaid Invoices</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for entry in customer_data %}
-                        <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}"
-                            data-href="{% url 'customer_unpaid_invoices' entry.customer.name %}">
-                            <!-- Customer Name -->
-                            <td class="fw-bold">
-                                {{ entry.customer.name }}
-                                {% if entry.customer.care_of %}
-                                    <br><small class="text-muted">({{ entry.customer.care_of }})</small>
-                                {% endif %}
-                            </td>
+                    {% for entry in customer_data %}
+                    <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}"
+                        data-href="{% url 'customer_unpaid_invoices' entry.customer.name %}">
+                        <!-- Customer Name -->
+                        <td class="fw-bold">
+                            {{ entry.customer.name }}
+                            {% if entry.customer.care_of %}
+                            <br><small class="text-muted">({{ entry.customer.care_of }})</small>
+                            {% endif %}
+                        </td>
 
-                            <!-- Unpaid Invoices -->
-                            <td>
-                                <table class="table table-sm table-borderless mb-0">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th>Invoice No.</th>
-                                            <th>Delivery Date</th>
-                                            <th class="text-end">Total Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for invoice in entry.unpaid_invoices %}
-                                        <tr>
-                                            <td>{{ invoice.number }}</td>
-                                            <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
-                                            <td class="text-end fw-bold">HK$ {{ invoice.total_price|currency }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                <p class="fw-bold mt-2 text-danger text-end">Total Unpaid: HK$ {{ entry.total_unpaid|currency }}</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                        <!-- Unpaid Invoices -->
+                        <td>
+                            <table class="table table-sm table-borderless mb-0">
+                                <thead class="bg-light">
+                                <tr>
+                                    <th>Invoice No.</th>
+                                    <th>Delivery Date</th>
+                                    <th class="text-end">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for invoice in entry.unpaid_invoices %}
+                                <tr>
+                                    <td>{{ invoice.number }}</td>
+                                    <td>{{ invoice.delivery_date|date:"Y-m-d" }}</td>
+                                    <td class="text-end fw-bold">HK$ {{ invoice.total_price|currency }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <p class="fw-bold mt-2 text-danger text-end">Total Unpaid: HK$ {{
+                                entry.total_unpaid|currency }}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -127,6 +130,7 @@
 .clickable-row {
     transition: background-color 0.2s ease-in-out;
 }
+
 </style>
 
 <!-- JavaScript for Clickable Rows -->
@@ -138,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
 </script>
 
 {% endblock %}

@@ -2,6 +2,7 @@ import calendar
 import logging
 import re
 from collections import defaultdict
+from datetime import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
@@ -9,9 +10,9 @@ from django.db.models.functions import ExtractMonth, ExtractYear
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.timezone import localdate
-from django.utils.timezone import now
 from django.utils.timezone import make_aware
-from datetime import datetime
+from django.utils.timezone import now
+
 from ..models import Invoice
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,8 @@ def home(request):
     invoices_today = Invoice.objects.filter(delivery_date=today)
 
     # Get invoices that have a payment_date but no deposit_date
-    pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True, payment_date__gte=start_date)
+    pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
+                                              payment_date__gte=start_date)
 
     # Calculate total pending deposit amount
     total_pending_deposit = pending_deposits.aggregate(Sum('total_price'))['total_price__sum'] or 0
@@ -58,7 +60,6 @@ def home(request):
         'total_pending_deposit': total_pending_deposit,
         'payment_totals_dict': payment_totals_dict,  # Pass to template
     })
-
 
 
 @staff_member_required
