@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(' ')
 
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(' ')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,7 +132,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "static"),
@@ -157,9 +162,11 @@ JAZZMIN_SETTINGS = {
     "site_title": "Lafarge Admin",
     "site_header": "Lafarge Admin",
     "welcome_sign": "Welcome to Lafarge Admin",
-    "show_sidebar": True,
     "navigation_expanded": True,
     "related_modal_active": True,
+    "hide_sidebar_on_create": True,
+    "default_collapse_sidebar": True,
+    "custom_css": "css/admin_overrides.css",
 }
 
 JAZZMIN_UI_TWEAKS = {

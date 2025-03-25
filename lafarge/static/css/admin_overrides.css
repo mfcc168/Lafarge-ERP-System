@@ -1,0 +1,26 @@
+/* Fix for TabularInline width */
+.tabular.inline-related {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabular.inline-related table {
+    width: 100% !important;
+}
+
+.tabular.inline-related td, .tabular.inline-related th {
+    white-space: nowrap;
+    padding: 8px;
+}
+
+/* Optional: Make form fields more compact */
+.tabular.inline-related input:not([type="checkbox"]),
+.tabular.inline-related textarea {
+    width: 100%;
+    max-width: 200px;
+}
+.tabular.inline-related select {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
