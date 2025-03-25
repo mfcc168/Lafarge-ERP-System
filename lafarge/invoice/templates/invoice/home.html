@@ -106,7 +106,7 @@
                     {% for invoice in pending_deposits %}
                     <tr>
                         <td>
-                            <a href="{% url 'invoice_detail' invoice.number %}"
+                            <a href="{% url 'admin:invoice_invoice_change' invoice.id %}"
                                class="text-decoration-none fw-bold text-primary">
                                 #{{ invoice.number }}
                             </a>
