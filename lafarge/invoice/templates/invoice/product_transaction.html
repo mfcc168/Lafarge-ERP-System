@@ -1,5 +1,5 @@
 {% extends "invoice/base.html" %}
-
+{% load custom_filter %}
 {% block content %}
 <h2>Transaction History for {{ product.name }}</h2>
 
@@ -26,7 +26,7 @@
             <td>{{ transaction.date }}</td>
             <td>{{ transaction.quantity }}</td>
             <td>{{ transaction.product_type }}</td>
-            <td>{{ transaction.remaining_stock }}</td>
+            <td>{{ transaction.remaining_stock|item }}</td>
         </tr>
         {% endfor %}
     </tbody>
