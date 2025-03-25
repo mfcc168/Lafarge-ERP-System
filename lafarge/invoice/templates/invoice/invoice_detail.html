@@ -28,7 +28,7 @@
                         <div class="col-md-8">
                             <h4 class="text-secondary">Sold To</h4>
                             <address class="mb-0">
-                                <strong class="text-dark">{{ invoice.customer.name }}</strong><br>
+                                <strong class="text-dark">{{ invoice.customer.name }} {% if invoice.customer.care_of %} ({{ invoice.customer.care_of }}) {% endif %}</strong><br>
                                 {{ invoice.customer.address|linebreaksbr }}
                             </address>
                         </div>
