@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.db.models import Case, When, Value, IntegerField
-from django.db import transaction
-import math
+from django.urls import reverse
+from django.utils.html import format_html
+
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
 
 admin.site.site_header = "Lafarge Admin"
 admin.site.site_title = "Lafarge Admin Portal"
 admin.site.index_title = "Welcome to Lafarge Admin Panel"
+
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -73,7 +75,8 @@ class InvoiceItemInline(admin.TabularInline):
     extra = 0  # Number of extra forms to display
     readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
     fields = (
-    'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price', 'product_type')  # Include product_type field
+        'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price',
+        'product_type')  # Include product_type field
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "product":
@@ -99,10 +102,16 @@ class InvoiceItemInline(admin.TabularInline):
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
-    list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price')
+    list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price', 'view_invoice_link')
     search_fields = ('number', 'customer__name')
     inlines = [InvoiceItemInline]
     readonly_fields = ('total_price', 'terms', 'salesman')
+
+    def view_invoice_link(self, obj):
+        url = reverse('invoice_detail', kwargs={'invoice_number': obj.number})
+        return format_html('<a class="button" href="{}" target="_blank">View Invoice</a>', url)
+
+    view_invoice_link.short_description = "Invoice Page"
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
