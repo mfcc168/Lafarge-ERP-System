@@ -6,7 +6,7 @@
     <div class="row justify-content-center g-4">
         {% for salesman in salesmen %}
         <div class="col-md-4">
-            <a href="{% url 'salesman_detail' salesman.id %}" class="text-decoration-none card-link">
+            <a href="{% url 'salesman_monthly_preview' salesman.id %}" class="text-decoration-none card-link">
                 <div class="card shadow-lg border-0 text-center py-4 h-100">
                     <div class="card-body">
                         <h5 class="card-title text-dark fw-bold">{{ salesman.name }}</h5>

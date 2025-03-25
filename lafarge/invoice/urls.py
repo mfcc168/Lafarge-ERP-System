@@ -16,7 +16,7 @@ from .views.pdf_download_views import (
     download_sample_pdf, download_statement_pdf
 )
 from .views.salesman_page_views import (
-    salesman_list, SalesmanInvoiceView, salesman_monthly_sales
+    salesman_list, SalesmanInvoiceView, salesman_monthly_sales, salesman_monthly_preview, salesman_monthly_report
 )
 from .views.product_page_views import (
     product_list, product_transaction_detail, product_transaction_view
@@ -27,6 +27,8 @@ urlpatterns = [
     path('salesmen/', salesman_list, name='salesman_list'),
     path('salesman/<int:salesman_id>/', SalesmanInvoiceView.as_view(), name='salesman_detail'),
     path('salesman/<int:salesman_id>/monthly-sales/', salesman_monthly_sales, name='salesman_monthly_sales'),
+    path('salesman/<int:salesman_id>/monthly/', salesman_monthly_preview, name='salesman_monthly_preview'),
+    path('salesman/<int:salesman_id>/monthly/<int:year>/<int:month>/', salesman_monthly_report, name='salesman_monthly_report'),
 
     # Customers
     path('customers/', CustomerListView.as_view(), name='customer_list'),

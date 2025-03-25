@@ -1,0 +1,48 @@
+{% extends "invoice/base.html" %}
+{% load custom_filter %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Monthly Invoice Summary</h2>
+
+    {% if months %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            {% for month in months %}
+                {% if month.total > 0 %}
+                <div class="col">
+                    <a href="{{ month.url }}" class="text-decoration-none card-link">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ month.name }}</h5>
+                                <p class="card-text fw-bold text-secondary">
+                                    Total: ${{ month.total|currency }}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">No invoices available.</div>
+    {% endif %}
+</div>
+
+<style>
+/* Ensure the entire card is clickable */
+.card-link {
+    text-decoration: none; /* Remove underline */
+    display: block;
+}
+
+.card-link .card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-link .card:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Increase shadow on hover */
+}
+</style>
+
+{% endblock %}

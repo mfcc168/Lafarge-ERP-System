@@ -1,0 +1,110 @@
+{% extends "invoice/base.html" %}
+{% load custom_filter %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Monthly Report - {{ month }}/{{ year }}</h2>
+    </div>
+
+    {% for week_num, data in weeks.items %}
+        {% with valid_invoices=data.invoices|dictsort:"delivery_date" %}
+        {% if valid_invoices|length > 0 %}
+        <div class="card shadow-sm mb-4 border-0 rounded-3">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark">Week {{ week_num }}</h5>
+                <span class="fs-5 fw-bold text-muted">Total: ${{ data.total|currency }}</span>
+            </div>
+            <div class="card-body bg-white rounded-bottom">
+                <div class="table-responsive">
+                    <table class="table align-middle border-0">
+                        <thead class="bg-light text-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th>Salesman</th>
+                                <th class="text-end">Price</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in valid_invoices %}
+                            {% if invoice.total_price > 0 %}
+                            <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                                <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                                <td>
+                                    <a href="{% url 'invoice_detail' invoice.number %}" class="text-decoration-none fw-bold text-primary">
+                                        #{{ invoice.number }}
+                                    </a>
+                                </td>
+                                <td class="fw-semibold">{{ invoice.customer.name }}</td>
+                                <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
+                                <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
+                                <td>
+                                    <ul class="list-unstyled mb-0 small">
+                                        {% for item in invoice.items %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    {% endfor %}
+
+    {% if monthly_total > 0 %}
+    <div class="alert alert-secondary text-center mt-4 shadow-sm">
+        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|currency }}</strong></h4>
+    </div>
+    {% else %}
+    <div class="alert alert-light border text-center mt-4 shadow-sm">
+        <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> No invoices found for this month.</h4>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* Table Styling */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    border: none !important;
+    padding: 12px 16px;
+}
+
+/* Alternating Row Colors */
+.table-row-light {
+    background-color: #f9f9f9 !important;
+}
+
+.table-row-dark {
+    background-color: #ffffff !important;
+}
+
+/* Hover Effect */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 12px !important;
+}
+
+/* Softer Background */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+</style>
+
+{% endblock %}
