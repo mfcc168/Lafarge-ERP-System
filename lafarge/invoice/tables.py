@@ -82,7 +82,7 @@ class InvoiceTable(tables.Table):
             }
         }
         order_by = '-id'
-        fields = ("id", "number", "customer", "delivery_date", "payment_date", "salesman", "total_price")
+        fields = ("id", "number", "customer", "delivery_date", "payment_date", "deposit_date", "salesman", "total_price")
 
     id = tables.Column(visible=False)  # Hide 'id' from being shown
 
@@ -94,6 +94,9 @@ class InvoiceFilter(FilterSet):
     delivery_date_to = DateFilter(field_name='delivery_date', lookup_expr='lte', label="Delivery Date (To)")
     payment_date = DateFilter(field_name='payment_date', lookup_expr='gte', label="Payment Date (From)")
     payment_date_to = DateFilter(field_name='payment_date', lookup_expr='lte', label="Payment Date (To)")
+    deposit_date = DateFilter(field_name='deposit_date', lookup_expr='gte', label="Deposit Date (From)")
+    deposit_date_to = DateFilter(field_name='deposit_date', lookup_expr='lte', label="Deposit Date (To)")
+
 
     class Meta:
         model = Invoice
