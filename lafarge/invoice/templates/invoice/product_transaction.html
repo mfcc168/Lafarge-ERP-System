@@ -1,8 +1,8 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
 {% block content %}
-<h2>Transaction History for {{ product.name }}</h2>
-
+<h2>Transaction History for {{ product.name }} {{product.registration_code}}</h2>
+<h4>Supplier: {{product.supplier}}</h4>
 <table class="table">
     <thead>
         <tr>
