@@ -56,6 +56,8 @@ class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
     name_alias = models.CharField(max_length=255, null=True, blank=True)
     supplier = models.CharField(max_length=255, blank=True, null=True)
+    import_date = models.DateField(null=True, blank=True)
+    import_invoice_number = models.CharField(max_length=255, blank=True, null=True)
     registration_code = models.CharField(max_length=255, blank=True, null=True)
     expiry_date = models.DateField(null=True, blank=True)
     unit = models.CharField(max_length=255, blank=True, null=True)

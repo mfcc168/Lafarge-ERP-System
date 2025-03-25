@@ -49,8 +49,28 @@ def product_transaction_view(request, product_id):
     )
 
     transactions_data = []
-    initial_stock = product.quantity + sum(item.quantity for item in transactions)
-    remaining_stock = initial_stock
+
+    # Calculate the initial stock from the remaining stock and transactions
+    remaining_stock = product.quantity
+    total_transaction_quantity = sum(item.quantity for item in transactions)
+
+    # The initial stock would be remaining stock + total transaction quantity
+    initial_stock = remaining_stock + total_transaction_quantity
+
+    # Reverse calculate the import quantity (the quantity that would bring stock to the initial amount)
+    import_quantity = initial_stock - remaining_stock
+
+    # Add the import transaction as the first row (if import data exists)
+    if product.import_date and product.import_invoice_number:
+        transactions_data.append({
+            "invoice_number": product.import_invoice_number,
+            "customer": product.supplier,
+            "date": product.import_date,
+            "quantity": "-",
+            "product_type": "IN",
+            "remaining_stock": initial_stock,
+        })
+        remaining_stock = initial_stock  # Set remaining stock to the initial stock after import transaction
 
     # Group transactions by invoice number
     grouped_transactions = defaultdict(lambda: {
