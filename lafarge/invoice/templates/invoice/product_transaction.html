@@ -16,8 +16,8 @@
     <tbody>
     {% for transaction in transactions %}
     <tr>
-        <td><a href="{% url 'invoice_detail' transaction.invoice_number %}" class="text-decoration-none text-dark">{{
-            transaction.invoice_number }}</a></td>
+        <td><a href="{% url 'invoice_detail' transaction.invoice_number %}" class="text-decoration-none text-dark">
+            {{ transaction.invoice_number }}</a></td>
         {% if transaction.sample_customer %}
         <td>{{ transaction.sample_customer }}</td>
         {% else %}
