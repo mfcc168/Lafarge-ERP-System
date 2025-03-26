@@ -39,3 +39,7 @@ span[id^="select2-id_invoiceitem_set-"][id$="-product-container"] {
     height: 90vh !important;  /* Make modal 90% of the viewport height */
     overflow-y: auto !important; /* Enable scrolling if content overflows */
 }
+
+.vLargeTextField {
+    font-size: 20px !important;
+}
