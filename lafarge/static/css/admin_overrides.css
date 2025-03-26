@@ -29,7 +29,12 @@
     max-width: 100% !important;
     padding-left: 10px !important;
     width: auto !important;
+    height: 80% !important;
+    margin-top: 5% !important;
 }
+.modal-content {
+    height: 100% !important;  /* Ensure content takes full height */
+}   
 
 
 
