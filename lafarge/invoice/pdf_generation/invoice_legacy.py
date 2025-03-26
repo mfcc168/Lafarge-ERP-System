@@ -28,7 +28,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
 
-    y_position = height - 154 + 12
+    y_position = height - 150 + 12
     text_object = pdf.beginText(100, y_position)
     text_object.setFont("Times-Roman", 12)
     if prefix_check(invoice.customer.name.lower()):
@@ -63,7 +63,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.drawString(37, height - 510, f"** ALL GOODS ARE NON RETURNABLE **")
 
     if office_hour_lines:
-        office_hour_height = 154
+        office_hour_height = 150
         if len(str(invoice.customer.name)) >= 40:
             office_hour_height = 165
         pdf.setFont("Times-Bold", 12)

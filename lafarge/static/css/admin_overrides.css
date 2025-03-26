@@ -1,6 +1,7 @@
 /* Fix for TabularInline width */
 .tabular.inline-related {
-    width: 100%;
+    table-layout: auto !important;
+    width: 100% !important;
     overflow-x: auto;
 }
 
@@ -14,21 +15,19 @@
 }
 
 /* Optional: Make form fields more compact */
-.tabular.inline-related input:not([type="checkbox"]),
+.tabular.inline-related input,
 .tabular.inline-related textarea {
     width: 90%;
     max-width: 200px;
 }
 
-span[id^="select2-id_invoiceitem_set-"][id$="-product-container"] {
-    width: 300px !important;
+/* Resize the product select field only */
+.select2-container--default .select2-selection--single {
+    width: 330px !important; /* Adjust the width as needed */
     min-width: 100px !important;
-    max-width: 300px !important;
+    max-width: 330px !important;
 }
 
-.select2-container {
-    min-width: 100px !important;
-}
 .modal-dialog {
     max-width: 100% !important;
     padding-left: 10px !important;
