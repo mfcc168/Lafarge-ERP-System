@@ -21,11 +21,8 @@
     max-width: 200px;
 }
 
-/* Resize the product select field only */
-.select2-container--default .select2-selection--single {
-    width: 330px !important; /* Adjust the width as needed */
-    min-width: 100px !important;
-    max-width: 330px !important;
+.select2-container {
+    min-width: 50% !important;
 }
 
 .modal-dialog {
