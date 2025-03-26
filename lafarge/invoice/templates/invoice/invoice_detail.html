@@ -90,7 +90,7 @@
                     </button>
                     {% endif %}
                     {% endif %}
-                    {% if invoice.customer.name == "Sample" %}
+                    {% if invoice.number|slice:":2" == "S-" %}
                     <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
                             onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
                         <i class="bi bi-search me-2"></i> Sample
