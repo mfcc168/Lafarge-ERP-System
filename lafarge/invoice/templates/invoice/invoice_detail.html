@@ -53,7 +53,7 @@
                                 <td>{{ item.quantity }} {{ item.product.unit }}</td>
                                 <td class="fw-semibold product-name">{{ item.product.name }}</td>
                                 {% if item.product_type == "normal" %}
-                                <td class="text-end">HK$ {{ item.price }}</td>
+                                <td class="text-end">HK$ {{ item|unit_price }}</td>
                                 <td class="text-end fw-bold text-success">HK$ {{ item.sum_price|currency }}</td>
                                 {% else %}
                                 <td class="text-end text-danger">{{ item.product_type }}</td>

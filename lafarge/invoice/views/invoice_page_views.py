@@ -30,7 +30,6 @@ class InvoiceListView(SingleTableMixin, FilterView):
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
     invoice = get_object_or_404(Invoice, number=invoice_number)
-
     # Render the invoice template with the context
     context = {
         'invoice': invoice
