@@ -74,7 +74,7 @@
             <!-- Floating Buttons (Right Side) -->
             <div class="col-auto d-none d-lg-block">
                 <div class="sticky-buttons">
-                    {% if invoice.customer.name != "Sample" %}
+                    {% if invoice.number|slice:":2" != "S-" %}
                     <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
                             onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
                         <i class="bi bi-file-earmark-text me-2"></i> Invoice
