@@ -26,3 +26,11 @@ def unit_price(item):
     if item.product.units_per_pack > 0:
         return f"{(item.price / item.product.units_per_pack).quantize(Decimal('0.01'), rounding=ROUND_UP):,.2f}"
     return 0
+
+@register.filter(name='percentage')
+def percentage(decimal):
+    try:
+        percentage = float(decimal) * 100
+        return f"{percentage:.10f}".rstrip('0').rstrip('.') + "%"
+    except (ValueError, TypeError):
+        return decimal

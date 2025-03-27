@@ -19,6 +19,19 @@ from django_tables2.views import SingleTableMixin
 from ..models import Salesman, Invoice
 from ..tables import InvoiceFilter, SalesmanInvoiceTable
 
+def sales_incentive_scheme(sales):
+    if sales < 50000:
+        return 0.02
+    elif sales < 70000:
+        return 0.025
+    elif sales < 100000:
+        return 0.0325
+    elif sales < 130000:
+        return 0.04
+    elif sales < 170000:
+        return 0.05
+    elif sales >= 170000:
+        return 0.055
 
 @staff_member_required
 def salesman_list(request):
@@ -108,6 +121,7 @@ def salesman_monthly_preview(request, salesman_id):
 @staff_member_required
 def salesman_monthly_report(request, salesman_id, year, month):
     salesman = get_object_or_404(Salesman, id=salesman_id)
+    sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
     first_day = make_aware(datetime(int(year), int(month), 1))
     last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
     breadcrumbs = [
@@ -117,6 +131,9 @@ def salesman_monthly_report(request, salesman_id, year, month):
     ]
     invoices = Invoice.objects.filter(
         salesman=salesman, delivery_date__range=(first_day, last_day)
+    ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+    invoice_share = Invoice.objects.filter(
+        salesman=sales_share, delivery_date__range=(first_day, last_day)
     ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
 
     weeks = {1: {"invoices": [], "total": Decimal("0.00")},
@@ -141,9 +158,31 @@ def salesman_monthly_report(request, salesman_id, year, month):
 
         invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
 
+    monthly_total_share = Decimal("0.00")
+    monthly_total_share_percentage = Decimal("0.00")
+    for invoice in invoice_share:
+        monthly_total_share += invoice.total_price
+    if salesman.name == "Dominic So":
+        monthly_total_share_percentage = Decimal('0.4')
+    elif salesman.name == "Alex Cheung":
+        monthly_total_share_percentage = Decimal('0.3')
+    elif salesman.name == "Matthew Mak":
+        monthly_total_share_percentage = Decimal('0.3')
+    personal_monthly_total_share = monthly_total_share * monthly_total_share_percentage
+    sales_monthly_total = monthly_total + personal_monthly_total_share
+    incentive_percentage = sales_incentive_scheme(sales_monthly_total)
+    commission = sales_monthly_total * Decimal(str(incentive_percentage)) * Decimal("1.1")
+
+
     return render(
         request,
         "invoice/salesman_monthly_report.html",
-        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total, "salesman": salesman,
+        {"weeks": weeks, "year": year, "month": month, "monthly_total": monthly_total,
+         "salesman": salesman, "commission": commission,
+         "monthly_total_share": monthly_total_share,
+         "monthly_total_share_percentage": monthly_total_share_percentage,
+         "personal_monthly_total_share": personal_monthly_total_share,
+         "sales_monthly_total": sales_monthly_total,
+         "incentive_percentage": incentive_percentage,
          "breadcrumbs": breadcrumbs},
     )
