@@ -111,9 +111,7 @@ JAZZMIN_SETTINGS = {
     "sidebar": "collapsed",
     "custom_css": "css/admin_overrides.css",
     "show_ui_builder": True,
-    "extra_js": [
-        "/static/js/custom_admin.js"
-    ],
+    "custom_js": "js/custom_admin.js",
 }
 
 JAZZMIN_UI_TWEAKS = {
