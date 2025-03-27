@@ -41,23 +41,23 @@ def product_transaction_detail(request, product_id):
 def product_transaction_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    # Fetch transactions sorted by date (oldest first)
+    # Fetch transactions sorted by date (newest first for correct calculation)
     transactions = InvoiceItem.objects.filter(product=product).select_related("invoice").order_by(
-        F("invoice__delivery_date").asc(nulls_last=True),  # Sort delivered first, undelivered last
-        "invoice__id",
-        "id"
+        F("invoice__delivery_date").desc(nulls_first=True),  # Reverse order
+        "-invoice__id",
+        "-id"
     )
 
     transactions_data = []
+    remaining_stock = product.quantity  # Start with the latest stock
 
-    # Calculate the initial stock from the remaining stock and transactions
-    remaining_stock = product.quantity
-    total_transaction_quantity = sum(item.quantity for item in transactions)
+    # Reverse process transactions to find initial stock
+    for item in transactions:
+        remaining_stock += item.quantity  # Add back to find original stock
 
-    # The initial stock would be remaining stock + total transaction quantity
-    initial_stock = remaining_stock + total_transaction_quantity
+    initial_stock = remaining_stock
 
-    # Add the import transaction as the first row (if import data exists)
+    # Add the import transaction as the first row (if available)
     if product.import_date and product.import_invoice_number:
         transactions_data.append({
             "invoice_number": product.import_invoice_number,
@@ -67,9 +67,11 @@ def product_transaction_view(request, product_id):
             "product_type": "IN",
             "remaining_stock": initial_stock,
         })
-        remaining_stock = initial_stock  # Set remaining stock to the initial stock after import transaction
+        remaining_stock = initial_stock
 
-    # Group transactions by invoice number
+
+    transactions = transactions[::-1]
+
     grouped_transactions = defaultdict(lambda: {
         "customer": "",
         "sample_customer": "",
@@ -84,24 +86,18 @@ def product_transaction_view(request, product_id):
         remaining_stock += quantity_change
 
         grouped_transactions[invoice_number]["customer"] = item.invoice.customer.name if item.invoice.customer else ""
-        grouped_transactions[invoice_number][
-            "sample_customer"] = item.invoice.sample_customer if item.invoice.sample_customer else ""  # No `.name` needed
-        grouped_transactions[invoice_number]["date"] = (
-            item.invoice.delivery_date if item.invoice.delivery_date else "To Be Delivered"
-        )
+        grouped_transactions[invoice_number]["sample_customer"] = item.invoice.sample_customer or ""
+        grouped_transactions[invoice_number]["date"] = item.invoice.delivery_date or "To Be Delivered"
         grouped_transactions[invoice_number]["quantity"] += quantity_change
 
-        # Store the lowest remaining stock for this invoice
-        if grouped_transactions[invoice_number]["remaining_stock"] is None or remaining_stock < \
-                grouped_transactions[invoice_number]["remaining_stock"]:
+        if grouped_transactions[invoice_number]["remaining_stock"] is None or remaining_stock < grouped_transactions[invoice_number]["remaining_stock"]:
             grouped_transactions[invoice_number]["remaining_stock"] = remaining_stock
 
     # Convert grouped data into a list
     for invoice_number, data in grouped_transactions.items():
         transactions_data.append({
             "invoice_number": invoice_number,
-            "customer": data["sample_customer"] if data["sample_customer"] else data["customer"],
-            # Prioritize sample_customer
+            "customer": data["sample_customer"] or data["customer"],  # Prioritize sample_customer
             "date": data["date"],
             "quantity": data["quantity"],
             "product_type": "OUT",
