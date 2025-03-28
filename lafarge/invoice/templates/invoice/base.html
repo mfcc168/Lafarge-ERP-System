@@ -21,7 +21,7 @@
             width: 250px;
             background-color: #343a40;
             padding-top: 20px;
-            transition: width 0.3s;
+            transition: all 0.3s;
             z-index: 1000;
         }
 
@@ -55,6 +55,7 @@
             margin-left: 250px;
             padding: 20px;
             transition: margin-left 0.3s;
+            padding-bottom: 70px; /* Space for mobile navbar */
         }
 
         /* Collapsed Sidebar */
@@ -92,6 +93,62 @@
             background: #0056b3;
         }
 
+        /* Mobile Bottom Navbar */
+        .mobile-navbar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #343a40;
+            z-index: 1000;
+            padding: 5px 0;
+        }
+
+        .mobile-navbar a {
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 10px 5px;
+            font-size: 12px;
+            flex: 1;
+        }
+
+        .mobile-navbar a i {
+            display: block;
+            margin: 0 auto 5px;
+            font-size: 18px;
+        }
+
+        .mobile-navbar a span {
+            display: block;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-navbar {
+                display: flex;
+                justify-content: space-around;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .content.collapsed {
+                margin-left: 0;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-navbar {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -105,8 +162,7 @@
     <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
     <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
     <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
-    <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i>
-        <span>Invoices</span></a>
+    <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
     <a href="{% url 'admin:index' %}" class="nav-item"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
 </div>
 
@@ -116,6 +172,16 @@
     {% endblock %}
 </div>
 
+<!-- Mobile Bottom Navbar -->
+<div class="mobile-navbar">
+    <a href="{% url 'home' %}"><i class="bi bi-house-door"></i> <span>Home</span></a>
+    <a href="{% url 'product_list' %}"><i class="bi bi-box"></i> <span>Products</span></a>
+    <a href="{% url 'salesman_list' %}"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
+    <a href="{% url 'customer_list' %}"><i class="bi bi-people"></i> <span>Customers</span></a>
+    <a href="{% url 'invoice_list' %}"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
+    <a href="{% url 'admin:index' %}"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
+</div>
+
 <!-- Sidebar Toggle Script -->
 <script>
     function toggleSidebar() {
@@ -123,6 +189,10 @@
         document.getElementById("content").classList.toggle("collapsed");
     }
 
+    // Close sidebar when clicking on mobile
+    if (window.innerWidth <= 768) {
+        document.getElementById("sidebar").style.display = "none";
+    }
 </script>
 {% bootstrap_javascript %}
 </body>
