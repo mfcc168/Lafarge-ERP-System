@@ -17,8 +17,7 @@
 /* Optional: Make form fields more compact */
 .tabular.inline-related input,
 .tabular.inline-related textarea {
-    width: 90%;
-    max-width: 200px;
+    width: 100px;
 }
 
 .select2-container {
