@@ -125,7 +125,7 @@
         }
 
         /* Responsive Styles */
-        @media (max-width: 768px) {
+        @media (max-width: 768px), (max-height: 500px) {
             .sidebar {
                 display: none;
             }
@@ -137,6 +137,7 @@
 
             .content {
                 margin-left: 0;
+                padding-bottom: 70px;
             }
 
             .content.collapsed {
@@ -144,9 +145,22 @@
             }
         }
 
-        @media (min-width: 769px) {
+        @media (min-width: 769px) and (min-height: 501px) {
             .mobile-navbar {
                 display: none !important;
+            }
+
+            .sidebar {
+                display: block;
+            }
+
+            .content {
+                margin-left: 250px;
+                padding-bottom: 20px;
+            }
+
+            .content.collapsed {
+                margin-left: 80px;
             }
         }
     </style>
@@ -189,10 +203,33 @@
         document.getElementById("content").classList.toggle("collapsed");
     }
 
-    // Close sidebar when clicking on mobile
-    if (window.innerWidth <= 768) {
-        document.getElementById("sidebar").style.display = "none";
+    // Handle orientation changes
+    function handleResponsive() {
+        const sidebar = document.getElementById("sidebar");
+        const mobileNavbar = document.querySelector(".mobile-navbar");
+        const content = document.getElementById("content");
+
+        if (window.innerWidth <= 768 || window.innerHeight <= 500) {
+            // Mobile view
+            sidebar.style.display = "none";
+            mobileNavbar.style.display = "flex";
+            content.style.marginLeft = "0";
+            content.style.paddingBottom = "70px";
+        } else {
+            // Desktop view
+            sidebar.style.display = "block";
+            mobileNavbar.style.display = "none";
+            content.style.marginLeft = sidebar.classList.contains("collapsed") ? "80px" : "250px";
+            content.style.paddingBottom = "20px";
+        }
     }
+
+    // Initial check
+    handleResponsive();
+
+    // Add event listener for resize and orientation changes
+    window.addEventListener("resize", handleResponsive);
+    window.addEventListener("orientationchange", handleResponsive);
 </script>
 {% bootstrap_javascript %}
 </body>
