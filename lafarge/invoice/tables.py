@@ -147,7 +147,7 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
     )
 
     def render_total_price(self, value):
-        return mark_safe(f"<span class='text-danger fw-bold'>$&nbsp;{currency(value)}</span>")  # Apply the currency format
+        return mark_safe(f"<span class='text-danger fw-bold'>${currency(value)}</span>")  # Apply the currency format
 
     class Meta:
         model = Invoice
