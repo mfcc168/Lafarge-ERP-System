@@ -82,16 +82,18 @@ def monthly_report(request, year, month):
         2: {"invoices": [], "total": Decimal("0.00")},
         3: {"invoices": [], "total": Decimal("0.00")},
         4: {"invoices": [], "total": Decimal("0.00")},
+        5: {"invoices": [], "total": Decimal("0.00")},
     }
     monthly_total = Decimal("0.00")
 
     for invoice in invoices:
         week_number = (invoice.delivery_date.day - 1) // 7 + 1
-        if week_number in weeks:
+        if week_number <= 4:
             weeks[week_number]["invoices"].append(invoice)
             weeks[week_number]["total"] += invoice.total_price
         else:
-            continue
+            weeks[5]["invoices"].append(invoice)  # Handle 5th week for months with >28 days
+            weeks[5]["total"] += invoice.total_price  # Add to the total for the 5th week
         monthly_total += invoice.total_price
 
         # Group invoice items by product name without the lot number
