@@ -5,3 +5,4 @@ from .invoice_page_views import *
 from .product_page_views import *
 from .salesman_page_views import *
 from .pdf_download_views import *
+from .payment_page_views import *

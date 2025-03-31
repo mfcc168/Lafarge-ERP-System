@@ -1,0 +1,118 @@
+{% extends "invoice/base.html" %}
+{% load custom_filter %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Monthly Payment Report - {{ month }}/{{ year }}</h2>
+    </div>
+
+
+
+    <div class="card shadow-sm mb-4 border-0 rounded-3">
+        <div class="card-body bg-white rounded-bottom">
+            <div class="table-responsive">
+                <table class="table align-middle border-0">
+                    <thead class="bg-light text-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Invoice</th>
+                        <th>Details</th>
+                        <th>Method</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-end">Grouped Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for cheque_detail, data in grouped_invoices.items %}
+                            {% for invoice in data.invoices %}
+                                {% if invoice.total_price > 0 %}
+                                    <tr class="{% cycle 'table-row-light' 'table-row-dark' %}
+                                        {% if cheque_detail and data.invoices|length > 1 %}
+                                            {% if forloop.first %}
+                                            border-top border-start border-end border-secondary
+                                            {% elif forloop.last %}
+                                            border-bottom border-start border-end border-secondary
+                                            {% else %}
+                                            border-start border-end border-secondary
+                                            {% endif %}
+                                        {% endif %}">
+                                        <td class="text-nowrap">{{ invoice.payment_date }}</td>
+                                        <td class="fw-semibold">{{ invoice.customer.name }}</td>
+                                        <td>
+                                            <a href="{% url 'invoice_detail' invoice.number %}"
+                                               class="text-decoration-none fw-bold text-primary">
+                                                #{{ invoice.number }}
+                                            </a>
+                                        </td>
+                                        <td><span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span></td>
+                                        <td>
+                                            {% if invoice.payment_method == "cash" %}
+                                                <span class="badge bg-secondary text-white">Cash</span>
+                                            {% elif invoice.payment_method == "cheque" %}
+                                                <span class="badge bg-secondary text-white">CQ</span>
+                                            {% elif invoice.payment_method == "fps" %}
+                                                <span class="badge bg-secondary text-white">FPS</span>
+                                            {% elif invoice.payment_method == "credit(cq)" %}
+                                                <span class="badge bg-secondary text-white">Credit CQ</span>
+                                            {% else %}
+                                                {{ invoice.payment_method }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
+                                        <td class="text-end fw-bold text-danger">
+                                            {% if cheque_detail and data.invoices|length > 1 and forloop.last %}
+                                                ${{ data.total_price|currency }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+/* Table Styling */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    border: none !important;
+    padding: 12px 16px;
+}
+
+/* Alternating Row Colors */
+.table-row-light {
+    background-color: #f9f9f9 !important;
+}
+
+.table-row-dark {
+    background-color: #ffffff !important;
+}
+
+/* Hover Effect */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 12px !important;
+}
+
+/* Softer Background */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+</style>
+
+{% endblock %}

@@ -22,6 +22,8 @@ from .views.salesman_page_views import (
     salesman_list, SalesmanInvoiceView, salesman_monthly_sales, salesman_monthly_preview, salesman_monthly_report
 )
 
+from .views.payment_page_views import (monthly_payment_preview, monthly_payment_report)
+
 urlpatterns = [
     # Salesmen
     path('salesmen/', salesman_list, name='salesman_list'),
@@ -62,6 +64,10 @@ urlpatterns = [
     path("api/customers/", CustomerView, name="CustomerView"),
     path('api/update-delivery-date/', UpdateDeliveryDateView.as_view(), name='update-delivery-date'),
     path('api/update-payment-date/', UpdatePaymentDateView.as_view(), name='update-payment-date'),
+
+    # Payments
+    path("payments/monthly", monthly_payment_preview, name="monthly_payment_preview"),
+    path("payments/monthly/<int:year>/<int:month>/", monthly_payment_report, name="monthly_payment_report"),
 
     # Home
     path('', home, name='home'),
