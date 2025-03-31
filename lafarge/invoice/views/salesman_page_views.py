@@ -152,8 +152,11 @@ def salesman_monthly_report(request, salesman_id, year, month):
 
     for invoice in invoices:
         week_number = (invoice.delivery_date.day - 1) // 7 + 1
-        weeks[week_number]["invoices"].append(invoice)
-        weeks[week_number]["total"] += invoice.total_price
+        if week_number in weeks:
+            weeks[week_number]["invoices"].append(invoice)
+            weeks[week_number]["total"] += invoice.total_price
+        else:
+            continue
         monthly_total += invoice.total_price
 
         # Group invoice items by product name without the lot number
