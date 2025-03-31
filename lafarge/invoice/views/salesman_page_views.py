@@ -124,6 +124,14 @@ def salesman_monthly_report(request, salesman_id, year, month):
     sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
     first_day = make_aware(datetime(int(year), int(month), 1))
     last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
+
+    current_date = datetime.now()
+    current_year = current_date.year
+    current_month = current_date.month
+    show_commission_summary = True
+    # Prevent showing the current month's commission report
+    if int(year) == current_year and int(month) == current_month:
+        show_commission_summary = False
     breadcrumbs = [
         {"name": "Salesmen", "url": reverse("salesman_list")},
         {"name": salesman.name, "url": reverse("salesman_monthly_preview", kwargs={"salesman_id": salesman.id})},
@@ -184,5 +192,6 @@ def salesman_monthly_report(request, salesman_id, year, month):
          "personal_monthly_total_share": personal_monthly_total_share,
          "sales_monthly_total": sales_monthly_total,
          "incentive_percentage": incentive_percentage,
+         "show_commission_summary": show_commission_summary,
          "breadcrumbs": breadcrumbs},
     )
