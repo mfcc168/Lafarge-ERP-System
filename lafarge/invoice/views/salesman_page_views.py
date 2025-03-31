@@ -97,7 +97,9 @@ def salesman_monthly_preview(request, salesman_id):
     for i in range(12):  # Get the last 12 months
         date = today.replace(day=1) - relativedelta(months=i)
         year, month = date.year, date.month
-
+        # Exclude January 2025
+        if year == 2025 and month == 1:
+            continue
         # Calculate total amount for the salesman in the month
         total_amount = (
                 Invoice.objects.filter(salesman=salesman, delivery_date__year=year, delivery_date__month=month)
@@ -149,7 +151,7 @@ def salesman_monthly_report(request, salesman_id, year, month):
              3: {"invoices": [], "total": Decimal("0.00")},
              4: {"invoices": [], "total": Decimal("0.00")},
              5: {"invoices": [], "total": Decimal("0.00")},
-             }         
+             }
     monthly_total = Decimal("0.00")
 
     for invoice in invoices:

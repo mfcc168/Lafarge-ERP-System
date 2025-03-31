@@ -50,7 +50,9 @@ def monthly_preview(request):
     for i in range(12):  # Get the last 12 months
         date = today.replace(day=1) - relativedelta(months=i)  # Correct month rollback
         year, month = date.year, date.month
-
+        # Exclude January 2025
+        if year == 2025 and month == 1:
+            continue
         # Calculate total amount for the month
         total_amount = (
                 Invoice.objects.filter(delivery_date__year=year, delivery_date__month=month)
