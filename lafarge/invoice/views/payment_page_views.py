@@ -21,7 +21,7 @@ def monthly_payment_preview(request):
     latest_invoice = Invoice.objects.filter(payment_date__isnull=False).order_by('-payment_date').first()
 
     if latest_invoice:
-        today = latest_invoice.delivery_date
+        today = latest_invoice.payment_date
     else:
         today = now().date()  # Fallback if no invoices exist
 
