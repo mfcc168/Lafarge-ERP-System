@@ -35,7 +35,7 @@ def monthly_payment_preview(request):
             continue
         # Calculate total amount for the month
         total_amount = (
-                Invoice.objects.filter(delivery_date__year=year, delivery_date__month=month)
+                Invoice.objects.filter(payment_date__year=year, payment_date__month=month)
                 .aggregate(total=Sum("total_price"))["total"] or 0
         )
 
