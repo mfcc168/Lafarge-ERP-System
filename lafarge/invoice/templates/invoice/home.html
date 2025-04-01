@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-async function fetchData() {
+async function fetchSalesmanInsights() {
     try {
         const response = await fetch("{% url 'sales_data' %}");
         const data = await response.json();
@@ -189,7 +189,7 @@ async function fetchData() {
         const months = data.sales_per_month.map(item => monthNames[item.month]);
         const sales = data.sales_per_month.map(item => item.total_sales);
 
-        const salesmen = data.sales_by_salesman.map(item => item.salesman__name);
+        const salesmen = data.sales_by_salesman.map(item => item.salesman__code);
         const salesAmounts = data.sales_by_salesman.map(item => item.total_sales);
 
         // Sales Trend Chart
@@ -209,7 +209,7 @@ async function fetchData() {
         });
         // Update Sales by Salesman Chart Title
                 document.querySelector(".border-left-success .card-title").innerHTML =
-                    `<i class="bi bi-person-lines-fill"></i> Sales by Salesman (${data.last_month_name})`;
+                    `<i class="bi bi-person-lines-fill"></i> Top Salesmen (${data.last_month_name})`;
         // Sales by Salesman Chart
         new Chart(document.getElementById("salesmanChart"), {
             type: "bar",
@@ -231,7 +231,7 @@ async function fetchData() {
     }
 }
 
-fetchData();
+fetchSalesmanInsights();
 
 async function fetchProductInsights() {
     try {
@@ -244,7 +244,7 @@ async function fetchProductInsights() {
         }
 
         // Update the title with the previous month's name
-        document.getElementById("productTitle").innerHTML = `<i class="bi bi-box"></i> Product Insights (${data.last_month_name})`;
+        document.getElementById("productTitle").innerHTML = `<i class="bi bi-box"></i> Top Products (${data.last_month_name})`;
 
         const products = data.product_sales.map(item => item.invoiceitem__product__name);
         const quantities = data.product_sales.map(item => item.total_quantity);

@@ -73,7 +73,7 @@ def sales_data(request):
         current_date = now()
         last_month = (current_date.month - 1) or 12
         last_month_year = current_date.year if current_date.month > 1 else current_date.year - 1
-        last_month_name = calendar.month_name[last_month]  # Get month name (e.g., "February")
+        last_month_name = calendar.month_name[last_month]
 
         # Get total sales per month
         sales_per_month = (
@@ -90,8 +90,11 @@ def sales_data(request):
         sales_by_salesman = (
             Invoice.objects
                 .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
-                .values('salesman__name')
+                .values('salesman__code')
                 .annotate(total_sales=Sum('total_price'))
+                .exclude(salesman__code="Lafarge")
+                .exclude(salesman__code="DS/MM/AC")
+                .exclude(salesman__code="KK")
                 .order_by('-total_sales')
         )
 
