@@ -35,9 +35,6 @@ urlpatterns = [
     # Customers
     path('customers/', CustomerListView.as_view(), name='customer_list'),
     path('customer/<str:customer_name>/', customer_detail, name='customer_detail'),
-    path('unpaid-invoices/', customers_with_unpaid_invoices, name='unpaid_invoices'),
-    path('unpaid-invoices/<str:customer_name>/', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
-    path('unpaid-invoices-by-month/<str:year_month>/', unpaid_invoices_by_month_detail, name='unpaid_invoices_by_month_detail'),
 
     # Products
     path('products/', product_list, name='product_list'),
@@ -47,8 +44,6 @@ urlpatterns = [
     # Invoices
     path('invoices/', InvoiceListView.as_view(), name='invoice_list'),
     path('invoice/<str:invoice_number>/', invoice_detail, name='invoice_detail'),
-    path("invoices/monthly/", monthly_preview, name="monthly_preview"),
-    path("invoices/monthly/<int:year>/<int:month>/", monthly_report, name="monthly_report"),
 
     # PDF Downloads
     path('delivery-note/<str:invoice_number>/download/', download_delivery_note_pdf, name='download_delivery_note_pdf'),
@@ -68,6 +63,15 @@ urlpatterns = [
     # Payments
     path("payments/monthly", monthly_payment_preview, name="monthly_payment_preview"),
     path("payments/monthly/<int:year>/<int:month>/", monthly_payment_report, name="monthly_payment_report"),
+
+    # Unpaids
+    path('unpaid-invoices/', customers_with_unpaid_invoices, name='unpaid_invoices'),
+    path('unpaid-invoices/<str:customer_name>/', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
+    path('unpaid-invoices-by-month/<str:year_month>/', unpaid_invoices_by_month_detail, name='unpaid_invoices_by_month_detail'),
+
+    # Sales
+    path("invoices/monthly/", monthly_preview, name="monthly_preview"),
+    path("invoices/monthly/<int:year>/<int:month>/", monthly_report, name="monthly_report"),
 
     # Home
     path('', home, name='home'),

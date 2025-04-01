@@ -163,6 +163,23 @@
                 margin-left: 80px;
             }
         }
+.page-title {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title-text {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
     </style>
 </head>
 <body>
@@ -177,6 +194,7 @@
     <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
     <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
     <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
+    <a href="{% url 'unpaid_invoices' %}" class="nav-item"><i class="bi bi-file-earmark-x"></i> <span>Statements</span></a>
     <a href="{% url 'monthly_payment_preview' %}" class="nav-item"><i class="bi bi-credit-card-2-back"></i> <span>Payments</span></a>
     <a href="{% url 'admin:index' %}" class="nav-item"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
 </div>
