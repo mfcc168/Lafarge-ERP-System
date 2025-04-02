@@ -156,8 +156,13 @@ class SalesmanMonthlyReport(APIView):
             invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
             invoice_data = {
                 'number': invoice.number,
+                'customer': invoice.customer.name,
+                'care_of': invoice.customer.care_of,
+                'sample_customer': invoice.sample_customer,
+                'salesman': invoice.salesman.name,
                 'total_price': invoice.total_price,
                 'delivery_date': invoice.delivery_date,
+                'payment_date': invoice.payment_date,
                 'items': invoice.items,
             }
             weeks[week_number]["invoices"].append(invoice_data)
