@@ -1,7 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import make_aware
+from django.db.models import Sum
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from collections import defaultdict
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from decimal import Decimal
+import re
 
 from ..serializers import *
 
@@ -69,3 +77,101 @@ class UpdatePaymentDateView(APIView):
         # Serialize the updated invoice and return the response
         serializer = InvoiceSerializer(invoice)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def sales_incentive_scheme(sales):
+    if sales < 50000:
+        return 0.02
+    elif sales < 70000:
+        return 0.025
+    elif sales < 100000:
+        return 0.0325
+    elif sales < 130000:
+        return 0.04
+    elif sales < 170000:
+        return 0.05
+    elif sales >= 170000:
+        return 0.055
+
+class SalesmanMonthlyPreview(APIView):
+
+    def get(self, request, salesman_id):
+        salesman = get_object_or_404(Salesman, id=salesman_id)
+        latest_invoice = Invoice.objects.filter(salesman=salesman, delivery_date__isnull=False)
+        latest_invoice = latest_invoice.order_by('-delivery_date').first()
+        today = latest_invoice.delivery_date if latest_invoice else datetime.now().date()
+
+        months = []
+        for i in range(12):  # Get the last 12 months
+            date = today.replace(day=1) - relativedelta(months=i)
+            year, month = date.year, date.month
+            if year == 2025 and month == 1:
+                continue
+            total_amount = Invoice.objects.filter(
+                salesman=salesman, delivery_date__year=year, delivery_date__month=month
+            ).aggregate(total=Sum("total_price"))["total"] or 0
+
+            if total_amount > 0:
+                months.append({
+                    'year': year,
+                    'month': month,
+                    'name': date.strftime('%B %Y'),
+                    'total': total_amount,
+                })
+
+        return Response({"months": months, "salesman": salesman.name})
+
+
+class SalesmanMonthlyReport(APIView):
+
+    def get(self, request, salesman_id, year, month):
+        salesman = get_object_or_404(Salesman, id=salesman_id)
+        sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
+        first_day = make_aware(datetime(int(year), int(month), 1))
+        last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
+
+        invoices = Invoice.objects.filter(
+            salesman=salesman, delivery_date__range=(first_day, last_day)
+        ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+        invoice_share = Invoice.objects.filter(
+            salesman=sales_share, delivery_date__range=(first_day, last_day)
+        )
+
+        weeks = {i: {"invoices": [], "total": Decimal("0.00")} for i in range(1, 6)}
+        monthly_total = Decimal("0.00")
+
+        for invoice in invoices:
+            week_number = (invoice.delivery_date.day - 1) // 7 + 1
+            if week_number > 4:
+                week_number = 5
+            weeks[week_number]["invoices"].append(invoice.id)
+            weeks[week_number]["total"] += invoice.total_price
+            monthly_total += invoice.total_price
+
+        grouped_items = defaultdict(list)
+        for invoice in invoices:
+            for item in invoice.invoiceitem_set.all():
+                if item.product:
+                    clean_name = re.sub(r"\\s*\\(Lot\\s*no\\.?\\s*[A-Za-z0-9-]+\\)", "", item.product.name)
+                    grouped_items[clean_name].append(str(item.quantity))
+
+        monthly_total_share = sum(inv.total_price for inv in invoice_share)
+        commission_percentage = {"Dominic So": 0.4, "Alex Cheung": 0.3, "Matthew Mak": 0.3}.get(salesman.name, 0)
+        personal_monthly_total_share = monthly_total_share * Decimal(str(commission_percentage))
+        sales_monthly_total = monthly_total + personal_monthly_total_share
+        incentive_percentage = sales_incentive_scheme(sales_monthly_total)
+        commission = sales_monthly_total * Decimal(str(incentive_percentage)) * Decimal("1.1")
+
+        return Response({
+            "weeks": weeks,
+            "year": year,
+            "month": month,
+            "monthly_total": monthly_total,
+            "salesman": salesman.name,
+            "commission": commission,
+            "monthly_total_share": monthly_total_share,
+            "monthly_total_share_percentage": commission_percentage,
+            "personal_monthly_total_share": personal_monthly_total_share,
+            "sales_monthly_total": sales_monthly_total,
+            "incentive_percentage": incentive_percentage,
+        })

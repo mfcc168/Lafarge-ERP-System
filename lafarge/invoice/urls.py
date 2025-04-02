@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views.api_views import (
     ProductView, InvoiceView, CustomerView,
-    UpdateDeliveryDateView, UpdatePaymentDateView
+    UpdateDeliveryDateView, UpdatePaymentDateView, SalesmanMonthlyReport, SalesmanMonthlyPreview
 )
 from .views.customer_page_views import (
     CustomerListView, customer_detail,
@@ -59,6 +59,8 @@ urlpatterns = [
     path("api/customers/", CustomerView, name="CustomerView"),
     path('api/update-delivery-date/', UpdateDeliveryDateView.as_view(), name='update-delivery-date'),
     path('api/update-payment-date/', UpdatePaymentDateView.as_view(), name='update-payment-date'),
+    path('api/salesman/<int:salesman_id>/monthly/', SalesmanMonthlyReport.as_view(), name='salesman-monthly-preview'),
+    path('api/salesman/<int:salesman_id>/monthly/<int:year>/<int:month>/', SalesmanMonthlyReport.as_view(), name='salesman-monthly-report'),
 
     # Payments
     path("payments/monthly", monthly_payment_preview, name="monthly_payment_preview"),
