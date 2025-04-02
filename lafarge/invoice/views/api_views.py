@@ -144,17 +144,21 @@ class SalesmanMonthlyReport(APIView):
             week_number = (invoice.delivery_date.day - 1) // 7 + 1
             if week_number > 4:
                 week_number = 5
+
+            # Group invoice items by product name without the lot number
+            grouped_items = defaultdict(list)
+
+            for item in invoice.invoiceitem_set.all():
+                if item.product:
+                    clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+                    grouped_items[clean_name].append(str(item.quantity))
+
+            invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
             invoice_data = {
                 'number': invoice.number,
                 'total_price': invoice.total_price,
                 'delivery_date': invoice.delivery_date,
-                'items': [
-                    {
-                        'product_name': re.sub(r"\\s*\\(Lot\\s*no\\.?\\s*[A-Za-z0-9-]+\\)", "", item.product.name),
-                        'quantity': item.quantity
-                    }
-                    for item in invoice.invoiceitem_set.all() if item.product
-                ]
+                'items': invoice.items,
             }
             weeks[week_number]["invoices"].append(invoice_data)
             weeks[week_number]["total"] += invoice.total_price
