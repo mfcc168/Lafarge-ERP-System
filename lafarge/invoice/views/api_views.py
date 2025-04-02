@@ -144,16 +144,21 @@ class SalesmanMonthlyReport(APIView):
             week_number = (invoice.delivery_date.day - 1) // 7 + 1
             if week_number > 4:
                 week_number = 5
-            weeks[week_number]["invoices"].append(invoice.id)
+            invoice_data = {
+                'number': invoice.number,
+                'total_price': invoice.total_price,
+                'delivery_date': invoice.delivery_date,
+                'items': [
+                    {
+                        'product_name': re.sub(r"\\s*\\(Lot\\s*no\\.?\\s*[A-Za-z0-9-]+\\)", "", item.product.name),
+                        'quantity': item.quantity
+                    }
+                    for item in invoice.invoiceitem_set.all() if item.product
+                ]
+            }
+            weeks[week_number]["invoices"].append(invoice_data)
             weeks[week_number]["total"] += invoice.total_price
             monthly_total += invoice.total_price
-
-        grouped_items = defaultdict(list)
-        for invoice in invoices:
-            for item in invoice.invoiceitem_set.all():
-                if item.product:
-                    clean_name = re.sub(r"\\s*\\(Lot\\s*no\\.?\\s*[A-Za-z0-9-]+\\)", "", item.product.name)
-                    grouped_items[clean_name].append(str(item.quantity))
 
         monthly_total_share = sum(inv.total_price for inv in invoice_share)
         commission_percentage = {"Dominic So": 0.4, "Alex Cheung": 0.3, "Matthew Mak": 0.3}.get(salesman.name, 0)
