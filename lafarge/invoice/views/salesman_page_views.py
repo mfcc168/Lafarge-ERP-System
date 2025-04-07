@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from calendar import monthrange
 from dateutil.relativedelta import relativedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
@@ -124,8 +125,11 @@ def salesman_monthly_preview(request, salesman_id):
 def salesman_monthly_report(request, salesman_id, year, month):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
-    first_day = make_aware(datetime(int(year), int(month), 1))
-    last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
+    year = int(year)
+    month = int(month)
+
+    first_day = make_aware(datetime(year, month, 1))
+    last_day = make_aware(datetime(year, month, monthrange(year, month)[1]))
 
     current_date = datetime.now()
     current_year = current_date.year

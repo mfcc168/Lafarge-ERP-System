@@ -9,6 +9,7 @@ from collections import defaultdict
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from calendar import monthrange
 import re
 
 from ..serializers import *
@@ -127,8 +128,11 @@ class SalesmanMonthlyReport(APIView):
     def get(self, request, salesman_id, year, month):
         salesman = get_object_or_404(Salesman, id=salesman_id)
         sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
-        first_day = make_aware(datetime(int(year), int(month), 1))
-        last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
+        year = int(year)
+        month = int(month)
+
+        first_day = make_aware(datetime(year, month, 1))
+        last_day = make_aware(datetime(year, month, monthrange(year, month)[1]))
 
         invoices = Invoice.objects.filter(
             salesman=salesman, delivery_date__range=(first_day, last_day)
