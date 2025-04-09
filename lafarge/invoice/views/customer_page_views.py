@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
@@ -23,8 +24,8 @@ class CustomerListView(SingleTableMixin, FilterView):
 
 
 @staff_member_required
-def customer_detail(request, customer_name):
-    customer = get_object_or_404(Customer, name=customer_name)
+def customer_detail(request, customer_name, customer_care_of):
+    customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     invoices = Invoice.objects.filter(customer=customer)
 
     # Apply filter to the invoices queryset
@@ -102,8 +103,8 @@ def customers_with_unpaid_invoices(request):
 
 
 @staff_member_required
-def unpaid_invoices_by_customer(request, customer_name):
-    customer = get_object_or_404(Customer, name=customer_name)
+def unpaid_invoices_by_customer(request, customer_name, customer_care_of):
+    customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
 
     return render(request, "invoice/unpaid_invoices_by_customer.html", {

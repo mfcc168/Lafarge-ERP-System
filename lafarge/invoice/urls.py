@@ -34,7 +34,7 @@ urlpatterns = [
 
     # Customers
     path('customers/', CustomerListView.as_view(), name='customer_list'),
-    path('customer/<str:customer_name>/', customer_detail, name='customer_detail'),
+    path('customer/<str:customer_name>/<str:customer_care_of>/', customer_detail, name='customer_detail'),
 
     # Products
     path('products/', product_list, name='product_list'),
@@ -51,7 +51,7 @@ urlpatterns = [
     path('invoice/<str:invoice_number>/download/', download_invoice_pdf, name='download_invoice_pdf'),
     path('orderform/<str:invoice_number>/download/', download_order_form_pdf, name='download_order_form_pdf'),
     path('sample/<str:invoice_number>/download/', download_sample_pdf, name='download_sample_pdf'),
-    path('statement/<str:customer_name>/download/', download_statement_pdf, name='download_statement_pdf'),
+    path('statement/<str:customer_name>/<str:customer_care_of>/download/', download_statement_pdf, name='download_statement_pdf'),
 
     # API Endpoints
     path("api/products/", ProductView, name="ProductView"),
@@ -68,7 +68,7 @@ urlpatterns = [
 
     # Unpaids
     path('unpaid-invoices/', customers_with_unpaid_invoices, name='unpaid_invoices'),
-    path('unpaid-invoices/<str:customer_name>/', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
+    path('unpaid-invoices/<str:customer_name>/<str:customer_care_of>', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
     path('unpaid-invoices-by-month/<str:year_month>/', unpaid_invoices_by_month_detail, name='unpaid_invoices_by_month_detail'),
 
     # Sales

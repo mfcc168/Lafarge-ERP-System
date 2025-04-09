@@ -46,7 +46,7 @@
             <div class="col-auto d-none d-lg-block">
                 <div class="sticky-buttons">
                     <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                            onclick="window.open('{% url 'download_statement_pdf' customer.name %}', '_blank')">
+                            onclick="window.open('{% url 'download_statement_pdf' customer.name customer.care_of %}', '_blank')">
                         <i class="bi bi-file-earmark-text me-2"></i> Statement
                     </button>
                 </div>

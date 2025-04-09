@@ -13,7 +13,7 @@ from .templatetags.custom_filter import currency
 
 class CustomerTable(tables.Table):
     name = tables.LinkColumn(
-        'customer_detail', args=[A('name')],
+        'customer_detail', args=[A('name'), A('care_of')],
         text=lambda record: record.name,
         attrs={'a': {'class': 'text-decoration-none'}, 'td': {'class': 'column-name'}}
     )
