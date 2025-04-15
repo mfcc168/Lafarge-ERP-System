@@ -28,7 +28,7 @@ def draw_invoice_page_legacy(pdf, invoice):
     delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
 
-    y_position = height - 150 + 12
+    y_position = height - 150 + 8
     text_object = pdf.beginText(100, y_position)
     text_object.setFont("Times-Roman", 12)
     if prefix_check(invoice.customer.name.lower()):
@@ -67,8 +67,8 @@ def draw_invoice_page_legacy(pdf, invoice):
         if len(str(invoice.customer.name)) >= 40:
             office_hour_height = 165
         pdf.setFont("Times-Bold", 12)
-        pdf.drawString(458, height - office_hour_height + 12, f"OFFICE HOURS:")
-        text_object = pdf.beginText(458, height - office_hour_height - 15 + 12)
+        pdf.drawString(458, height - office_hour_height + 8, f"OFFICE HOURS:")
+        text_object = pdf.beginText(458, height - office_hour_height - 15 + 8)
         text_object.setFont("Times-Roman", 10)
         for line in office_hour_lines:
             text_object.textLine(line)
@@ -76,8 +76,8 @@ def draw_invoice_page_legacy(pdf, invoice):
 
     # Salesman and Date
     pdf.setFont("Times-Bold", 10)
-    pdf.drawString(65, height - 100, f"{invoice.terms}")
-    pdf.drawString(65, height - 120, f"{invoice.salesman.code}")
+    pdf.drawString(65, height - 110, f"{invoice.terms}")
+    pdf.drawString(65, height - 130, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
     # Define the data for the table
