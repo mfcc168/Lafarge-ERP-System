@@ -1,6 +1,6 @@
 import math
 from datetime import timedelta
-
+from decimal import Decimal, ROUND_DOWN
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
@@ -215,8 +215,13 @@ class InvoiceItem(models.Model):
                     self.sum_price = math.floor(self.price / current_product.units_per_pack * self.quantity)
                 else:
                     self.sum_price = self.price / current_product.units_per_pack * self.quantity
+                if self.sum_price % 1 < 0.50:
+                    self.sum_price = Decimal(self.sum_price).quantize(Decimal('1'), rounding=ROUND_DOWN)
+                else:
+                    self.sum_price = Decimal(self.sum_price).quantize(Decimal('0.01'))
             else:
                 self.sum_price = 0.00  # For sample and bonus types
+
 
             # Save the updated product quantity
             current_product.save()
