@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Case, When, Value, IntegerField
-from django.urls import reverse
+from django.urls import path, reverse
+from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
@@ -58,9 +59,37 @@ class DeliverymanAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'quantity', 'price', 'unit_per_box', 'box_amount', 'box_remain')
+    list_display = ('name', 'quantity', 'price', 'unit_per_box', 'box_amount', 'box_remain', 'copy_product_button')
     search_fields = ('name',)
-    readonly_fields = ('box_amount', 'box_remain')  # Make box_amount and box_remain read-only
+    readonly_fields = ('box_amount', 'box_remain')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('copy/<int:product_id>/', self.admin_site.admin_view(self.copy_product), name='invoice_product_copy'),
+        ]
+        return custom_urls + urls
+
+    def copy_product(self, request, product_id):
+        original = Product.objects.get(pk=product_id)
+        params = {
+            'name': original.name,
+            'supplier': original.supplier if original.supplier else '',
+            'import_date': original.import_date if original.import_date else '',
+            'registration_code': original.registration_code if original.registration_code else '',
+            'unit': original.unit,
+            'price': original.price,
+            'units_per_pack': original.units_per_pack,
+        }
+        base_url = reverse('admin:invoice_product_add')
+        query_string = "&".join(f"{key}={value}" for key, value in params.items())
+        return HttpResponseRedirect(f"{base_url}?{query_string}")
+
+    def copy_product_button(self, obj):
+        url = reverse('admin:invoice_product_copy', args=[obj.pk])
+        return format_html('<a class="button" href="{}">Copy</a>', url)
+
+    copy_product_button.short_description = 'Copy Product'
 
 
 @admin.register(ProductTransaction)
