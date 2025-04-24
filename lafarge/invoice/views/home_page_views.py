@@ -28,7 +28,7 @@ def home(request):
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date)
 
-    future_deposits = pending_deposits.filter(payment_date__gte=today)
+    future_deposits = pending_deposits.filter(payment_date__gt=today)
     current_pending_deposits = pending_deposits.exclude(id__in=future_deposits.values('id'))
 
     # Calculate total pending deposit amount
