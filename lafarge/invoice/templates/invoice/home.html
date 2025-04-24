@@ -156,7 +156,7 @@
                     {% for payment_type, total in future_payment_totals_dict.items %}
                     {% if payment_type %}
                     <tr class="fw-semibold">
-                        <td colspan="5" class="text-end text-secondary">{{ payment_type|title }} (Future) Total:</td>
+                        <td colspan="5" class="text-end text-secondary">{{ payment_type|title }} (Post Dated) Total:</td>
                         <td class="text-end text-secondary">${{ total|currency }}</td>
                     </tr>
                     {% endif %}
