@@ -28,14 +28,18 @@ def home(request):
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date)
 
+    future_deposits = pending_deposits.filter(payment_date__gte=today)
+    current_pending_deposits = pending_deposits.exclude(id__in=future_deposits.values('id'))
+
     # Calculate total pending deposit amount
-    total_pending_deposit = pending_deposits.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_pending_deposit = current_pending_deposits.aggregate(Sum('total_price'))['total_price__sum'] or 0
 
     # Calculate payment type totals
-    payment_type_totals = pending_deposits.values('payment_method').annotate(total=Sum('total_price'))
-
+    payment_type_totals = current_pending_deposits.values('payment_method').annotate(total=Sum('total_price'))
+    future_payment_type_totals = future_deposits.values('payment_method').annotate(total=Sum('total_price'))
     # Convert to dictionary for easier template access
     payment_totals_dict = {entry['payment_method']: entry['total'] for entry in payment_type_totals}
+    future_payment_totals_dict = {entry['payment_method']: entry['total'] for entry in future_payment_type_totals}
 
     modified_invoices = []
     for invoice in invoices_today:
@@ -58,7 +62,8 @@ def home(request):
         'invoices_today': modified_invoices,
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,
-        'payment_totals_dict': payment_totals_dict,  # Pass to template
+        'payment_totals_dict': payment_totals_dict,
+        'future_payment_totals_dict': future_payment_totals_dict,
     })
 
 

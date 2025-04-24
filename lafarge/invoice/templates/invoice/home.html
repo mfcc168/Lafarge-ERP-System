@@ -150,6 +150,17 @@
                         <td colspan="5" class="text-end">Total:</td>
                         <td class="text-end text-danger">${{ total_pending_deposit|currency }}</td>
                     </tr>
+                    <tr class="fw-bold">
+                        <td colspan="6" class="text-center text-muted pt-4">Future-Dated Payments (Scheduled)</td>
+                    </tr>
+                    {% for payment_type, total in future_payment_totals_dict.items %}
+                    {% if payment_type %}
+                    <tr class="fw-semibold">
+                        <td colspan="5" class="text-end text-secondary">{{ payment_type|title }} (Future) Total:</td>
+                        <td class="text-end text-secondary">${{ total|currency }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
                     </tfoot>
 
 
