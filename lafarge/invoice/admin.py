@@ -3,6 +3,8 @@ from django.db.models import Case, When, Value, IntegerField
 from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
+from .models import SpecialPrice
+from .forms import SpecialPriceInlineForm
 
 from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
 
@@ -11,11 +13,20 @@ admin.site.site_title = "Lafarge Admin Portal"
 admin.site.index_title = "Welcome to Lafarge Admin Panel"
 
 
+class SpecialPriceInline(admin.TabularInline):
+    model = SpecialPrice
+    form = SpecialPriceInlineForm
+    extra = 1
+    min_num = 0
+    verbose_name = "Special Product Price"
+    verbose_name_plural = "Special Product Prices"
+
+
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'care_of', 'address', 'telephone_number')
     search_fields = ('name', 'care_of', 'address', 'telephone_number')
-
+    inlines = [SpecialPriceInline]
     def get_search_results(self, request, queryset, search_term):
         # Call the superclass implementation to get the initial queryset
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)

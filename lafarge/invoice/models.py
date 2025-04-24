@@ -81,6 +81,22 @@ class Product(models.Model):
         return self.name + " (Quantity: " + str(self.quantity) + ")"
 
 
+class SpecialPrice(models.Model):
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    product_base_name = models.CharField(max_length=255)
+    special_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        unique_together = ('customer', 'product_base_name')
+
+    def __str__(self):
+        return f"{self.customer.name} - {self.product_base_name}: {self.special_price}"
+
+
+def extract_base_name(full_name: str) -> str:
+    return full_name.split('(')[0].strip()
+
+
 class ProductTransaction(models.Model):
     TRANSACTION_CHOICES = [
         ('sale', 'Sale'),
@@ -190,7 +206,7 @@ class InvoiceItem(models.Model):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
-            # Determine if this is an update or a new item
+                # Determine if this is an update or a new item
             is_edit = self.pk is not None
             current_product = Product.objects.get(pk=self.product.pk)
 
@@ -210,7 +226,21 @@ class InvoiceItem(models.Model):
 
             # Calculate price details
             if self.product_type == 'normal':
-                self.price = current_product.price if not self.net_price else self.net_price
+
+                base_name = extract_base_name(current_product.name)
+
+                if self.net_price:
+                    self.price = self.net_price
+                else:
+                    try:
+                        special_price_obj = SpecialPrice.objects.get(
+                            customer=self.invoice.customer,
+                            product_base_name=base_name
+                        )
+                        self.price = special_price_obj.special_price
+                    except SpecialPrice.DoesNotExist:
+                        self.price = current_product.price
+
                 if "Licarlo" in self.product.name:
                     self.sum_price = math.floor(self.price / current_product.units_per_pack * self.quantity)
                 else:
@@ -221,7 +251,6 @@ class InvoiceItem(models.Model):
                     self.sum_price = Decimal(self.sum_price).quantize(Decimal('0.01'))
             else:
                 self.sum_price = 0.00  # For sample and bonus types
-
 
             # Save the updated product quantity
             current_product.save()
