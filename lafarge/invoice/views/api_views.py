@@ -96,8 +96,8 @@ def sales_incentive_scheme(sales):
 
 class SalesmanMonthlyPreview(APIView):
 
-    def get(self, request, salesman_id):
-        salesman = get_object_or_404(Salesman, id=salesman_id)
+    def get(self, request, salesman_name):
+        salesman = get_object_or_404(Salesman, name__isstartwith=salesman_name.capitalize())
         latest_invoice = Invoice.objects.filter(salesman=salesman, delivery_date__isnull=False)
         latest_invoice = latest_invoice.order_by('-delivery_date').first()
         today = latest_invoice.delivery_date if latest_invoice else datetime.now().date()
@@ -125,8 +125,8 @@ class SalesmanMonthlyPreview(APIView):
 
 class SalesmanMonthlyReport(APIView):
 
-    def get(self, request, salesman_id, year, month):
-        salesman = get_object_or_404(Salesman, id=salesman_id)
+    def get(self, request, salesman_name, year, month):
+        salesman = get_object_or_404(Salesman, name__isstartwith=salesman_name.capitalize())
         sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
         year = int(year)
         month = int(month)
