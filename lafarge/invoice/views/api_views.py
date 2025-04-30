@@ -238,7 +238,6 @@ class GetAllSalesmenCommissions(APIView):
 
             response_data.append({
                 "salesman": salesman.name,
-                "username": salesman.user.username,
                 "commission": round(commission, 2)
             })
 
