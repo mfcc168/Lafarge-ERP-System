@@ -2,7 +2,8 @@ from django.urls import path
 
 from .views.api_views import (
     ProductView, InvoiceView, CustomerView,
-    UpdateDeliveryDateView, UpdatePaymentDateView, SalesmanMonthlyReport, SalesmanMonthlyPreview
+    UpdateDeliveryDateView, UpdatePaymentDateView, SalesmanMonthlyReport, SalesmanMonthlyPreview,
+    GetAllSalesmenCommissions
 )
 from .views.customer_page_views import (
     CustomerListView, customer_detail,
@@ -61,6 +62,7 @@ urlpatterns = [
     path('api/update-payment-date/', UpdatePaymentDateView.as_view(), name='update-payment-date'),
     path('api/salesman/<str:salesman_name>/monthly/', SalesmanMonthlyReport.as_view(), name='salesman-monthly-preview'),
     path('api/salesman/<str:salesman_name>/monthly/<int:year>/<int:month>/', SalesmanMonthlyReport.as_view(), name='salesman-monthly-report'),
+    path("api/salesmen/commissions/<int:year>/<int:month>/", GetAllSalesmenCommissions.as_view(), name="get_all_salesmen_commissions"),
 
     # Payments
     path("payments/monthly", monthly_payment_preview, name="monthly_payment_preview"),

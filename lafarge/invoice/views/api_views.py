@@ -94,6 +94,7 @@ def sales_incentive_scheme(sales):
     elif sales >= 170000:
         return 0.055
 
+
 class SalesmanMonthlyPreview(APIView):
 
     def get(self, request, salesman_name):
@@ -193,3 +194,52 @@ class SalesmanMonthlyReport(APIView):
             "sales_monthly_total": sales_monthly_total,
             "incentive_percentage": incentive_percentage,
         })
+
+
+class GetAllSalesmenCommissions(APIView):
+
+    def get(self, request, year, month):
+        year = int(year)
+        month = int(month)
+
+        first_day = make_aware(datetime(year, month, 1))
+        last_day = make_aware(datetime(year, month, monthrange(year, month)[1]))
+
+        sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
+
+        # Only include salesmen involved in commission scheme
+        eligible_salesmen = Salesman.objects.filter(name__in=["Dominic So", "Alex Cheung", "Matthew Mak"])
+
+        response_data = []
+
+        invoice_share = Invoice.objects.filter(
+            salesman=sales_share,
+            delivery_date__range=(first_day, last_day)
+        )
+        monthly_total_share = sum(inv.total_price for inv in invoice_share)
+
+        for salesman in eligible_salesmen:
+            invoices = Invoice.objects.filter(
+                salesman=salesman,
+                delivery_date__range=(first_day, last_day)
+            )
+            monthly_total = sum(inv.total_price for inv in invoices)
+
+            commission_percentage = {
+                "Dominic So": 0.4,
+                "Alex Cheung": 0.3,
+                "Matthew Mak": 0.3
+            }.get(salesman.name, 0)
+
+            personal_monthly_total_share = monthly_total_share * Decimal(str(commission_percentage))
+            sales_monthly_total = monthly_total + personal_monthly_total_share
+            incentive_percentage = sales_incentive_scheme(sales_monthly_total)
+            commission = sales_monthly_total * Decimal(str(incentive_percentage)) * Decimal("1.1")
+
+            response_data.append({
+                "salesman": salesman.name,
+                "username": salesman.user.username,
+                "commission": round(commission, 2)
+            })
+
+        return Response(response_data)
