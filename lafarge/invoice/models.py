@@ -151,7 +151,7 @@ class Invoice(models.Model):
                     Q(delivery_date__lte=threshold_date) |
                     Q(delivery_date__gte=first_of_last_month, delivery_date__lte=last_month)
             )
-        )
+        ).exclude(number__startswith="S-")
 
     def calculate_total_price(self):
         total = sum(item.sum_price for item in self.invoiceitem_set.all())
