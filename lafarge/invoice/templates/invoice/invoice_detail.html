@@ -83,12 +83,12 @@
                             onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
                         <i class="bi bi-file-earmark me-2"></i> Order Form
                     </button>
+                    {% endif %}
                     {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
                     <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
                             onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
                         <i class="bi bi-truck me-2"></i> Delivery Note
                     </button>
-                    {% endif %}
                     {% endif %}
                     {% if invoice.number|slice:":2" == "S-" %}
                     <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
