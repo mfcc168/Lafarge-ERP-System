@@ -128,7 +128,7 @@ class SalesmanMonthlyReport(APIView):
 
     def get(self, request, salesman_name, year, month):
         salesman = get_object_or_404(Salesman, name__istartswith=salesman_name.capitalize())
-        sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
+        sales_share = get_object_or_404(Salesman, name__in=["DS/MM/AC", "Kelvin Ko"])
         year = int(year)
         month = int(month)
 
@@ -205,7 +205,7 @@ class GetAllSalesmenCommissions(APIView):
         first_day = make_aware(datetime(year, month, 1))
         last_day = make_aware(datetime(year, month, monthrange(year, month)[1]))
 
-        sales_share = get_object_or_404(Salesman, name="DS/MM/AC")
+        sales_share = get_object_or_404(Salesman, name__in=["DS/MM/AC", "Kelvin Ko"])
 
         # Only include salesmen involved in commission scheme
         eligible_salesmen = Salesman.objects.filter(name__in=["Dominic So", "Alex Cheung", "Matthew Mak"])
