@@ -128,7 +128,8 @@ class SalesmanMonthlyReport(APIView):
 
     def get(self, request, salesman_name, year, month):
         salesman = get_object_or_404(Salesman, name__istartswith=salesman_name.capitalize())
-        sales_share = Salesman.objects.filter(name__in=["DS/MM/AC", "Kelvin Ko"])
+        sales_share1 = get_object_or_404(Salesman, name="DS/MM/AC")
+        sales_share2 = get_object_or_404(Salesman, name="Kelvin Ko")
         year = int(year)
         month = int(month)
 
@@ -138,8 +139,12 @@ class SalesmanMonthlyReport(APIView):
         invoices = Invoice.objects.filter(
             salesman=salesman, delivery_date__range=(first_day, last_day)
         ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
-        invoice_share = Invoice.objects.filter(
-            salesman=sales_share, delivery_date__range=(first_day, last_day)
+
+        invoice_share1 = Invoice.objects.filter(
+            salesman=sales_share1, delivery_date__range=(first_day, last_day)
+        )
+        invoice_share2 = Invoice.objects.filter(
+            salesman=sales_share2, delivery_date__range=(first_day, last_day)
         )
 
         weeks = {i: {"invoices": [], "total": Decimal("0.00")} for i in range(1, 6)}
@@ -174,7 +179,12 @@ class SalesmanMonthlyReport(APIView):
             weeks[week_number]["total"] += invoice.total_price
             monthly_total += invoice.total_price
 
-        monthly_total_share = sum(inv.total_price for inv in invoice_share)
+
+        monthly_total_share = (
+                sum(inv.total_price for inv in invoice_share1) +
+                sum(inv.total_price for inv in invoice_share2)
+        )
+
         commission_percentage = {"Dominic So": 0.4, "Alex Cheung": 0.3, "Matthew Mak": 0.3}.get(salesman.name, 0)
         personal_monthly_total_share = monthly_total_share * Decimal(str(commission_percentage))
         sales_monthly_total = monthly_total + personal_monthly_total_share
@@ -205,18 +215,26 @@ class GetAllSalesmenCommissions(APIView):
         first_day = make_aware(datetime(year, month, 1))
         last_day = make_aware(datetime(year, month, monthrange(year, month)[1]))
 
-        sales_share = Salesman.objects.filter(name__in=["DS/MM/AC", "Kelvin Ko"])
+        sales_share1 = get_object_or_404(Salesman, name="DS/MM/AC")
+        sales_share2 = get_object_or_404(Salesman, name="Kelvin Ko")
 
         # Only include salesmen involved in commission scheme
         eligible_salesmen = Salesman.objects.filter(name__in=["Dominic So", "Alex Cheung", "Matthew Mak"])
 
         response_data = []
 
-        invoice_share = Invoice.objects.filter(
-            salesman=sales_share,
+        invoice_share1 = Invoice.objects.filter(
+            salesman=sales_share1,
             delivery_date__range=(first_day, last_day)
         )
-        monthly_total_share = sum(inv.total_price for inv in invoice_share)
+        invoice_share2 = Invoice.objects.filter(
+            salesman=sales_share2,
+            delivery_date__range=(first_day, last_day)
+        )
+        monthly_total_share = (
+                sum(inv.total_price for inv in invoice_share1) +
+                sum(inv.total_price for inv in invoice_share2)
+        )
 
         for salesman in eligible_salesmen:
             invoices = Invoice.objects.filter(
