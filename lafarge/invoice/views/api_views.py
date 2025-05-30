@@ -177,7 +177,7 @@ class SalesmanMonthlyReport(APIView):
             weeks[week_number]["total"] += invoice.total_price
             monthly_total += invoice.total_price
 
-
+        invoice_shares_data = []
         for invoice in invoice_shares:
             # Group invoice items by product name without the lot number
             grouped_items = defaultdict(list)
@@ -188,7 +188,7 @@ class SalesmanMonthlyReport(APIView):
                     grouped_items[clean_name].append(str(item.quantity))
 
             invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
-            invoice_shares_data = {
+            invoice_data = {
                 'number': invoice.number,
                 'customer': invoice.customer.name,
                 'care_of': invoice.customer.care_of,
@@ -199,7 +199,7 @@ class SalesmanMonthlyReport(APIView):
                 'payment_date': invoice.payment_date,
                 'items': invoice.items,
             }
-
+            invoice_shares_data.append(invoice_data)
 
         monthly_total_share = sum(inv.total_price for inv in invoice_shares)
 
