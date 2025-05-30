@@ -140,11 +140,9 @@ class SalesmanMonthlyReport(APIView):
             salesman=salesman, delivery_date__range=(first_day, last_day)
         ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
 
-        invoice_share1 = Invoice.objects.filter(
-            salesman=sales_share1, delivery_date__range=(first_day, last_day)
-        )
-        invoice_share2 = Invoice.objects.filter(
-            salesman=sales_share2, delivery_date__range=(first_day, last_day)
+        invoice_shares = Invoice.objects.filter(
+            Q(salesman=sales_share1) | Q(salesman=sales_share2),
+            delivery_date__range=(first_day, last_day)
         )
 
         weeks = {i: {"invoices": [], "total": Decimal("0.00")} for i in range(1, 6)}
@@ -180,10 +178,31 @@ class SalesmanMonthlyReport(APIView):
             monthly_total += invoice.total_price
 
 
-        monthly_total_share = (
-                sum(inv.total_price for inv in invoice_share1) +
-                sum(inv.total_price for inv in invoice_share2)
-        )
+        for invoice in invoice_shares:
+            # Group invoice items by product name without the lot number
+            grouped_items = defaultdict(list)
+
+            for item in invoice.invoiceitem_set.all():
+                if item.product:
+                    clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+                    grouped_items[clean_name].append(str(item.quantity))
+
+            invoice.items = [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+            invoice_shares_data = {
+                'number': invoice.number,
+                'customer': invoice.customer.name,
+                'care_of': invoice.customer.care_of,
+                'sample_customer': invoice.sample_customer,
+                'salesman': invoice.salesman.name,
+                'total_price': invoice.total_price,
+                'delivery_date': invoice.delivery_date,
+                'payment_date': invoice.payment_date,
+                'items': invoice.items,
+            }
+
+
+        monthly_total_share = sum(inv.total_price for inv in invoice_shares)
+
 
         commission_percentage = {"Dominic So": 0.4, "Alex Cheung": 0.3, "Matthew Mak": 0.3}.get(salesman.name, 0)
         personal_monthly_total_share = monthly_total_share * Decimal(str(commission_percentage))
@@ -198,6 +217,7 @@ class SalesmanMonthlyReport(APIView):
             "monthly_total": monthly_total,
             "salesman": salesman.name,
             "commission": commission,
+            "invoice_shares_data": invoice_shares_data,
             "monthly_total_share": monthly_total_share,
             "monthly_total_share_percentage": commission_percentage,
             "personal_monthly_total_share": personal_monthly_total_share,
@@ -223,18 +243,13 @@ class GetAllSalesmenCommissions(APIView):
 
         response_data = []
 
-        invoice_share1 = Invoice.objects.filter(
-            salesman=sales_share1,
+        invoice_shares = Invoice.objects.filter(
+            Q(salesman=sales_share1) | Q(salesman=sales_share2),
             delivery_date__range=(first_day, last_day)
         )
-        invoice_share2 = Invoice.objects.filter(
-            salesman=sales_share2,
-            delivery_date__range=(first_day, last_day)
-        )
-        monthly_total_share = (
-                sum(inv.total_price for inv in invoice_share1) +
-                sum(inv.total_price for inv in invoice_share2)
-        )
+
+        monthly_total_share = sum(inv.total_price for inv in invoice_shares)
+
 
         for salesman in eligible_salesmen:
             invoices = Invoice.objects.filter(
