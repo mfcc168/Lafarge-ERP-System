@@ -60,10 +60,19 @@ def product_transaction_view(request, product_id):
 
     # Add the import transaction as the first row (if available)
     if product.import_date and product.import_invoice_number:
+        if transactions:  # Checks if transactions is not empty
+            first_item = transactions[0]
+            first_product = first_item.invoice.invoiceitem_set.first()
+
+            batch_number = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", first_product.product.name)
+        if batch_number:
+            batch_number = batch_number.group(1)
+
         transactions_data.append({
             "invoice_number": product.import_invoice_number,
             "customer": product.supplier,
             "date": product.import_date,
+            "batch_number": batch_number,
             "quantity": "-",
             "product_type": "IN",
             "remaining_stock": initial_stock,
