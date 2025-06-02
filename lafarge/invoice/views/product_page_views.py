@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -85,6 +86,12 @@ def product_transaction_view(request, product_id):
         quantity_change = -item.quantity
         remaining_stock += quantity_change
 
+        first_product = item.invoice.invoiceitem_set.first()
+
+        batch_number = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", first_product.product.name)
+        if batch_number:
+            batch_number = batch_number.group(1)
+
         grouped_transactions[invoice_number]["customer"] = item.invoice.customer.name if item.invoice.customer else ""
         grouped_transactions[invoice_number]["sample_customer"] = item.invoice.sample_customer or ""
         grouped_transactions[invoice_number]["care_of"] = item.invoice.customer.care_of or ""
@@ -98,6 +105,7 @@ def product_transaction_view(request, product_id):
     for invoice_number, data in grouped_transactions.items():
         transactions_data.append({
             "invoice_number": invoice_number,
+            "batch_number": batch_number,
             "customer": data["sample_customer"] or data["customer"],  # Prioritize sample_customer
             "care_of": data["care_of"],
             "date": data["date"],
