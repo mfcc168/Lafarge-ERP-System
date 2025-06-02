@@ -19,9 +19,17 @@
         <td><a href="{% url 'invoice_detail' transaction.invoice_number %}" class="text-decoration-none text-dark">
             {{ transaction.invoice_number }}</a></td>
         {% if transaction.sample_customer %}
-        <td>{{ transaction.sample_customer }}</td>
+            {% if transaction.care_of %}
+            <td>{{ transaction.sample_customer }} ({{ transaction.care_of }})</td>
+            {% else %}
+            <td>{{ transaction.sample_customer }} </td>
+            {% endif %}
         {% else %}
-        <td>{{ transaction.customer }}</td>
+            {% if transaction.care_of %}
+            <td>{{ transaction.customer }} ({{ transaction.care_of }})</td>
+            {% else %}
+            <td>{{ transaction.customer }}</td>
+            {% endif %}
         {% endif %}
         <td>{{ transaction.date }}</td>
         <td>{{ transaction.quantity }}</td>

@@ -87,6 +87,7 @@ def product_transaction_view(request, product_id):
 
         grouped_transactions[invoice_number]["customer"] = item.invoice.customer.name if item.invoice.customer else ""
         grouped_transactions[invoice_number]["sample_customer"] = item.invoice.sample_customer or ""
+        grouped_transactions[invoice_number]["care_of"] = item.invoice.customer.care_of or ""
         grouped_transactions[invoice_number]["date"] = item.invoice.delivery_date or "To Be Delivered"
         grouped_transactions[invoice_number]["quantity"] += quantity_change
 
@@ -98,6 +99,7 @@ def product_transaction_view(request, product_id):
         transactions_data.append({
             "invoice_number": invoice_number,
             "customer": data["sample_customer"] or data["customer"],  # Prioritize sample_customer
+            "care_of": data["care_of"],
             "date": data["date"],
             "quantity": data["quantity"],
             "product_type": "OUT",
