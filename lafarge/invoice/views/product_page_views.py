@@ -100,6 +100,7 @@ def product_transaction_view(request, product_id):
         batch_number = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", first_product.product.name)
         if batch_number:
             batch_number = batch_number.group(1)
+        care_of = None
         if item.invoice.customer.care_of:
             if not prefix_check(item.invoice.customer.care_of.lower()):
                 care_of = "Dr. " + item.invoice.customer.care_of
