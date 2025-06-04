@@ -52,6 +52,8 @@ def product_transaction_view(request, product_id):
 
     transactions_data = []
     remaining_stock = product.quantity  # Start with the latest stock
+    batch_match = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", product.name)
+    batch_number = batch_match.group(1)
 
     # Reverse process transactions to find initial stock
     for item in transactions:
@@ -61,14 +63,6 @@ def product_transaction_view(request, product_id):
 
     # Add the import transaction as the first row (if available)
     if product.import_date and product.import_invoice_number:
-        if transactions:  # Checks if transactions is not empty
-            first_item = transactions[0]
-            first_product = first_item.invoice.invoiceitem_set.first()
-
-            batch_number = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", first_product.product.name)
-        if batch_number:
-            batch_number = batch_number.group(1)
-
         transactions_data.append({
             "invoice_number": product.import_invoice_number,
             "customer": product.supplier,
@@ -95,11 +89,7 @@ def product_transaction_view(request, product_id):
         quantity_change = -item.quantity
         remaining_stock += quantity_change
 
-        first_product = item.invoice.invoiceitem_set.first()
 
-        batch_number = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", first_product.product.name)
-        if batch_number:
-            batch_number = batch_number.group(1)
         care_of = None
         if item.invoice.customer.care_of:
             if not prefix_check(item.invoice.customer.care_of.lower()):
