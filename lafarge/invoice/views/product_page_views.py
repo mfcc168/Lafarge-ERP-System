@@ -53,8 +53,10 @@ def product_transaction_view(request, product_id):
     transactions_data = []
     remaining_stock = product.quantity  # Start with the latest stock
     batch_match = re.search(r"\(Lot\s*no\.?:?\s*([A-Za-z0-9-]+)\)", product.name)
-    batch_number = batch_match.group(1)
-
+    if batch_match:
+        batch_number = batch_match.group(1)
+    else:
+        batch_number = ""
     # Reverse process transactions to find initial stock
     for item in transactions:
         remaining_stock += item.quantity  # Add back to find original stock
@@ -96,8 +98,20 @@ def product_transaction_view(request, product_id):
                 care_of = "Dr. " + item.invoice.customer.care_of
             else:
                 care_of = item.invoice.customer.care_of
-        grouped_transactions[invoice_number]["customer"] = item.invoice.customer.name if item.invoice.customer else ""
-        grouped_transactions[invoice_number]["sample_customer"] = item.invoice.sample_customer or ""
+        customer_name = None
+        if item.invoice.customer.name:
+            if not prefix_check(item.invoice.customer.name.lower()):
+                customer_name = "Dr. " + item.invoice.customer.name
+            else:
+                customer_name = item.invoice.customer.name
+        sample_customer = None
+        if item.invoice.sample_customer:
+            if not prefix_check(item.invoice.sample_customer.lower()):
+                sample_customer = "Dr. " + item.invoice.sample_customer
+            else:
+                sample_customer = item.invoice.sample_customer
+        grouped_transactions[invoice_number]["customer"] = customer_name if item.invoice.customer else ""
+        grouped_transactions[invoice_number]["sample_customer"] = sample_customer or ""
         grouped_transactions[invoice_number][
             "care_of"] = care_of if item.invoice.customer else None
         grouped_transactions[invoice_number]["date"] = item.invoice.delivery_date or "To Be Delivered"
