@@ -1,0 +1,7 @@
+{% if record.number %}
+<a href="{% url 'copy_previous_order' record.number %}" class="btn btn-sm btn-outline-primary" title="Copy this order">
+    <i class="bi bi-files"></i> Copy
+</a>
+{% else %}
+<span class="text-muted">N/A</span>
+{% endif %}

@@ -1,17 +1,21 @@
-from datetime import datetime
+from datetime import datetime, timezone
+import re
 
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
 
-from ..models import Customer, Invoice
+from ..models import Customer, Invoice, InvoiceItem
+from ..number_generation_utils import generate_next_number
 from ..tables import CustomerTable, InvoiceFilter, CustomerFilter, CustomerInvoiceTable
 
 
@@ -136,3 +140,37 @@ def unpaid_invoices_by_month_detail(request, year_month):
         'total_unpaid': total_unpaid,
     }
     return render(request, 'invoice/unpaid_invoices_by_month_detail.html', context)
+
+
+@staff_member_required
+def copy_previous_order(request, invoice_number):
+    # Get the original invoice
+    original_invoice = get_object_or_404(Invoice, number=invoice_number)
+
+
+    # Generate the new invoice number
+    new_number = generate_next_number()
+
+    # Create a new invoice
+    new_invoice = Invoice.objects.create(
+        number=new_number,
+        customer=original_invoice.customer,
+        salesman=original_invoice.salesman,
+        deliveryman=original_invoice.deliveryman,
+        terms=original_invoice.terms,
+        # Leave other dates blank
+    )
+
+    # Copy all invoice items
+    for item in original_invoice.invoiceitem_set.all():
+        InvoiceItem.objects.create(
+            invoice=new_invoice,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.price,
+            net_price=item.net_price,
+            hide_nett=item.hide_nett,
+            product_type=item.product_type
+        )
+
+    return HttpResponseRedirect(reverse('admin:invoice_invoice_change', args=[new_invoice.id]))

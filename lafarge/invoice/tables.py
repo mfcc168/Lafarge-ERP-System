@@ -103,6 +103,11 @@ class InvoiceFilter(FilterSet):
         fields = ["number", "salesman"]  # Only include direct model fields here
 
 
+# Add this import at the top of the file if not already present
+from django.urls import reverse
+
+
+# Then modify the CustomerInvoiceTable class by adding the copy_order column
 class CustomerInvoiceTable(ExportMixin, tables.Table):
     number = tables.LinkColumn(
         'invoice_detail',
@@ -146,12 +151,27 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
         attrs={'td': {'class': 'small'}}
     )
 
+    # Add this new column for the copy functionality
+    copy_order = tables.TemplateColumn(
+        template_name='invoice/copy_order_button.html',
+        verbose_name='Copy Order',
+        orderable=False,
+        attrs={
+            'td': {
+                'class': 'text-center'
+            },
+            'th': {
+                'class': 'text-center bg-light text-dark text-uppercase'
+            }
+        }
+    )
+
     def render_total_price(self, value):
         return mark_safe(f"<span class='text-danger fw-bold'>${currency(value)}</span>")  # Apply the currency format
 
     class Meta:
         model = Invoice
-        fields = ("number", "total_price", "delivery_date", "payment_date", "items")
+        fields = ("number", "total_price", "delivery_date", "payment_date", "items", "copy_order")
         attrs = {
             'class': 'table table-hover table-striped shadow-sm rounded-3 bg-white border',
             'th': {
