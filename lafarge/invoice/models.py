@@ -267,5 +267,11 @@ def update_invoice_total(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
+    # Revert product quantity
+    product = instance.product
+    product.quantity += instance.quantity
+    product.save()
+
+    # Recalculate and save invoice total
     instance.invoice.calculate_total_price()
     instance.invoice.save()
