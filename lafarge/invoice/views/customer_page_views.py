@@ -163,6 +163,14 @@ def copy_previous_order(request, invoice_number):
 
     # Copy all invoice items
     for item in original_invoice.invoiceitem_set.all():
+        available_stock = item.product.quantity
+
+        if item.quantity <= 0:
+            continue  # Skip zero or negative quantity
+
+        if item.quantity > available_stock:
+            continue  # Skip if not enough stock
+            
         InvoiceItem.objects.create(
             invoice=new_invoice,
             product=item.product,
