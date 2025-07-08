@@ -257,6 +257,13 @@ class InvoiceItem(models.Model):
             # Finally, save the invoice item
             super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        current_product = Product.objects.get(pk=self.product.pk)
+        current_product.quantity += self.quantity
+        current_product.save()
+        super().delete(*args, **kwargs)
+
+
 
 # Signals to update total price
 @receiver(post_save, sender=InvoiceItem)
@@ -267,10 +274,6 @@ def update_invoice_total(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
-    # Revert product quantity
-    product = instance.product
-    product.quantity += instance.quantity
-    product.save()
 
     # Recalculate and save invoice total
     instance.invoice.calculate_total_price()
