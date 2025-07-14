@@ -2,6 +2,25 @@
 {% load custom_filter %}
 {% block content %}
 <h2>Transaction History for {{ product.name }} {{product.registration_code}}</h2>
+
+<!-- Add filter form -->
+<form method="get" class="mb-4">
+    <div class="row">
+        <div class="col-md-5">
+            <input type="text" id="customer_filter" name="customer_filter" class="form-control"
+                   value="{{ request.GET.customer_filter }}" placeholder="Customer Name">
+        </div>
+        <div class="col-md-5">
+            <input type="text" id="invoice_filter" name="invoice_filter" class="form-control"
+                   value="{{ request.GET.invoice_filter }}" placeholder="Invoice Number">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Filter</button>
+            <a href="?clear=1" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
 <table class="table">
     <thead>
     <tr>

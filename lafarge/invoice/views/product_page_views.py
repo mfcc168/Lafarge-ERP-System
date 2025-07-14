@@ -43,12 +43,15 @@ def product_transaction_detail(request, product_id):
 def product_transaction_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    # Fetch transactions sorted by date (newest first for correct calculation)
     transactions = InvoiceItem.objects.filter(product=product).select_related("invoice").order_by(
-        F("invoice__delivery_date").desc(nulls_first=True),  # Reverse order
+        F("invoice__delivery_date").desc(nulls_first=True),
         "-invoice__id",
         "-id"
     )
+
+    customer_filter = request.GET.get('customer_filter', '').lower()
+    invoice_filter = request.GET.get('invoice_filter', '').lower()
+    clear_filter = request.GET.get('clear')
 
     transactions_data = []
     remaining_stock = product.quantity  # Start with the latest stock
@@ -57,13 +60,12 @@ def product_transaction_view(request, product_id):
         batch_number = batch_match.group(1)
     else:
         batch_number = ""
-    # Reverse process transactions to find initial stock
+
     for item in transactions:
-        remaining_stock += item.quantity  # Add back to find original stock
+        remaining_stock += item.quantity
 
     initial_stock = remaining_stock
 
-    # Add the import transaction as the first row (if available)
     if product.import_date and product.import_invoice_number:
         transactions_data.append({
             "invoice_number": product.import_invoice_number,
@@ -91,7 +93,6 @@ def product_transaction_view(request, product_id):
         quantity_change = -item.quantity
         remaining_stock += quantity_change
 
-
         care_of = None
         if item.invoice.customer.care_of:
             if not prefix_check(item.invoice.customer.care_of.lower()):
@@ -110,10 +111,10 @@ def product_transaction_view(request, product_id):
                 sample_customer = "Dr. " + item.invoice.sample_customer
             else:
                 sample_customer = item.invoice.sample_customer
+
         grouped_transactions[invoice_number]["customer"] = customer_name if item.invoice.customer else ""
         grouped_transactions[invoice_number]["sample_customer"] = sample_customer or ""
-        grouped_transactions[invoice_number][
-            "care_of"] = care_of if item.invoice.customer else None
+        grouped_transactions[invoice_number]["care_of"] = care_of if item.invoice.customer else None
         grouped_transactions[invoice_number]["date"] = item.invoice.delivery_date or "To Be Delivered"
         grouped_transactions[invoice_number]["quantity"] += quantity_change
 
@@ -121,12 +122,12 @@ def product_transaction_view(request, product_id):
                 grouped_transactions[invoice_number]["remaining_stock"]:
             grouped_transactions[invoice_number]["remaining_stock"] = remaining_stock
 
-    # Convert grouped data into a list
+    filtered_transactions = []
     for invoice_number, data in grouped_transactions.items():
-        # Determine which customer name to display
+
         display_name = data["care_of"] if data["care_of"] is not None else (data["sample_customer"] or data["customer"])
 
-        transactions_data.append({
+        transaction = {
             "invoice_number": invoice_number,
             "batch_number": batch_number,
             "customer": display_name,
@@ -135,11 +136,52 @@ def product_transaction_view(request, product_id):
             "quantity": data["quantity"],
             "product_type": "OUT",
             "remaining_stock": data["remaining_stock"],
-        })
+        }
+
+        matches_customer = True
+        if customer_filter:
+            customer_words = customer_filter.split()
+            display_name_lower = display_name.lower() if display_name else ""
+            matches_customer = any(word in display_name_lower for word in customer_words)
+
+        matches_invoice = True
+        if invoice_filter:
+            invoice_str = str(invoice_number).lower()
+            invoice_words = invoice_filter.split()
+            matches_invoice = any(word in invoice_str for word in invoice_words)
+
+        if matches_customer and matches_invoice:
+            filtered_transactions.append(transaction)
+
+    if product.import_date and product.import_invoice_number:
+        import_transaction = {
+            "invoice_number": product.import_invoice_number,
+            "customer": product.supplier,
+            "date": product.import_date,
+            "batch_number": batch_number,
+            "quantity": "-",
+            "product_type": "IN",
+            "remaining_stock": initial_stock,
+        }
+
+        matches_customer = True
+        if customer_filter:
+            customer_words = customer_filter.split()
+            supplier_name = product.supplier.lower() if product.supplier else ""
+            matches_customer = any(word in supplier_name for word in customer_words)
+
+        matches_invoice = True
+        if invoice_filter:
+            invoice_str = str(product.import_invoice_number).lower()
+            invoice_words = invoice_filter.split()
+            matches_invoice = any(word in invoice_str for word in invoice_words)
+
+        if matches_customer and matches_invoice:
+            filtered_transactions.insert(0, import_transaction)
 
     context = {
         "product": product,
-        "transactions": transactions_data,
+        "transactions": filtered_transactions,
     }
 
     return render(request, "invoice/product_transaction.html", context)
