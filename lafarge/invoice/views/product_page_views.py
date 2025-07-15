@@ -140,9 +140,8 @@ def product_transaction_view(request, product_id):
 
         matches_customer = True
         if customer_filter:
-            customer_words = customer_filter.split()
             display_name_lower = display_name.lower() if display_name else ""
-            matches_customer = any(word in display_name_lower for word in customer_words)
+            matches_customer = customer_filter in display_name_lower.split()
 
         matches_invoice = True
         if invoice_filter:
