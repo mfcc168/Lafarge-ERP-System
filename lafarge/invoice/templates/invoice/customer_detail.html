@@ -7,7 +7,11 @@
 <div class="container mt-5">
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-body">
+            {% if customer.care_of %}
+            <h2 class="text-uppercase text-primary">{{ customer.name }} {{ customer.care_of }}'s Profile</h2>
+            {% else %}
             <h2 class="text-uppercase text-primary">{{ customer.name }}'s Profile</h2>
+            {% endif %}
 
             <!-- Customer Details -->
             <div class="bg-light p-4 rounded-3 shadow-sm mb-4">
