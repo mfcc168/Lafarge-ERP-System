@@ -17,6 +17,7 @@ from django.utils.timezone import now
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
+from ..decorators import user_is_lafarge_or_superuser
 from ..models import Salesman, Invoice
 from ..tables import InvoiceFilter, SalesmanInvoiceTable
 
@@ -34,7 +35,7 @@ def sales_incentive_scheme(sales):
     elif sales >= 170000:
         return 0.055
 
-@staff_member_required
+@user_is_lafarge_or_superuser
 def salesman_list(request):
     salesmen = Salesman.objects.all()
     return render(request, 'invoice/salesman_list.html', {'salesmen': salesmen})
@@ -79,7 +80,7 @@ def salesman_monthly_sales(request, salesman_id):
     })
 
 
-@staff_member_required
+@user_is_lafarge_or_superuser
 def salesman_monthly_preview(request, salesman_id):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     latest_invoice = Invoice.objects.filter(salesman=salesman, delivery_date__isnull=False).order_by(
@@ -121,7 +122,7 @@ def salesman_monthly_preview(request, salesman_id):
                   {'months': months, 'salesman': salesman, "breadcrumbs": breadcrumbs})
 
 
-@staff_member_required
+@user_is_lafarge_or_superuser
 def salesman_monthly_report(request, salesman_id, year, month):
     salesman = get_object_or_404(Salesman, id=salesman_id)
     sales_share = get_object_or_404(Salesman, name="DS/MM/AC")

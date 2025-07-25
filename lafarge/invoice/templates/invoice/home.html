@@ -2,6 +2,7 @@
 {% load custom_filter %}
 {% block content %}
 <div class="container-fluid mt-4">
+    {% if user.is_superuser or user.username == 'lafarge' %}
     <h2 class="text-center mb-4">Data Analysis</h2>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -35,6 +36,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Today's Invoices -->
     <div class="mt-5">

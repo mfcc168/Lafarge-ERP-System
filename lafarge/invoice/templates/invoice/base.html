@@ -191,8 +191,10 @@
     </div>
     <a href="{% url 'home' %}" class="nav-item"><i class="bi bi-house-door"></i> <span>Home</span></a>
     <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
+    {% if user.is_superuser or user.username == 'lafarge' %}
     <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
     <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
+    {% endif %}
     <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
     <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
     <a href="{% url 'unpaid_invoices' %}" class="nav-item"><i class="bi bi-file-earmark-x"></i> <span>Statements</span></a>
@@ -210,8 +212,10 @@
 <div class="mobile-navbar">
     <a href="{% url 'home' %}"><i class="bi bi-house-door"></i> <span>Home</span></a>
     <a href="{% url 'product_list' %}"><i class="bi bi-box"></i> <span>Products</span></a>
+    {% if user.is_superuser or user.username == 'lafarge' %}
     <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
     <a href="{% url 'salesman_list' %}"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
+    {% endif %}
     <a href="{% url 'customer_list' %}"><i class="bi bi-people"></i> <span>Customers</span></a>
     <a href="{% url 'invoice_list' %}"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
     <a href="{% url 'unpaid_invoices' %}" class="nav-item"><i class="bi bi-file-earmark-x"></i> <span>Statements</span></a>
