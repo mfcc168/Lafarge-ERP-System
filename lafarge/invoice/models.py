@@ -69,7 +69,6 @@ class Product(models.Model):
     box_remain = models.PositiveIntegerField(default=0, editable=False)
 
     def save(self, *args, **kwargs):
-        # Calculate box_amount and box_remain based on the quantity and unit_per_box
         if self.unit_per_box > 0:
             self.box_amount, self.box_remain = divmod(self.quantity, self.unit_per_box)
         else:
@@ -167,15 +166,12 @@ class Invoice(models.Model):
         previous_delivery_date = None
 
         if not is_new or self.pk:
-            # Get the previous state of the invoice
             previous_delivery_date = Invoice.objects.get(pk=self.pk).delivery_date
-            # Calculate the total price after saving (whether it's new or existing)
             self.calculate_total_price()
 
         super().save(*args, **kwargs)
 
         if not previous_delivery_date and self.delivery_date:
-            # Create ProductTransaction records for related items
             for item in self.invoiceitem_set.all():
                 product = item.product
                 ProductTransaction.objects.create(
@@ -218,13 +214,10 @@ class InvoiceItem(models.Model):
                 # Revert the previous quantity back to the product
                 current_product.quantity += previous_quantity
 
-            # Calculate new quantity
             new_quantity = current_product.quantity - self.quantity
 
-            # Update the product quantity
             current_product.quantity = new_quantity
 
-            # Calculate price details
             if self.product_type == 'normal':
 
                 base_name = extract_base_name(current_product.name)

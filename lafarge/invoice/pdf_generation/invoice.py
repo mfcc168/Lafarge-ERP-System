@@ -51,7 +51,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
         else:
             pdf.drawString(50, height - 185, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 205
-    # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
@@ -103,7 +102,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
             else:
                 product_quantities[key] = item.quantity
 
-        # Prepare table data
         data = [["Product", "Quantity"]]
         for (product_name, unit), total_quantity in product_quantities.items():
             data.append([
@@ -111,7 +109,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 f"{float(total_quantity):,g} {unit}",  # Ensure correct unit is displayed
             ])
 
-        # Configure table styles
         table = Table(data, colWidths=[250, 150])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -129,7 +126,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
         table.drawOn(pdf, 50, height - 286 - table_height)
 
     else:
-        # Define the data for the table
         data = [["Product", "Quantity", "Unit Price", "Amount"]]
 
         for item in invoice.invoiceitem_set.all():
@@ -157,7 +153,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
                 f"${item.sum_price:,.2f}\n" if item.sum_price != 0 else f"-\n"
             ])
 
-        # Create the table
         table = Table(data, colWidths=[200, 100, 100, 100])
         table.setStyle(TableStyle([
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -175,7 +170,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
         # Draw the table, positioning it to expand downward
         table.drawOn(pdf, 60, height - 286 - table_height)
 
-        # Add total price at the bottom
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawRightString(510, height - 600, f"Total: ${invoice.total_price:,.2f}")
 

@@ -24,20 +24,16 @@ def home(request):
     today = localdate()
     invoices_today = Invoice.objects.filter(delivery_date=today)
 
-    # Get invoices that have a payment_date but no deposit_date
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date)
 
     future_deposits = pending_deposits.filter(payment_date__gt=today)
     current_pending_deposits = pending_deposits.exclude(id__in=future_deposits.values('id'))
 
-    # Calculate total pending deposit amount
     total_pending_deposit = current_pending_deposits.aggregate(Sum('total_price'))['total_price__sum'] or 0
 
-    # Calculate payment type totals
     payment_type_totals = current_pending_deposits.values('payment_method').annotate(total=Sum('total_price'))
     future_payment_type_totals = future_deposits.values('payment_method').annotate(total=Sum('total_price'))
-    # Convert to dictionary for easier template access
     payment_totals_dict = {entry['payment_method']: entry['total'] for entry in payment_type_totals}
     future_payment_totals_dict = {entry['payment_method']: entry['total'] for entry in future_payment_type_totals}
 
@@ -70,17 +66,14 @@ def home(request):
 @staff_member_required
 def sales_data(request):
     try:
-        # Check if invoices exist
         if not Invoice.objects.exists():
             return JsonResponse({"error": "No invoices found"}, status=400)
 
-        # Get current date
         current_date = now()
         last_month = (current_date.month - 1) or 12
         last_month_year = current_date.year if current_date.month > 1 else current_date.year - 1
         last_month_name = calendar.month_name[last_month]
 
-        # Get total sales per month
         sales_per_month = (
             Invoice.objects
                 .annotate(month=ExtractMonth('delivery_date'), year=ExtractYear('delivery_date'))
@@ -91,7 +84,6 @@ def sales_data(request):
                 .order_by('month')
         )
 
-        # Get sales by salesman for last month
         sales_by_salesman = (
             Invoice.objects
                 .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
@@ -106,7 +98,7 @@ def sales_data(request):
         data = {
             "sales_per_month": list(sales_per_month),
             "sales_by_salesman": list(sales_by_salesman),
-            "last_month_name": last_month_name,  # Include month name in response
+            "last_month_name": last_month_name,
         }
 
         return JsonResponse(data)
@@ -119,24 +111,22 @@ def sales_data(request):
 @staff_member_required
 def product_insights_data(request):
     try:
-        # Get current date
         current_date = now()
         last_month = (current_date.month - 1) or 12
         last_month_year = current_date.year if current_date.month > 1 else current_date.year - 1
-        last_month_name = calendar.month_name[last_month]  # Get month name
+        last_month_name = calendar.month_name[last_month]
 
-        # Get total sales per product for the previous month
         product_sales = (
             Invoice.objects
                 .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
-                .values('invoiceitem__product__name')  # Get product name
-                .annotate(total_quantity=Sum('invoiceitem__quantity'))  # Sum of quantity sold
-                .order_by('-total_quantity')  # Order by highest sales
+                .values('invoiceitem__product__name')
+                .annotate(total_quantity=Sum('invoiceitem__quantity'))
+                .order_by('-total_quantity')
         )
 
         data = {
             "product_sales": list(product_sales),
-            "last_month_name": last_month_name,  # Include last month's name
+            "last_month_name": last_month_name,
         }
         return JsonResponse(data)
 

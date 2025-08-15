@@ -74,7 +74,6 @@ def customers_with_unpaid_invoices(request):
     for customer in customers:
         customer_unpaid_invoices = unpaid_invoices.filter(customer=customer)
         if customer_unpaid_invoices.exists():  # Ensure at least one unpaid invoice
-            # Calculate the total unpaid amount for this customer
             customer_total_unpaid = customer_unpaid_invoices.aggregate(
                 total=Sum('total_price')
             )['total'] or 0  # Default to 0 if no unpaid invoices
@@ -85,10 +84,8 @@ def customers_with_unpaid_invoices(request):
                 "total_unpaid": customer_total_unpaid,
             })
 
-    # Calculate the total unpaid amount for all invoices with delivery_date not null
     total_unpaid = unpaid_invoices.aggregate(total=Sum('total_price'))['total'] or 0
 
-    # Calculate monthly unpaid totals for invoices with delivery_date not null
     monthly_unpaid = (
         unpaid_invoices
             .annotate(month=TruncMonth('delivery_date'))
@@ -144,14 +141,11 @@ def unpaid_invoices_by_month_detail(request, year_month):
 
 @staff_member_required
 def copy_previous_order(request, invoice_number):
-    # Get the original invoice
     original_invoice = get_object_or_404(Invoice, number=invoice_number)
 
 
-    # Generate the new invoice number
     new_number = generate_next_number()
 
-    # Create a new invoice
     new_invoice = Invoice.objects.create(
         number=new_number,
         customer=original_invoice.customer,

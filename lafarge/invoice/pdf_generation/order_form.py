@@ -52,7 +52,6 @@ def draw_order_form_page(pdf, order):
         else:
             product_quantities[key] = item.quantity
 
-    # Prepare table data
     data = [["Product", "Quantity"]]
     for (product_name, unit), total_quantity in product_quantities.items():
         data.append([
@@ -60,7 +59,6 @@ def draw_order_form_page(pdf, order):
             f"{float(total_quantity):,g} {unit}",  # Ensure correct unit is displayed
         ])
 
-    # Configure table styles
     table = Table(data, colWidths=[150, 50])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),

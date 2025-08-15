@@ -42,7 +42,6 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
         else:
             pdf.drawString(60, height - 200, f"C/O: Dr. {customer.care_of}")
     y_position = height - 220
-    # Create a TextObject for multi-line address
     text_object = pdf.beginText(60, y_position)
     text_object.setFont("Helvetica", 10)
     for line in address_lines:
@@ -52,7 +51,6 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
     pdf.drawText(text_object)
 
     # Table for Invoice Items
-    # Define the data for the table
     data = [["Invoice Date", "Invoice No.", "Amount"]]
     total_unpaid = 0
     for invoice in unpaid_invoices:
@@ -68,7 +66,6 @@ def draw_statement_page(pdf, customer, unpaid_invoices):
         f"Total: HK$ {total_unpaid:,.2f}"
     ])
 
-    # Create the table
     table = Table(data, colWidths=[100, 100, 100])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.darkgrey),  # Header background color

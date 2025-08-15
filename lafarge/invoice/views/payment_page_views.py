@@ -33,7 +33,6 @@ def monthly_payment_preview(request):
         # Exclude January 2025
         if year == 2025 and month == 1:
             continue
-        # Calculate total amount for the month
         total_amount = (
                 Invoice.objects.filter(payment_date__year=year, payment_date__month=month)
                 .aggregate(total=Sum("total_price"))["total"] or 0

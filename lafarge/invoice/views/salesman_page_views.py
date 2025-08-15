@@ -68,7 +68,6 @@ def salesman_monthly_sales(request, salesman_id):
             .order_by('payment_date__month')
     )
 
-    # Prepare data for the chart
     months = [0] * 12  # 12 months
     for sale in monthly_sales:
         month_index = sale['payment_date__month'] - 1
@@ -102,7 +101,6 @@ def salesman_monthly_preview(request, salesman_id):
         # Exclude January 2025
         if year == 2025 and month == 1:
             continue
-        # Calculate total amount for the salesman in the month
         total_amount = (
                 Invoice.objects.filter(salesman=salesman, delivery_date__year=year, delivery_date__month=month)
                 .aggregate(total=Sum("total_price"))["total"] or 0

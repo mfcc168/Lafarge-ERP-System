@@ -31,7 +31,6 @@ class InvoiceListView(SingleTableMixin, FilterView):
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
     invoice = get_object_or_404(Invoice, number=invoice_number)
-    # Render the invoice template with the context
     context = {
         'invoice': invoice
     }
@@ -54,7 +53,6 @@ def monthly_preview(request):
         # Exclude January 2025
         if year == 2025 and month == 1:
             continue
-        # Calculate total amount for the month
         total_amount = (
                 Invoice.objects.filter(delivery_date__year=year, delivery_date__month=month)
                 .aggregate(total=Sum("total_price"))["total"] or 0

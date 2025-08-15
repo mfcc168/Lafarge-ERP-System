@@ -34,7 +34,6 @@ def draw_delivery_note(pdf, invoice):
         else:
             pdf.drawString(50, height - 190, f"C/O: Dr. {invoice.customer.care_of}")
     y_position = height - 200
-    # Create a TextObject for multi-line address
     text_object = pdf.beginText(50, y_position)
     text_object.setFont("Helvetica", 9)
     for line in address_lines:
@@ -60,7 +59,6 @@ def draw_delivery_note(pdf, invoice):
     pdf.setFont("Helvetica-Bold", 10)
     pdf.drawString(50, height - 105, f"Date: ")
 
-    # Define the data for the table
     data = [["Product", "Quantity"]]
     for item in invoice.invoiceitem_set.all():
 
@@ -76,7 +74,6 @@ def draw_delivery_note(pdf, invoice):
             f"{float(item.quantity):g} {item.product.unit}\n",
         ])
 
-    # Create the table
     table = Table(data, colWidths=[250, 150])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),

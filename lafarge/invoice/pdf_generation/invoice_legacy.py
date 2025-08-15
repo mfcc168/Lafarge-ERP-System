@@ -80,7 +80,6 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.drawString(65, height - 130, f"{invoice.salesman.code}")
 
     # Table for Invoice Items
-    # Define the data for the table
     data = [[" ", " ", " ", " "]]
     for item in invoice.invoiceitem_set.all():
         nett_display = ""
@@ -115,7 +114,6 @@ def draw_invoice_page_legacy(pdf, invoice):
                 f"${item.sum_price:,.2f}" if item.sum_price != 0 else f"-"
             ])
 
-    # Create the table
     table = Table(data, colWidths=[200, 122, 92, 100])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -137,7 +135,6 @@ def draw_invoice_page_legacy(pdf, invoice):
     pdf.setFont("Times-Bold", 14)
     pdf.drawString(460, height - 430, f"${invoice.total_price:,.2f}")
 
-    # Generate barcode from invoice number
     barcode = code128.Code128(invoice.number, barWidth=1.2, barHeight=10)
 
     # Position the barcode at the top of the page

@@ -41,7 +41,6 @@ def draw_sample_page(pdf, invoice):
             else:
                 pdf.drawString(30, height - 130, f"C/O: Dr. {invoice.customer.care_of}")
         y_position = height - 150
-        # Create a TextObject for multi-line address
         text_object = pdf.beginText(30, y_position)
         text_object.setFont("Helvetica", 10)
         for line in address_lines:
@@ -72,7 +71,6 @@ def draw_sample_page(pdf, invoice):
         else:
             product_quantities[product_name] = item.quantity
 
-    # Prepare table data
     data = [["Product", "Quantity"]]
     for product_name, total_quantity in product_quantities.items():
         data.append([
@@ -80,7 +78,6 @@ def draw_sample_page(pdf, invoice):
             f"{float(total_quantity):,g} {item.product.unit}",  # Use the unit from the last item processed
         ])
 
-    # Configure table styles
     table = Table(data, colWidths=[200, 50])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),

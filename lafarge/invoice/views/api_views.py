@@ -49,9 +49,7 @@ class UpdateDeliveryDateView(APIView):
         except Invoice.DoesNotExist:
             return Response({"error": "Invoice not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Update the delivery_date
         invoice.delivery_date = delivery_date
-        # Update the deliveryman is not null
         if deliveryman:
             invoice.deliveryman = deliveryman
         invoice.save()
@@ -71,7 +69,6 @@ class UpdatePaymentDateView(APIView):
         except Invoice.DoesNotExist:
             return Response({"error": "Invoice not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Update the delivery_date
         invoice.payment_date = payment_date
         invoice.save()
 
