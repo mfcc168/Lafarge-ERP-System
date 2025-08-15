@@ -1,4 +1,5 @@
 import io
+from urllib.parse import unquote
 
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
@@ -141,6 +142,10 @@ def download_order_form_pdf(request, invoice_number):
 
 @staff_member_required
 def download_statement_pdf(request, customer_name, customer_care_of):
+    # URL decode the parameters to handle special characters like apostrophes
+    customer_name = unquote(customer_name)
+    customer_care_of = unquote(customer_care_of)
+    
     # Get the invoice object
     customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
