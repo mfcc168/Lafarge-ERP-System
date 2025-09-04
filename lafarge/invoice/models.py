@@ -153,8 +153,9 @@ class Invoice(models.Model):
         ).exclude(number__startswith="S-")
 
     def calculate_total_price(self):
-        total = sum(item.sum_price for item in self.invoiceitem_set.all())
-        self.total_price = total
+        invoice_items_total = sum(item.sum_price for item in self.invoiceitem_set.all())
+        additional_items_total = sum(item.price for item in self.additionalitem_set.all())
+        self.total_price = invoice_items_total + additional_items_total
 
     def save(self, *args, **kwargs):
         # Automatically set salesman from customer if not already set
@@ -257,6 +258,14 @@ class InvoiceItem(models.Model):
         super().delete(*args, **kwargs)
 
 
+class AdditionalItem(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"{self.description} - ${self.price}"
+
 
 # Signals to update total price
 @receiver(post_save, sender=InvoiceItem)
@@ -267,7 +276,17 @@ def update_invoice_total(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
+    instance.invoice.calculate_total_price()
+    instance.invoice.save()
 
-    # Recalculate and save invoice total
+
+@receiver(post_save, sender=AdditionalItem)
+def update_invoice_total_additional(sender, instance, **kwargs):
+    instance.invoice.calculate_total_price()
+    instance.invoice.save()
+
+
+@receiver(post_delete, sender=AdditionalItem)
+def revert_invoice_total_additional(sender, instance, **kwargs):
     instance.invoice.calculate_total_price()
     instance.invoice.save()

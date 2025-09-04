@@ -6,7 +6,7 @@ from django.utils.html import format_html
 from .models import SpecialPrice
 from .forms import SpecialPriceInlineForm
 
-from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word
+from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word, AdditionalItem
 
 admin.site.site_header = "Lafarge Admin"
 admin.site.site_title = "Lafarge Admin Portal"
@@ -139,12 +139,20 @@ class InvoiceItemInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class AdditionalItemInline(admin.TabularInline):
+    model = AdditionalItem
+    extra = 0
+    fields = ('description', 'price')
+    verbose_name = "Additional Item"
+    verbose_name_plural = "Additional Items"
+
+
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
     list_display = ('number', 'terms', 'customer', 'delivery_date', 'payment_date', 'total_price', 'view_invoice_link')
     search_fields = ('number', 'customer__name')
-    inlines = [InvoiceItemInline]
+    inlines = [InvoiceItemInline, AdditionalItemInline]
     readonly_fields = ('total_price', 'terms', 'salesman')
 
     def view_invoice_link(self, obj):
