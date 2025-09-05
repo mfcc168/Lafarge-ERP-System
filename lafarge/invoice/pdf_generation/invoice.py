@@ -22,7 +22,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
     """
     width, height = A4
 
-    # Draw the background image
+    # Set background image based on copy type
     if copy_type == "Poison Form":
         background_image_path = os.path.join(settings.STATIC_ROOT, 'PoisonForm.png')
     elif copy_type == "Customer Copy":
@@ -34,7 +34,7 @@ def draw_invoice_page(pdf, invoice, copy_type):
     pdf.drawImage(background_image_path, 0, 0, width, height)
     pdf.setFont("Helvetica-Bold", 12)
 
-    # Customer information
+    # Render customer details section
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
     delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]

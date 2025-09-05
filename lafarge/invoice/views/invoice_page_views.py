@@ -29,7 +29,7 @@ class InvoiceListView(SingleTableMixin, FilterView):
 
 @staff_member_required
 def invoice_detail(request, invoice_number):
-    # Fetch the invoice by its number
+    # Retrieve invoice with related data to minimize database queries
     invoice = get_object_or_404(
         Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
         number=invoice_number
@@ -53,7 +53,7 @@ def monthly_preview(request):
     for i in range(12):  # Get the last 12 months
         date = today.replace(day=1) - relativedelta(months=i)  # Correct month rollback
         year, month = date.year, date.month
-        # Exclude January 2025
+        # Skip January 2025 per business requirement
         if year == 2025 and month == 1:
             continue
         total_amount = (
@@ -61,7 +61,7 @@ def monthly_preview(request):
                 .aggregate(total=Sum("total_price"))["total"] or 0
         )
 
-        # Only show months where total amount is greater than 0
+        # Include all months regardless of sales volume
         months.append({
             'year': year,
             'month': month,
@@ -96,8 +96,8 @@ def monthly_report(request, year, month):
             weeks[week_number]["invoices"].append(invoice)
             weeks[week_number]["total"] += invoice.total_price
         else:
-            weeks[5]["invoices"].append(invoice)  # Handle 5th week for months with >28 days
-            weeks[5]["total"] += invoice.total_price  # Add to the total for the 5th week
+            weeks[5]["invoices"].append(invoice)  # Handle months with more than 28 days
+            weeks[5]["total"] += invoice.total_price
         monthly_total += invoice.total_price
 
         # Group invoice items by product name without the lot number

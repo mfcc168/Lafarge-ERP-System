@@ -1,3 +1,10 @@
+"""
+Django Tables2 configuration for data presentation and filtering.
+
+Defines table classes for displaying and exporting customer, invoice, and
+product transaction data with custom rendering and filtering capabilities.
+"""
+
 import django_tables2 as tables
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -17,10 +24,10 @@ class CustomerTable(tables.Table):
         text=lambda record: record.name,
         attrs={'a': {'class': 'text-decoration-none'}, 'td': {'class': 'column-name'}}
     )
-    care_of = tables.Column(attrs={"td": {"class": "column-care-of"}})  # Truncate care of
-    address = tables.Column(attrs={"td": {"class": "column-address"}})  # Truncate address
-    office_hour = tables.Column(attrs={"td": {"class": "column-office-hour"}})  # Enable wrapping
-    telephone_number = tables.Column(attrs={"td": {"class": "column-telephone-number"}})  # Enable wrapping
+    care_of = tables.Column(attrs={"td": {"class": "column-care-of"}})
+    address = tables.Column(attrs={"td": {"class": "column-address"}})
+    office_hour = tables.Column(attrs={"td": {"class": "column-office-hour"}})
+    telephone_number = tables.Column(attrs={"td": {"class": "column-telephone-number"}})
 
     class Meta:
         model = Customer
@@ -58,15 +65,15 @@ class InvoiceTable(tables.Table):
     customer = tables.Column(attrs={"td": {"class": "column-customer"}})
 
     def render_number(self, value):
-        """Render total_price with formatting"""
+        """Render invoice number with styling."""
         return mark_safe(f'<span class="text-decoration-none fw-bold text-primary">#{escape(value)}</span>')
 
     def render_salesman(self, value):
-        """Render salesman as a badge"""
+        """Render salesman code as styled badge."""
         return mark_safe(f'<span class="badge bg-secondary text-white">{escape(value.code)}</span>')
 
     def render_total_price(self, value):
-        """Render total_price with formatting"""
+        """Render total price with currency formatting."""
         return mark_safe(f'<span class="text-end fw-bold text-success">${escape(currency(value))}</span>')
 
     class Meta:
@@ -84,7 +91,7 @@ class InvoiceTable(tables.Table):
         order_by = '-id'
         fields = ("id", "number", "customer", "delivery_date", "payment_date", "deposit_date", "salesman", "total_price")
 
-    id = tables.Column(visible=False)  # Hide 'id' from being shown
+    id = tables.Column(visible=False)
 
 
 class InvoiceFilter(FilterSet):
@@ -103,11 +110,7 @@ class InvoiceFilter(FilterSet):
         fields = ["number", "salesman"]  # Only include direct model fields here
 
 
-# Add this import at the top of the file if not already present
 from django.urls import reverse
-
-
-# Then modify the CustomerInvoiceTable class by adding the copy_order column
 class CustomerInvoiceTable(ExportMixin, tables.Table):
     number = tables.LinkColumn(
         'invoice_detail',
@@ -151,7 +154,7 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
         attrs={'td': {'class': 'small'}}
     )
 
-    # Add this new column for the copy functionality
+    # Column for copying existing orders
     copy_order = tables.TemplateColumn(
         template_name='invoice/copy_order_button.html',
         verbose_name='Copy Order',
@@ -167,7 +170,8 @@ class CustomerInvoiceTable(ExportMixin, tables.Table):
     )
 
     def render_total_price(self, value):
-        return mark_safe(f"<span class='text-danger fw-bold'>${currency(value)}</span>")  # Apply the currency format
+        """Render price with currency formatting and styling."""
+        return mark_safe(f"<span class='text-danger fw-bold'>${currency(value)}</span>")
 
     class Meta:
         model = Invoice
@@ -192,26 +196,26 @@ class ProductTransactionTable(tables.Table):
     nature_of_transaction = tables.Column(empty_values=(), verbose_name='Nature of Transaction')
 
     def render_invoice_number(self, record):
-        # Extract invoice number from the description
+        """Extract invoice number from transaction description."""
         if 'invoice #' in record.description:
             parts = record.description.split('invoice #')
             if len(parts) > 1:
-                return parts[1].split(' ')[0].strip()  # Get the number after 'invoice #'
+                return parts[1].split(' ')[0].strip()
         return "N/A"
 
     def render_customer(self, record):
-        # Extract customer name from the description
+        """Extract customer name from transaction description."""
         if 'from ' in record.description:
             parts = record.description.split('from ')
             if len(parts) > 1:
-                return parts[1].strip()  # Get the part after 'from'
+                return parts[1].strip()
         return "N/A"
 
     def render_nature_of_transaction(self, record):
         return "IN" if record.change > 0 else "OUT"
 
     def render_change(self, value):
-        # Add a "+" sign for positive changes
+        """Format quantity change with appropriate sign."""
         return f"+{value}" if value > 0 else str(value)
 
     class Meta:
@@ -229,7 +233,7 @@ class ProductTransactionFilter(FilterSet):
 
     class Meta:
         model = ProductTransaction
-        fields = []  # List only non-model fields to avoid duplication
+        fields = []
 
 
 class SalesmanInvoiceTable(ExportMixin, tables.Table):
@@ -282,6 +286,7 @@ class SalesmanInvoiceTable(ExportMixin, tables.Table):
     )
 
     def render_total_amount(self, record):
+        """Calculate and render total amount for invoice items."""
         return mark_safe(
             f"<span class='text-danger fw-bold'>${sum(item.sum_price for item in record.invoiceitem_set.all()):,.2f}</span>")
 

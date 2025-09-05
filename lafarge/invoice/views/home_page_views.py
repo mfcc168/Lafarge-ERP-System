@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 @staff_member_required
 def home(request):
+    """Dashboard view displaying today's invoices and pending deposits."""
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
     invoices_today = Invoice.objects.filter(delivery_date=today).select_related(
@@ -67,6 +68,7 @@ def home(request):
 
 @staff_member_required
 def sales_data(request):
+    """API endpoint providing sales analytics data for charts and reports."""
     try:
         if not Invoice.objects.exists():
             return JsonResponse({"error": "No invoices found"}, status=400)
@@ -113,6 +115,7 @@ def sales_data(request):
 
 @staff_member_required
 def product_insights_data(request):
+    """API endpoint providing product sales analytics for the previous month."""
     try:
         current_date = now()
         last_month = (current_date.month - 1) or 12

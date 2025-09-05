@@ -29,10 +29,11 @@ class CustomerListView(SingleTableMixin, FilterView):
 
 @staff_member_required
 def customer_detail(request, customer_name, customer_care_of):
+    """Display customer details with filterable invoice history and export functionality."""
     customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     invoices = Invoice.objects.filter(customer=customer)
 
-    # Apply filter to the invoices queryset
+    # Filter invoice history based on request parameters
     filter = InvoiceFilter(request.GET, queryset=invoices)
     filter.form.fields.pop('number', None)
     filter.form.fields.pop('salesman', None)
@@ -41,7 +42,7 @@ def customer_detail(request, customer_name, customer_care_of):
     table = CustomerInvoiceTable(filter.qs)
     RequestConfig(request).configure(table)
 
-    # Check for export format in request and handle CSV export
+    # Handle data export if requested
     export_format = request.GET.get("_export", None)
     if TableExport.is_valid_format(export_format):
         exporter = TableExport(export_format, table)  # Pass the table instance here
