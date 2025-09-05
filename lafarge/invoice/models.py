@@ -24,13 +24,13 @@ class Salesman(models.Model):
 
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, db_index=True)
     hide_care_of = models.BooleanField(default=False)
-    care_of = models.CharField(max_length=255, blank=True, null=True)
+    care_of = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     address = models.TextField()
     terms = models.CharField(max_length=50, null=True, blank=True)
     office_hour = models.TextField(blank=True, null=True)
-    telephone_number = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    telephone_number = models.CharField(max_length=255, blank=True, null=True, unique=True, db_index=True)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     delivery_to = models.CharField(max_length=255, blank=True, null=True)
     show_delivery_address = models.BooleanField(default=False)
@@ -39,6 +39,12 @@ class Customer(models.Model):
     show_expiry_date = models.BooleanField(default=False)
     salesman = models.ForeignKey(Salesman, on_delete=models.SET_NULL, null=True, blank=True)
     statement_use_additonal_line = models.TextField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['name', 'care_of']),  # Composite index for customer lookup
+            models.Index(fields=['salesman']),  # For salesman filtering
+        ]
 
     def __str__(self):
         return self.name + (" (" + self.care_of + ")" if self.care_of else "")
@@ -53,7 +59,7 @@ class Deliveryman(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True, db_index=True)
     name_alias = models.CharField(max_length=255, null=True, blank=True)
     supplier = models.CharField(max_length=255, blank=True, null=True)
     import_date = models.DateField(null=True, blank=True)
@@ -63,7 +69,7 @@ class Product(models.Model):
     unit = models.CharField(max_length=255, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     units_per_pack = models.PositiveIntegerField(default=1)
-    quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)  # Changed to DecimalField
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0, db_index=True)  # Index for stock queries
     unit_per_box = models.PositiveIntegerField(default=1)
     box_amount = models.PositiveIntegerField(default=0, editable=False)
     box_remain = models.PositiveIntegerField(default=0, editable=False)
@@ -103,12 +109,19 @@ class ProductTransaction(models.Model):
         ('adjustment', 'Adjustment'),
     ]
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    transaction_type = models.CharField(max_length=50, choices=TRANSACTION_CHOICES)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, db_index=True)
+    transaction_type = models.CharField(max_length=50, choices=TRANSACTION_CHOICES, db_index=True)
     change = models.IntegerField()  # Positive for restock, negative for sale
     quantity_after_transaction = models.PositiveIntegerField()
-    timestamp = models.DateTimeField(default=timezone.now)
+    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
     description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['product', 'timestamp']),  # For transaction history
+            models.Index(fields=['transaction_type', 'timestamp']),  # For transaction type filtering
+            models.Index(fields=['product', 'transaction_type']),  # For product transaction analysis
+        ]
 
     def __str__(self):
         return f"{self.product.name} - {self.transaction_type} ({self.change}) on {self.timestamp}"
@@ -121,15 +134,15 @@ class Invoice(models.Model):
         ('fps', 'Fps'),
         ('credit(cq)', 'Credit Cheque'),
     ]
-    number = models.CharField(max_length=50, unique=True)
+    number = models.CharField(max_length=50, unique=True, db_index=True)
     terms = models.CharField(max_length=50, null=True, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, db_index=True)
     sample_customer = models.CharField(max_length=50, null=True, blank=True)
-    salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE, null=True, blank=True)
+    salesman = models.ForeignKey(Salesman, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     deliveryman = models.ForeignKey(Deliveryman, on_delete=models.CASCADE, null=True, blank=True)
-    delivery_date = models.DateField(null=True, blank=True)
-    payment_date = models.DateField(null=True, blank=True)
-    deposit_date = models.DateField(null=True, blank=True)
+    delivery_date = models.DateField(null=True, blank=True, db_index=True)
+    payment_date = models.DateField(null=True, blank=True, db_index=True)
+    deposit_date = models.DateField(null=True, blank=True, db_index=True)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES, null=True, blank=True)
     cheque_detail = models.CharField(max_length=50, null=True, blank=True)
     products = models.ManyToManyField(Product, through='InvoiceItem')
@@ -184,6 +197,17 @@ class Invoice(models.Model):
                     timestamp=self.delivery_date
                 )
 
+    class Meta:
+        indexes = [
+            # Critical composite indexes based on query patterns
+            models.Index(fields=['delivery_date', 'payment_date']),  # For unpaid invoices queries
+            models.Index(fields=['salesman', 'delivery_date']),  # For salesman reports
+            models.Index(fields=['customer', 'payment_date']),  # For customer unpaid invoices
+            models.Index(fields=['delivery_date', 'customer']),  # For customer invoice history
+            models.Index(fields=['payment_date', 'deposit_date']),  # For pending deposits
+            models.Index(fields=['number']),  # For invoice lookups (already unique but explicit index)
+        ]
+
 
 class InvoiceItem(models.Model):
     PRODUCT_TYPE_CHOICES = [
@@ -192,8 +216,8 @@ class InvoiceItem(models.Model):
         ('sample', 'Sample'),
     ]
 
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, db_index=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, db_index=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=1, default=0.0)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -256,6 +280,12 @@ class InvoiceItem(models.Model):
         current_product.quantity += self.quantity
         current_product.save()
         super().delete(*args, **kwargs)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['invoice', 'product']),  # For invoice item queries
+            models.Index(fields=['product', 'product_type']),  # For product analysis
+        ]
 
 
 class AdditionalItem(models.Model):
