@@ -9,8 +9,6 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.graphics.barcode import code128
 
 from ..check_utils import prefix_check
-from ..encryption import encrypt_customer_id
-from ..qrcode import generate_whatsapp_qr_code
 
 
 def draw_invoice_page(pdf, invoice, copy_type):
@@ -181,11 +179,6 @@ def draw_invoice_page(pdf, invoice, copy_type):
 
         pdf.setFont("Helvetica-Bold", 14)
         pdf.drawRightString(510, height - 600, f"Total: ${invoice.total_price:,.2f}")
-
-        encrypted_customer_id = encrypt_customer_id(invoice.customer.id)
-        qr_code_image = generate_whatsapp_qr_code(str(os.getenv('PHONE_NUMBER')), encrypted_customer_id)
-        qr_code_reader = ImageReader(qr_code_image)
-        pdf.drawImage(qr_code_reader, 50, height - 822, width=75, height=75)
 
         barcode = code128.Code128(invoice.number, barWidth=1.2, barHeight=10)
 
