@@ -26,10 +26,47 @@
 
 .modal-dialog {
     max-width: 100% !important;
-    padding-left: 10px !important;
-    width: auto !important;
-    height: 80% !important;
-    margin-top: 5% !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-content {
+    height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.modal-header {
+    flex-shrink: 0 !important;
+}
+
+.modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+.modal-footer {
+    flex-shrink: 0 !important;
+}
+
+/* Make sure the form content inside modal-body expands */
+.modal-body > * {
+    height: 100% !important;
+}
+
+/* For admin forms specifically */
+.modal-body .form-row,
+.modal-body .field-box,
+.modal-body .fieldset {
+    margin-bottom: 20px !important;
 }
 
 
@@ -41,4 +78,21 @@
 
 .vTextField {
     font-size: 20px !important;
+}
+
+/* Prevent Jazzmin modals from closing on backdrop click only */
+.modal-backdrop {
+    pointer-events: none !important;
+}
+
+/* Keep modal dialog interactive */
+.modal-dialog {
+    pointer-events: all !important;
+}
+
+/* Keep close buttons working */
+.modal .btn-close,
+.modal [data-dismiss="modal"],
+.modal [data-bs-dismiss="modal"] {
+    pointer-events: all !important;
 }

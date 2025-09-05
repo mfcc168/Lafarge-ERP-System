@@ -112,6 +112,9 @@ JAZZMIN_SETTINGS = {
     "custom_css": "css/admin_overrides.css",
     "show_ui_builder": True,
     "custom_js": "js/custom_admin.js",
+    # Additional modal settings
+    "modal_backdrop": "static",
+    "modal_keyboard": True,
 }
 
 JAZZMIN_UI_TWEAKS = {
