@@ -61,10 +61,20 @@
                                 {% endif %}
                             </tr>
                             {% endfor %}
+                            {% for item in invoice.additionalitem_set.all %}
+                            <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                                <td>-</td>
+                                <td class="fw-semibold">{{ item.description }}</td>
+                                <td class="text-end">-</td>
+                                <td class="text-end fw-bold text-info">HK$ {{ item.price|currency }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% if invoice.additionalitem_set.all or invoice.invoiceitem_set.all %}
                             <tr class="fw-bold bg-secondary text-white">
                                 <td colspan="3" class="text-end">Total</td>
                                 <td class="text-end">HK$ {{ invoice.total_price|currency }}</td>
                             </tr>
+                            {% endif %}
                             </tbody>
                         </table>
                     </div>

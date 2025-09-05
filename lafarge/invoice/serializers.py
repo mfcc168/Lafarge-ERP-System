@@ -25,3 +25,15 @@ class DeliverymanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deliveryman
         fields = '__all__'
+
+
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = '__all__'
+
+
+class AdditionalItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalItem
+        fields = '__all__'

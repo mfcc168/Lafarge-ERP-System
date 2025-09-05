@@ -143,8 +143,6 @@ class AdditionalItemInline(admin.TabularInline):
     model = AdditionalItem
     extra = 0
     fields = ('description', 'price')
-    verbose_name = "Additional Item"
-    verbose_name_plural = "Additional Items"
 
 
 @admin.register(Invoice)

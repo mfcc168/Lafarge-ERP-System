@@ -56,7 +56,7 @@
                     <tbody>
                     {% for entry in customer_data %}
                     <tr class="clickable-row {% cycle 'table-row-light' 'table-row-dark' %}"
-                        data-href="{% url 'customer_unpaid_invoices' entry.customer.name entry.customer.care_of %}">
+                        data-href="{% url 'customer_unpaid_invoices' entry.customer.name entry.customer.care_of|default:'' %}">
                         <!-- Customer Name -->
                         <td class="fw-bold">
                             {{ entry.customer.name }}

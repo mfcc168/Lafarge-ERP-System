@@ -105,6 +105,8 @@ def customers_with_unpaid_invoices(request):
 
 @staff_member_required
 def unpaid_invoices_by_customer(request, customer_name, customer_care_of):
+    if customer_care_of == '':
+        customer_care_of = None
     customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
 

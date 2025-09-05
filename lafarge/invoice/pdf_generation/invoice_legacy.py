@@ -114,6 +114,15 @@ def draw_invoice_page_legacy(pdf, invoice):
                 f"${item.sum_price:,.2f}" if item.sum_price != 0 else f"-"
             ])
 
+    # Add additional items to the invoice
+    for item in invoice.additionalitem_set.all():
+        data.append([
+            item.description,
+            "-",
+            "-",
+            f"${item.price:,.2f}"
+        ])
+
     table = Table(data, colWidths=[200, 122, 92, 100])
     table.setStyle(TableStyle([
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),

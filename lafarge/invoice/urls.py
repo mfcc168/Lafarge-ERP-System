@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from .views.api_views import (
     ProductView, InvoiceView, CustomerView,
@@ -70,7 +70,7 @@ urlpatterns = [
 
     # Unpaids
     path('unpaid-invoices/', customers_with_unpaid_invoices, name='unpaid_invoices'),
-    path('unpaid-invoices/<str:customer_name>/<str:customer_care_of>', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
+    re_path(r'unpaid-invoices/(?P<customer_name>[^/]+)/(?P<customer_care_of>.*)$', unpaid_invoices_by_customer, name='customer_unpaid_invoices'),
     path('unpaid-invoices-by-month/<str:year_month>/', unpaid_invoices_by_month_detail, name='unpaid_invoices_by_month_detail'),
 
     # Sales
