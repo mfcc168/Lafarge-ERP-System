@@ -22,10 +22,12 @@ logger = logging.getLogger(__name__)
 def home(request):
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
-    invoices_today = Invoice.objects.filter(delivery_date=today)
+    invoices_today = Invoice.objects.filter(delivery_date=today).select_related(
+        'customer', 'salesman'
+    ).prefetch_related('invoiceitem_set__product')
 
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
-                                              payment_date__gte=start_date)
+                                              payment_date__gte=start_date).select_related('customer')
 
     future_deposits = pending_deposits.filter(payment_date__gt=today)
     current_pending_deposits = pending_deposits.exclude(id__in=future_deposits.values('id'))
@@ -87,6 +89,7 @@ def sales_data(request):
         sales_by_salesman = (
             Invoice.objects
                 .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
+                .select_related('salesman')
                 .values('salesman__code')
                 .annotate(total_sales=Sum('total_price'))
                 .exclude(salesman__code="Lafarge")
@@ -119,6 +122,7 @@ def product_insights_data(request):
         product_sales = (
             Invoice.objects
                 .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
+                .prefetch_related('invoiceitem_set__product')
                 .values('invoiceitem__product__name')
                 .annotate(total_quantity=Sum('invoiceitem__quantity'))
                 .order_by('-total_quantity')

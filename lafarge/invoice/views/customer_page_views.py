@@ -61,13 +61,13 @@ def customers_with_unpaid_invoices(request):
     customers = Customer.objects.filter(
         invoice__payment_date__isnull=True,
         invoice__delivery_date__isnull=False
-    ).distinct().exclude(name="Sample")
+    ).distinct().exclude(name="Sample").select_related('salesman')
 
     # Fetch unpaid invoices with delivery_date not null
     unpaid_invoices = Invoice.objects.filter(
         payment_date__isnull=True,
         delivery_date__isnull=False
-    ).exclude(number__startswith="S-")
+    ).exclude(number__startswith="S-").select_related('customer', 'salesman')
 
     # Filter customer data to include only those with at least one unpaid invoice
     customer_data = []
@@ -143,7 +143,10 @@ def unpaid_invoices_by_month_detail(request, year_month):
 
 @staff_member_required
 def copy_previous_order(request, invoice_number):
-    original_invoice = get_object_or_404(Invoice, number=invoice_number)
+    original_invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
 
 
     new_number = generate_next_number()

@@ -43,7 +43,9 @@ def product_transaction_detail(request, product_id):
 def product_transaction_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    transactions = InvoiceItem.objects.filter(product=product).select_related("invoice").order_by(
+    transactions = InvoiceItem.objects.filter(product=product).select_related(
+        "invoice", "invoice__customer", "invoice__salesman"
+    ).order_by(
         F("invoice__delivery_date").desc(nulls_first=True),
         "-invoice__id",
         "-id"

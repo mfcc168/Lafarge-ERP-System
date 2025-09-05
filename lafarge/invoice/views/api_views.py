@@ -135,12 +135,12 @@ class SalesmanMonthlyReport(APIView):
 
         invoices = Invoice.objects.filter(
             salesman=salesman, delivery_date__range=(first_day, last_day)
-        ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+        ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
 
         invoice_shares = Invoice.objects.filter(
             Q(salesman=sales_share1) | Q(salesman=sales_share2),
             delivery_date__range=(first_day, last_day)
-        )
+        ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
 
         weeks = {i: {"invoices": [], "total": Decimal("0.00")} for i in range(1, 6)}
         monthly_total = Decimal("0.00")

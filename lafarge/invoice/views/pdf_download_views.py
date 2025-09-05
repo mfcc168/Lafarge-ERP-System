@@ -19,7 +19,10 @@ from ..pdf_generation.statement import draw_statement_page
 
 @staff_member_required
 def download_invoice_legacy_pdf(request, invoice_number):
-    invoice = get_object_or_404(Invoice, number=invoice_number)
+    invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
 
@@ -37,7 +40,10 @@ def download_invoice_legacy_pdf(request, invoice_number):
 
 @staff_member_required
 def download_invoice_pdf(request, invoice_number):
-    invoice = get_object_or_404(Invoice, number=invoice_number)
+    invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
 
@@ -64,7 +70,10 @@ def download_invoice_pdf(request, invoice_number):
 
 @staff_member_required
 def download_sample_pdf(request, invoice_number):
-    sample = get_object_or_404(Invoice, number=invoice_number)
+    sample = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A5)
 
@@ -82,7 +91,10 @@ def download_sample_pdf(request, invoice_number):
 
 @staff_member_required
 def download_order_form_pdf(request, invoice_number):
-    order_form = get_object_or_404(Invoice, number=invoice_number)
+    order_form = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A5)
 
@@ -103,7 +115,7 @@ def download_statement_pdf(request, customer_name, customer_care_of):
     customer_name = unquote(customer_name)
     customer_care_of = unquote(customer_care_of)
     customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
-    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer)
+    unpaid_invoices = Invoice.get_unpaid_invoices().filter(customer=customer).select_related('customer', 'salesman')
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
 
@@ -121,7 +133,10 @@ def download_statement_pdf(request, customer_name, customer_care_of):
 
 @staff_member_required
 def download_delivery_note_pdf(request, invoice_number):
-    invoice = get_object_or_404(Invoice, number=invoice_number)
+    invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
 

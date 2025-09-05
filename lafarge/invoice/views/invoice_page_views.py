@@ -30,7 +30,10 @@ class InvoiceListView(SingleTableMixin, FilterView):
 @staff_member_required
 def invoice_detail(request, invoice_number):
     # Fetch the invoice by its number
-    invoice = get_object_or_404(Invoice, number=invoice_number)
+    invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
     context = {
         'invoice': invoice
     }

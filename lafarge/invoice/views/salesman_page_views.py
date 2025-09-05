@@ -144,10 +144,10 @@ def salesman_monthly_report(request, salesman_id, year, month):
     ]
     invoices = Invoice.objects.filter(
         salesman=salesman, delivery_date__range=(first_day, last_day)
-    ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+    ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
     invoice_share = Invoice.objects.filter(
         salesman=sales_share, delivery_date__range=(first_day, last_day)
-    ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+    ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
 
     weeks = {1: {"invoices": [], "total": Decimal("0.00")},
              2: {"invoices": [], "total": Decimal("0.00")},
