@@ -16,10 +16,7 @@ admin.site.index_title = "Welcome to Lafarge Admin Panel"
 class SpecialPriceInline(admin.TabularInline):
     model = SpecialPrice
     form = SpecialPriceInlineForm
-    extra = 1
-    min_num = 0
-    verbose_name = "Special Product Price"
-    verbose_name_plural = "Special Product Prices"
+    extra = 0
 
 
 @admin.register(Customer)

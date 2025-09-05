@@ -28,6 +28,7 @@ def draw_sample_page(pdf, invoice):
 
     # Customer information
     address_lines = [line.strip() for line in invoice.customer.address.split("\n") if line.strip()]
+    delivery_address_lines = [line.strip() for line in invoice.customer.delivery_address.split("\n") if line.strip()]
     office_hour_lines = [line.strip() for line in invoice.customer.office_hour.split("\n") if line.strip()]
     pdf.setFont("Helvetica-Bold", 10)
     if invoice.customer.name != "Sample":
@@ -88,7 +89,11 @@ def draw_sample_page(pdf, invoice):
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
     ]))
-
+    text_object = pdf.beginText(32, height - 410)
+    if invoice.customer.show_delivery_address:
+        for line in delivery_address_lines:
+            text_object.textLine(line)
+    pdf.drawText(text_object)
     # Position the table to expand downward
     table.wrapOn(pdf, width, height)
     table_width, table_height = table.wrap(0, 0)  # Get actual table height
