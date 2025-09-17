@@ -29,10 +29,11 @@ class CustomerListView(SingleTableMixin, FilterView):
 
 @staff_member_required
 def customer_detail(request, customer_name, customer_care_of):
+    """Display customer details with filterable invoice history and export functionality."""
     customer = get_object_or_404(Customer, Q(name=customer_name) & (Q(care_of=customer_care_of) | Q(care_of__isnull=True)))
     invoices = Invoice.objects.filter(customer=customer)
 
-    # Apply filter to the invoices queryset
+    # Filter invoice history based on request parameters
     filter = InvoiceFilter(request.GET, queryset=invoices)
     filter.form.fields.pop('number', None)
     filter.form.fields.pop('salesman', None)
@@ -41,7 +42,7 @@ def customer_detail(request, customer_name, customer_care_of):
     table = CustomerInvoiceTable(filter.qs)
     RequestConfig(request).configure(table)
 
-    # Check for export format in request and handle CSV export
+    # Handle data export if requested
     export_format = request.GET.get("_export", None)
     if TableExport.is_valid_format(export_format):
         exporter = TableExport(export_format, table)  # Pass the table instance here
@@ -61,13 +62,13 @@ def customers_with_unpaid_invoices(request):
     customers = Customer.objects.filter(
         invoice__payment_date__isnull=True,
         invoice__delivery_date__isnull=False
-    ).distinct().exclude(name="Sample")
+    ).distinct().exclude(name="Sample").select_related('salesman')
 
     # Fetch unpaid invoices with delivery_date not null
     unpaid_invoices = Invoice.objects.filter(
         payment_date__isnull=True,
         delivery_date__isnull=False
-    ).exclude(number__startswith="S-")
+    ).exclude(number__startswith="S-").select_related('customer', 'salesman')
 
     # Filter customer data to include only those with at least one unpaid invoice
     customer_data = []
@@ -143,7 +144,10 @@ def unpaid_invoices_by_month_detail(request, year_month):
 
 @staff_member_required
 def copy_previous_order(request, invoice_number):
-    original_invoice = get_object_or_404(Invoice, number=invoice_number)
+    original_invoice = get_object_or_404(
+        Invoice.objects.select_related('customer', 'salesman').prefetch_related('invoiceitem_set__product'),
+        number=invoice_number
+    )
 
 
     new_number = generate_next_number()

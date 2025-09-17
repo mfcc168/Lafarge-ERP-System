@@ -1,3 +1,10 @@
+"""
+Django models for the Lafarge ERP invoice management system.
+
+This module defines the core business models including customers, products,
+invoices, and related transaction tracking.
+"""
+
 import math
 from datetime import timedelta
 from decimal import Decimal, ROUND_DOWN
@@ -75,6 +82,7 @@ class Product(models.Model):
     box_remain = models.PositiveIntegerField(default=0, editable=False)
 
     def save(self, *args, **kwargs):
+        """Calculate box amounts and save product."""
         if self.unit_per_box > 0:
             self.box_amount, self.box_remain = divmod(self.quantity, self.unit_per_box)
         else:
@@ -99,6 +107,7 @@ class SpecialPrice(models.Model):
 
 
 def extract_base_name(full_name: str) -> str:
+    """Extract base product name by removing lot number information in parentheses."""
     return full_name.split('(')[0].strip()
 
 
@@ -151,6 +160,17 @@ class Invoice(models.Model):
 
     @staticmethod
     def get_unpaid_invoices():
+        """
+        Retrieve invoices that are unpaid and meet specific criteria.
+        
+        Returns invoices that:
+        - Have no payment date recorded
+        - Were delivered more than 30 days ago OR in the previous month
+        - Are not sample invoices (number doesn't start with 'S-')
+        
+        Returns:
+            QuerySet: Filtered unpaid invoices
+        """
         today = timezone.now().date()
         first_of_this_month = today.replace(day=1)
         last_month = first_of_this_month - timedelta(days=1)
@@ -166,20 +186,26 @@ class Invoice(models.Model):
         ).exclude(number__startswith="S-")
 
     def calculate_total_price(self):
+        """Calculate and update the total price from invoice items and additional items."""
         invoice_items_total = sum(item.sum_price for item in self.invoiceitem_set.all())
         additional_items_total = sum(item.price for item in self.additionalitem_set.all())
         self.total_price = invoice_items_total + additional_items_total
 
     def save(self, *args, **kwargs):
-        # Automatically set salesman from customer if not already set
+        """
+        Save invoice with automatic field population and transaction logging.
+        
+        Automatically sets salesman and terms from customer, calculates totals,
+        and creates product transactions when delivery date is set.
+        """
+        # Inherit salesman and terms from customer
         self.salesman = self.customer.salesman
-        # Automatically set terms from customer if not already set
         self.terms = self.customer.terms
 
         is_new = self.pk is None
         previous_delivery_date = None
 
-        if not is_new or self.pk:
+        if not is_new and self.pk:
             previous_delivery_date = Invoice.objects.get(pk=self.pk).delivery_date
             self.calculate_total_price()
 
@@ -226,17 +252,23 @@ class InvoiceItem(models.Model):
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPE_CHOICES, default='normal')
 
     def save(self, *args, **kwargs):
+        """
+        Save invoice item with automatic pricing and inventory management.
+        
+        Handles product quantity deduction, special pricing calculation,
+        and ensures data consistency through database transactions.
+        """
         with transaction.atomic():
-                # Determine if this is an update or a new item
+            # Handle quantity adjustments for edits vs new items
             is_edit = self.pk is not None
             current_product = Product.objects.get(pk=self.product.pk)
 
             if is_edit:
-                # If it's an edit, get the previous item to revert its quantity
+                # Revert previous quantity for existing items
                 previous_item = InvoiceItem.objects.get(pk=self.pk)
                 previous_quantity = previous_item.quantity
 
-                # Revert the previous quantity back to the product
+                # Restore product quantity from previous transaction
                 current_product.quantity += previous_quantity
 
             new_quantity = current_product.quantity - self.quantity
@@ -268,14 +300,15 @@ class InvoiceItem(models.Model):
                 else:
                     self.sum_price = Decimal(self.sum_price).quantize(Decimal('0.01'))
             else:
-                self.sum_price = 0.00  # For sample and bonus types
+                self.sum_price = 0.00  # Sample and bonus items have no monetary value
 
-            # Save the updated product quantity
+            # Persist product quantity changes
             current_product.save()
-            # Finally, save the invoice item
+            # Complete invoice item creation/update
             super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        """Delete invoice item and restore product quantity."""
         current_product = Product.objects.get(pk=self.product.pk)
         current_product.quantity += self.quantity
         current_product.save()
@@ -297,26 +330,30 @@ class AdditionalItem(models.Model):
         return f"{self.description} - ${self.price}"
 
 
-# Signals to update total price
+# Model signals for automatic invoice total calculation
 @receiver(post_save, sender=InvoiceItem)
 def update_invoice_total(sender, instance, **kwargs):
+    """Update invoice total when invoice item is saved."""
     instance.invoice.calculate_total_price()
     instance.invoice.save()
 
 
 @receiver(post_delete, sender=InvoiceItem)
 def revert_invoice_total(sender, instance, **kwargs):
+    """Update invoice total when invoice item is deleted."""
     instance.invoice.calculate_total_price()
     instance.invoice.save()
 
 
 @receiver(post_save, sender=AdditionalItem)
 def update_invoice_total_additional(sender, instance, **kwargs):
+    """Update invoice total when additional item is saved."""
     instance.invoice.calculate_total_price()
     instance.invoice.save()
 
 
 @receiver(post_delete, sender=AdditionalItem)
 def revert_invoice_total_additional(sender, instance, **kwargs):
+    """Update invoice total when additional item is deleted."""
     instance.invoice.calculate_total_price()
     instance.invoice.save()

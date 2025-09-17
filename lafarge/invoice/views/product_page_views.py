@@ -13,20 +13,22 @@ from ..tables import ProductTransactionTable, ProductTransactionFilter
 
 @staff_member_required
 def product_list(request):
+    """Display all products ordered by name."""
     products = Product.objects.all().order_by('name')
     return render(request, 'invoice/product_list.html', {'products': products})
 
 
 @staff_member_required
 def product_transaction_detail(request, product_id):
+    """Display product transaction history with filtering and export functionality."""
     product = get_object_or_404(Product, id=product_id)
     transactions = ProductTransaction.objects.filter(product=product).order_by('timestamp')
 
-    # Apply filter
+    # Filter transactions based on request parameters
     filterset = ProductTransactionFilter(request.GET, queryset=transactions)
     table = ProductTransactionTable(filterset.qs)
 
-    # Handle export
+    # Export data if requested
     export_format = request.GET.get("_export", None)
     if export_format:
         exporter = TableExport(export_format, table)
@@ -41,9 +43,12 @@ def product_transaction_detail(request, product_id):
 
 
 def product_transaction_view(request, product_id):
+    """Display product usage history through invoice items."""
     product = get_object_or_404(Product, id=product_id)
 
-    transactions = InvoiceItem.objects.filter(product=product).select_related("invoice").order_by(
+    transactions = InvoiceItem.objects.filter(product=product).select_related(
+        "invoice", "invoice__customer", "invoice__salesman"
+    ).order_by(
         F("invoice__delivery_date").desc(nulls_first=True),
         "-invoice__id",
         "-id"

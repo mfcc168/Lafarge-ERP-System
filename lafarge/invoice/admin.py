@@ -1,12 +1,21 @@
+"""
+Django admin configuration for the Lafarge ERP system.
+
+Customizes the admin interface for managing customers, products, invoices,
+and related entities with enhanced search, filtering, and bulk operations.
+"""
+
 from django.contrib import admin
 from django.db.models import Case, When, Value, IntegerField
 from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import SpecialPrice
-from .forms import SpecialPriceInlineForm
 
-from .models import Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, ProductTransaction, Forbidden_Word, AdditionalItem
+from .models import (
+    Customer, Salesman, Deliveryman, Invoice, InvoiceItem, Product, 
+    ProductTransaction, Forbidden_Word, AdditionalItem, SpecialPrice
+)
+from .forms import SpecialPriceInlineForm
 
 admin.site.site_header = "Lafarge Admin"
 admin.site.site_title = "Lafarge Admin Portal"
@@ -25,24 +34,25 @@ class CustomerAdmin(admin.ModelAdmin):
     search_fields = ('name', 'care_of', 'address', 'telephone_number')
     inlines = [SpecialPriceInline]
     def get_search_results(self, request, queryset, search_term):
-        # Call the superclass implementation to get the initial queryset
+        """
+        Override search to prioritize results by field importance.
+        
+        Search priority: name > care_of > address > telephone_number
+        """
+        # Get base search results from parent class
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
 
         if search_term:
-            # Exact matches for name (highest priority)
+            # Search with priority: name > care_of > address > telephone
             name_matches = queryset.filter(name__icontains=search_term)
-
-            # Partial matches in care_of (next priority)
             care_of_matches = queryset.filter(care_of__icontains=search_term).exclude(
                 pk__in=name_matches.values_list('pk', flat=True))
-
             address_matches = queryset.filter(address__icontains=search_term).exclude(
                 pk__in=name_matches.values_list('pk', flat=True))
-
             telephone_matches = queryset.filter(telephone_number__icontains=search_term).exclude(
                 pk__in=name_matches.values_list('pk', flat=True))
 
-            # Combine name matches first, then care_of matches
+            # Combine results in priority order
             queryset = name_matches | care_of_matches | address_matches | telephone_matches
 
         return queryset, use_distinct
@@ -79,6 +89,7 @@ class ProductAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def copy_product(self, request, product_id):
+        """Handle product copy functionality in admin."""
         original = Product.objects.get(pk=product_id)
         params = {
             'name': original.name,
@@ -94,6 +105,7 @@ class ProductAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(f"{base_url}?{query_string}")
 
     def copy_product_button(self, obj):
+        """Render copy button for product admin."""
         url = reverse('admin:invoice_product_copy', args=[obj.pk])
         return format_html('<a class="button" href="{}">Copy</a>', url)
 
@@ -109,28 +121,28 @@ class ProductTransactionAdmin(admin.ModelAdmin):
 
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
-    extra = 0  # Number of extra forms to display
-    readonly_fields = ('sum_price', 'price')  # Make sum_price read-only
+    extra = 0
+    readonly_fields = ('sum_price', 'price')
     fields = (
         'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price',
-        'product_type')  # Include product_type field
+        'product_type')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        Customize product dropdown to show in-stock items first.
+        """
         if db_field.name == "product":
-            # Get all products and split them into two groups
+            # Order products: in-stock first, then out-of-stock
             products_gt_zero = Product.objects.filter(quantity__gt=0).order_by('name')
             products_eq_zero = Product.objects.filter(quantity=0).order_by('name')
 
-            # Combine the two querysets and annotate them for sorting
             combined_queryset = (products_gt_zero | products_eq_zero).annotate(
                 sort_order=Case(
-                    When(quantity=0, then=Value(1)),  # Products with quantity = 0 get a higher sort order
-                    default=Value(0),  # Products with quantity > 0 get a lower sort order
+                    When(quantity=0, then=Value(1)),
+                    default=Value(0),
                     output_field=IntegerField(),
                 )
-            ).order_by('sort_order', 'name')  # Sort by sort_order first, then by name
-
-            # Set the combined queryset as the queryset for the product field
+            ).order_by('sort_order', 'name')
             kwargs["queryset"] = combined_queryset
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -151,25 +163,30 @@ class InvoiceAdmin(admin.ModelAdmin):
     readonly_fields = ('total_price', 'terms', 'salesman')
 
     def view_invoice_link(self, obj):
+        """Generate link to view invoice detail page."""
         url = reverse('invoice_detail', kwargs={'invoice_number': obj.number})
         return format_html('<a class="button" href="{}" target="_blank">View Invoice</a>', url)
 
     view_invoice_link.short_description = "Invoice Page"
 
     def save_related(self, request, form, formsets, change):
+        """Ensure invoice total is recalculated after related objects are saved."""
         super().save_related(request, form, formsets, change)
         form.instance.save()
 
     def delete_model(self, request, obj):
         """
         Override delete_model to restock products when an invoice is deleted.
+        
+        When an invoice is deleted, this method restores product quantities
+        that were reduced during invoice creation and logs the restock transactions.
         """
         for invoice_item in obj.invoiceitem_set.all():
             product = invoice_item.product
             product.quantity += invoice_item.quantity
             product.save()
 
-            # Log the restock transaction
+            # Record product restock transaction
             if obj.delivery_date:
                 ProductTransaction.objects.create(
                     product=product,
@@ -179,12 +196,14 @@ class InvoiceAdmin(admin.ModelAdmin):
                     description=f"Restock due to deletion of invoice #{obj.number} from {obj.customer.name}"
                 )
 
-        # Delete the invoice
+        # Proceed with invoice deletion
         super().delete_model(request, obj)
 
     def delete_queryset(self, request, queryset):
         """
-        Override delete_queryset to handle bulk deletion in the admin.
+        Handle bulk deletion by calling delete_model for each invoice.
+        
+        This ensures proper product restocking for all deleted invoices.
         """
         for obj in queryset:
             self.delete_model(request, obj)

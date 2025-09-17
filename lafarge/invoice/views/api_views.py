@@ -17,6 +17,7 @@ from ..serializers import *
 
 @api_view(['GET'])
 def ProductView(request):
+    """API endpoint to retrieve all products."""
     products = Product.objects.all()
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
@@ -24,6 +25,7 @@ def ProductView(request):
 
 @api_view(['GET'])
 def InvoiceView(request):
+    """API endpoint to retrieve all invoices."""
     invoices = Invoice.objects.all()
     serializer = InvoiceSerializer(invoices, many=True)
     return Response(serializer.data)
@@ -31,12 +33,15 @@ def InvoiceView(request):
 
 @api_view(['GET'])
 def CustomerView(request):
+    """API endpoint to retrieve all customers."""
     customers = Customer.objects.all()
     serializer = CustomerSerializer(customers, many=True)
     return Response(serializer.data)
 
 
 class UpdateDeliveryDateView(APIView):
+    """API endpoint for updating invoice delivery date and deliveryman."""
+    
     def patch(self, request, *args, **kwargs):
         invoice_number = request.data.get('number')
         delivery_date = request.data.get('delivery_date')
@@ -54,12 +59,14 @@ class UpdateDeliveryDateView(APIView):
             invoice.deliveryman = deliveryman
         invoice.save()
 
-        # Serialize the updated invoice and return the response
+        # Return updated invoice data
         serializer = InvoiceSerializer(invoice)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UpdatePaymentDateView(APIView):
+    """API endpoint for updating invoice payment date."""
+    
     def patch(self, request, *args, **kwargs):
         invoice_number = request.data.get('number')
         payment_date = request.data.get('payment_date')
@@ -72,12 +79,21 @@ class UpdatePaymentDateView(APIView):
         invoice.payment_date = payment_date
         invoice.save()
 
-        # Serialize the updated invoice and return the response
+        # Return updated invoice data
         serializer = InvoiceSerializer(invoice)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 def sales_incentive_scheme(sales):
+    """
+    Calculate commission rate based on sales volume tiers.
+    
+    Args:
+        sales (float): Total sales amount
+        
+    Returns:
+        float: Commission percentage (as decimal)
+    """
     if sales < 50000:
         return 0.02
     elif sales < 70000:
@@ -93,7 +109,8 @@ def sales_incentive_scheme(sales):
 
 
 class SalesmanMonthlyPreview(APIView):
-
+    """API endpoint for salesman monthly sales summary."""
+    
     def get(self, request, salesman_name):
         salesman = get_object_or_404(Salesman, name__istartswith=salesman_name.capitalize())
         latest_invoice = Invoice.objects.filter(salesman=salesman, delivery_date__isnull=False)
@@ -101,7 +118,7 @@ class SalesmanMonthlyPreview(APIView):
         today = latest_invoice.delivery_date if latest_invoice else datetime.now().date()
 
         months = []
-        for i in range(12):  # Get the last 12 months
+        for i in range(12):  # Process last 12 months of data
             date = today.replace(day=1) - relativedelta(months=i)
             year, month = date.year, date.month
             if year == 2025 and month == 1:
@@ -122,7 +139,8 @@ class SalesmanMonthlyPreview(APIView):
 
 
 class SalesmanMonthlyReport(APIView):
-
+    """API endpoint for detailed salesman monthly report with commission calculation."""
+    
     def get(self, request, salesman_name, year, month):
         salesman = get_object_or_404(Salesman, name__istartswith=salesman_name.capitalize())
         sales_share1 = get_object_or_404(Salesman, name="DS/MM/AC")
@@ -135,12 +153,12 @@ class SalesmanMonthlyReport(APIView):
 
         invoices = Invoice.objects.filter(
             salesman=salesman, delivery_date__range=(first_day, last_day)
-        ).prefetch_related("invoiceitem_set", "invoiceitem_set__product")
+        ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
 
         invoice_shares = Invoice.objects.filter(
             Q(salesman=sales_share1) | Q(salesman=sales_share2),
             delivery_date__range=(first_day, last_day)
-        )
+        ).select_related('customer', 'salesman').prefetch_related("invoiceitem_set__product")
 
         weeks = {i: {"invoices": [], "total": Decimal("0.00")} for i in range(1, 6)}
         monthly_total = Decimal("0.00")
@@ -150,7 +168,7 @@ class SalesmanMonthlyReport(APIView):
             if week_number > 4:
                 week_number = 5
 
-            # Group invoice items by product name without the lot number
+            # Group invoice items by clean product name (remove lot numbers)
             grouped_items = defaultdict(list)
 
             for item in invoice.invoiceitem_set.all():
@@ -176,7 +194,7 @@ class SalesmanMonthlyReport(APIView):
 
         invoice_shares_data = []
         for invoice in invoice_shares:
-            # Group invoice items by product name without the lot number
+            # Group invoice items by clean product name (remove lot numbers)
             grouped_items = defaultdict(list)
 
             for item in invoice.invoiceitem_set.all():
@@ -224,7 +242,8 @@ class SalesmanMonthlyReport(APIView):
 
 
 class GetAllSalesmenCommissions(APIView):
-
+    """API endpoint for calculating all eligible salesmen commissions for a given month."""
+    
     def get(self, request, year, month):
         year = int(year)
         month = int(month)
@@ -235,7 +254,7 @@ class GetAllSalesmenCommissions(APIView):
         sales_share1 = get_object_or_404(Salesman, name="DS/MM/AC")
         sales_share2 = get_object_or_404(Salesman, name="Kelvin Ko")
 
-        # Only include salesmen involved in commission scheme
+        # Filter to commission-eligible salesmen only
         eligible_salesmen = Salesman.objects.filter(name__in=["Dominic So", "Alex Cheung", "Matthew Mak"])
 
         response_data = []
