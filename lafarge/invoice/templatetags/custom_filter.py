@@ -34,3 +34,10 @@ def percentage(decimal):
         return f"{percentage:.10f}".rstrip('0').rstrip('.') + "%"
     except (ValueError, TypeError):
         return decimal
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    """Get item from dictionary by key."""
+    if isinstance(dictionary, dict):
+        return dictionary.get(key, 0)
+    return 0

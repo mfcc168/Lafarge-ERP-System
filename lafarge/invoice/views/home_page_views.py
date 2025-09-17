@@ -40,6 +40,29 @@ def home(request):
     payment_totals_dict = {entry['payment_method']: entry['total'] for entry in payment_type_totals}
     future_payment_totals_dict = {entry['payment_method']: entry['total'] for entry in future_payment_type_totals}
 
+    # Calculate counts for each payment method (group by cheque_detail for cheques)
+    payment_counts_dict = {}
+    future_payment_counts_dict = {}
+    
+    for payment_method in set(payment_totals_dict.keys()) | set(future_payment_totals_dict.keys()):
+        # For current pending deposits
+        current_invoices = current_pending_deposits.filter(payment_method=payment_method)
+        if payment_method == 'cheque':
+            # Count unique cheque details
+            payment_counts_dict[payment_method] = len(set(current_invoices.exclude(cheque_detail__isnull=True).values_list('cheque_detail', flat=True)))
+        else:
+            # Count individual invoices for non-cheque payments
+            payment_counts_dict[payment_method] = current_invoices.count()
+        
+        # For future deposits
+        future_invoices = future_deposits.filter(payment_method=payment_method)
+        if payment_method == 'cheque':
+            # Count unique cheque details
+            future_payment_counts_dict[payment_method] = len(set(future_invoices.exclude(cheque_detail__isnull=True).values_list('cheque_detail', flat=True)))
+        else:
+            # Count individual invoices for non-cheque payments
+            future_payment_counts_dict[payment_method] = future_invoices.count()
+
     modified_invoices = []
     for invoice in invoices_today:
         grouped_items = defaultdict(list)
@@ -63,6 +86,8 @@ def home(request):
         'total_pending_deposit': total_pending_deposit,
         'payment_totals_dict': payment_totals_dict,
         'future_payment_totals_dict': future_payment_totals_dict,
+        'payment_counts_dict': payment_counts_dict,
+        'future_payment_counts_dict': future_payment_counts_dict,
     })
 
 
