@@ -124,8 +124,7 @@ class InvoiceItemInline(admin.TabularInline):
     extra = 0
     readonly_fields = ('sum_price', 'price')
     fields = (
-        'product', 'quantity', 'net_price', 'hide_nett', 'price', 'sum_price',
-        'product_type')
+        'product', 'quantity', 'net_price', 'product_type', 'hide_nett', 'price', 'sum_price')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
