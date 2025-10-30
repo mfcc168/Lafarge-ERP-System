@@ -24,6 +24,7 @@ from .views.salesman_page_views import (
 )
 
 from .views.payment_page_views import (monthly_payment_preview, monthly_payment_report)
+from .views.analyze_page_views import (monthly_analyze_preview, monthly_analyze_detail, monthly_analyze_api)
 
 urlpatterns = [
     # Salesmen
@@ -76,6 +77,11 @@ urlpatterns = [
     # Sales
     path("invoices/monthly/", monthly_preview, name="monthly_preview"),
     path("invoices/monthly/<int:year>/<int:month>/", monthly_report, name="monthly_report"),
+
+    # Analysis
+    path("analyze/monthly/", monthly_analyze_preview, name="monthly_analyze_preview"),
+    path("analyze/monthly/<int:year>/<int:month>/", monthly_analyze_detail, name="monthly_analyze_detail"),
+    path("api/analyze/monthly/<int:year>/<int:month>/", monthly_analyze_api, name="monthly_analyze_api"),
 
     # Home
     path('', home, name='home'),

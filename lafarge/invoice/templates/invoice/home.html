@@ -260,15 +260,15 @@ async function fetchProductInsights() {
         document.getElementById("productTitle").innerHTML = `<i class="bi bi-box"></i> Top Products (${data.last_month_name})`;
 
         const products = data.product_sales.map(item => item.invoiceitem__product__name);
-        const quantities = data.product_sales.map(item => item.total_quantity);
+        const revenues = data.product_sales.map(item => item.total_revenue);
 
         new Chart(document.getElementById("productChart"), {
             type: "doughnut",
             data: {
                 labels: products,
                 datasets: [{
-                    label: "Total Quantity Sold",
-                    data: quantities,
+                    label: "Total Revenue",
+                    data: revenues,
                     backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
                     borderColor: "#fff",
                     borderWidth: 1

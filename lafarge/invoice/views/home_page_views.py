@@ -147,17 +147,30 @@ def product_insights_data(request):
         last_month_year = current_date.year if current_date.month > 1 else current_date.year - 1
         last_month_name = calendar.month_name[last_month]
 
-        product_sales = (
-            Invoice.objects
-                .filter(delivery_date__month=last_month, delivery_date__year=last_month_year)
-                .prefetch_related('invoiceitem_set__product')
-                .values('invoiceitem__product__name')
-                .annotate(total_quantity=Sum('invoiceitem__quantity'))
-                .order_by('-total_quantity')
+        # Get all invoice items for the specified month
+        from ..models import InvoiceItem
+        invoice_items = (
+            InvoiceItem.objects
+                .filter(invoice__delivery_date__month=last_month, invoice__delivery_date__year=last_month_year)
+                .select_related('product')
+                .values('product__name', 'sum_price')
         )
 
+        # Group by cleaned product name (without lot numbers)
+        grouped_products = defaultdict(float)
+        for item in invoice_items:
+            if item['product__name']:
+                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item['product__name'])
+                grouped_products[clean_name] += float(item['sum_price'] or 0)
+
+        # Convert to list format and sort by revenue
+        product_sales = [
+            {'invoiceitem__product__name': name, 'total_revenue': revenue}
+            for name, revenue in sorted(grouped_products.items(), key=lambda x: x[1], reverse=True)
+        ]
+
         data = {
-            "product_sales": list(product_sales),
+            "product_sales": product_sales,
             "last_month_name": last_month_name,
         }
         return JsonResponse(data)

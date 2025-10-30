@@ -193,6 +193,7 @@
     <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
     {% if user.is_superuser or user.username == 'lafarge' %}
     <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
+    <a href="{% url 'monthly_analyze_preview' %}" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Analysis</span></a>
     <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
     {% endif %}
     <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
@@ -214,6 +215,7 @@
     <a href="{% url 'product_list' %}"><i class="bi bi-box"></i> <span>Products</span></a>
     {% if user.is_superuser or user.username == 'lafarge' %}
     <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
+    <a href="{% url 'monthly_analyze_preview' %}" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Analysis</span></a>
     <a href="{% url 'salesman_list' %}"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
     {% endif %}
     <a href="{% url 'customer_list' %}"><i class="bi bi-people"></i> <span>Customers</span></a>

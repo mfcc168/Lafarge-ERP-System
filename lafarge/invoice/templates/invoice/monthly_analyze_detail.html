@@ -1,0 +1,299 @@
+{% extends "invoice/base.html" %}
+{% load custom_filter %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-bar-chart-fill text-primary"></i> 
+                Product Analysis - {{ month_name }}
+            </h2>
+            <p class="text-muted mb-0">
+                <i class="bi bi-info-circle"></i> 
+                Revenue-based analysis of {{ total_products }} products | Total: ${{ total_revenue|currency }}
+            </p>
+        </div>
+        <a href="{% url 'monthly_analyze_preview' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Overview
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm summary-card revenue-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">${{ total_revenue|currency }}</h3>
+                    <p class="text-muted mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm summary-card products-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary">{{ total_products }}</h3>
+                    <p class="text-muted mb-0">Products Sold</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm summary-card avg-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-calculator"></i>
+                    </div>
+                    <h3 class="fw-bold text-info">
+                        {% if total_products > 0 %}
+                            {% widthratio total_revenue total_products 1 as avg_revenue %}
+                            ${{ avg_revenue|floatformat:0|currency }}
+                        {% else %}
+                            $0
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Avg per Product</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> 
+                        Product Revenue Analysis
+                        <small class="text-muted">(Top 20 Products)</small>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="productRevenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> 
+                        Detailed Product Data
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col" class="text-end">Revenue</th>
+                                    <th scope="col" class="text-end">Quantity</th>
+                                    <th scope="col" class="text-end">Avg Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in product_analysis %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td class="fw-semibold">{{ product.name }}</td>
+                                    <td class="text-end fw-bold text-success">${{ product.revenue|currency }}</td>
+                                    <td class="text-end">{{ product.quantity|floatformat:1 }}</td>
+                                    <td class="text-end text-muted">
+                                        {% if product.quantity > 0 %}
+                                            {% widthratio product.revenue product.quantity 1 as avg_price %}
+                                            ${{ avg_price|floatformat:2|currency }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No product data available for this month.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    async function fetchAnalysisData() {
+        try {
+            const response = await fetch("{% url 'monthly_analyze_api' year=year month=month %}");
+            const data = await response.json();
+
+            if (!data.products) {
+                console.error("No product data received");
+                return;
+            }
+
+            // Take top 20 products for the chart
+            const topProducts = data.products.slice(0, 20);
+            const productNames = topProducts.map(item => {
+                // Truncate long product names for better display
+                return item.name.length > 30 ? item.name.substring(0, 30) + '...' : item.name;
+            });
+            const revenues = topProducts.map(item => item.revenue);
+
+            // Create horizontal bar chart
+            const ctx = document.getElementById("productRevenueChart").getContext('2d');
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: productNames,
+                    datasets: [{
+                        label: "Revenue ($)",
+                        data: revenues,
+                        backgroundColor: function(context) {
+                            // Create gradient colors
+                            const colors = [
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(255, 205, 86, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ];
+                            return colors[context.dataIndex % colors.length];
+                        },
+                        borderColor: function(context) {
+                            const colors = [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 205, 86, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ];
+                            return colors[context.dataIndex % colors.length];
+                        },
+                        borderWidth: 2,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // This makes it horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    // Show full product name in tooltip
+                                    return data.products[context[0].dataIndex].name;
+                                },
+                                label: function(context) {
+                                    return `Revenue: $${context.parsed.x.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Error fetching analysis data:", error);
+        }
+    }
+
+    fetchAnalysisData();
+});
+</script>
+
+<style>
+.summary-card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 15px;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+}
+
+.revenue-card {
+    border-left: 4px solid #28a745;
+}
+
+.products-card {
+    border-left: 4px solid #007bff;
+}
+
+.avg-card {
+    border-left: 4px solid #17a2b8;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+}
+
+.chart-container {
+    position: relative;
+    height: 600px;
+    width: 100%;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 400px;
+    }
+    
+    .table-responsive {
+        font-size: 0.9em;
+    }
+}
+</style>
+
+{% endblock %}
