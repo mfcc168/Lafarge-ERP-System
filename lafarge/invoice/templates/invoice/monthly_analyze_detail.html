@@ -20,47 +20,13 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4">
+    <div class="row">
             <div class="card border-0 shadow-sm summary-card revenue-card">
                 <div class="card-body text-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-currency-dollar"></i>
-                    </div>
                     <h3 class="fw-bold text-success">${{ total_revenue|currency }}</h3>
                     <p class="text-muted mb-0">Total Revenue</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm summary-card products-card">
-                <div class="card-body text-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
-                    <h3 class="fw-bold text-primary">{{ total_products }}</h3>
-                    <p class="text-muted mb-0">Products Sold</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm summary-card avg-card">
-                <div class="card-body text-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-calculator"></i>
-                    </div>
-                    <h3 class="fw-bold text-info">
-                        {% if total_products > 0 %}
-                            {% widthratio total_revenue total_products 1 as avg_revenue %}
-                            ${{ avg_revenue|floatformat:0|currency }}
-                        {% else %}
-                            $0
-                        {% endif %}
-                    </h3>
-                    <p class="text-muted mb-0">Avg per Product</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Chart Section -->
