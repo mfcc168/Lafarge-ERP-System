@@ -5,27 +5,24 @@
 <div class="container mt-4">
     <h2 class="mb-4 text-primary text-uppercase">Product List</h2>
 
-    <div class="row g-3">  <!-- Spaced-out rows -->
+    <div class="row g-3">
         {% for product in products %}
         <div class="col-12">
-            <a href="{% url 'product_transactions' product.id %}" class="card-link">
-                <div class="card border-0 shadow-sm p-4 rounded-3 bg-white d-flex flex-column">
-                    <div class="card-body d-flex flex-column">
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <!-- Top Part: White Background, Clickable -->
+                <a href="{% url 'product_transactions' product.id %}" class="card-link">
+                    <div class="card-body p-4 bg-white">
                         <!-- Product Title -->
                         <h5 class="card-title fw-bold text-dark mb-2">
                             {{ product.name }}
                         </h5>
 
-                        <!-- Product Details: Two-column layout -->
+                        <!-- Primary Details: Price and Quantity -->
                         <div class="row gy-2">
                             <div class="col-md-6">
                                 <p class="text-muted d-flex justify-content-between fs-6">
                                     <span><i class="bi bi-tag"></i> Price:</span>
                                     <span class="fw-bold text-dark">${{ product.price }}</span>
-                                </p>
-                                <p class="text-muted d-flex justify-content-between fs-6">
-                                    <span><i class="bi bi-box"></i> Unopened Total:</span>
-                                    <span class="fw-bold">{{ product.box_amount }} boxes x {{product.unit_per_box}} units</span>
                                 </p>
                             </div>
                             <div class="col-md-6">
@@ -33,15 +30,31 @@
                                     <span><i class="bi bi-layers"></i> Quantity:</span>
                                     <span class="fw-bold">{{ product.quantity|intcomma }}</span>
                                 </p>
-                                <p class="text-muted d-flex justify-content-between fs-6">
-                                    <span><i class="bi bi-box-seam"></i> Opened Box Remain Units:</span>
-                                    <span class="fw-bold">{{ product.box_remain }}</span>
-                                </p>
                             </div>
                         </div>
+                    </div>
+                </a>
 
-                        <!-- Footer with Registration Code & Expiry -->
+                <!-- Bottom Part: Gray Background, Non-Clickable -->
+                <div class="card-body p-4 bg-light">
+                    <!-- Dropdown Toggle Button -->
+                    <div class="mt-2">
+                        <button class="btn btn-link text-primary p-0 fs-6 toggle-details" type="button" data-bs-target="#details-{{ product.id }}" aria-expanded="false">
+                            <i class="bi bi-chevron-down"></i> <span class="toggle-text">More Details</span>
+                        </button>
+                    </div>
+
+                    <!-- Collapsible Details -->
+                    <div class="collapse" id="details-{{ product.id }}">
                         <div class="border-top pt-3 mt-3 text-muted fs-6">
+                            <p class="text-muted d-flex justify-content-between fs-6">
+                                <span><i class="bi bi-box"></i> Unopened Total:</span>
+                                <span class="fw-bold">{{ product.box_amount }} boxes x {{ product.unit_per_box }} units</span>
+                            </p>
+                            <p class="text-muted d-flex justify-content-between fs-6">
+                                <span><i class="bi bi-box-seam"></i> Opened Box Remain Units:</span>
+                                <span class="fw-bold">{{ product.box_remain }}</span>
+                            </p>
                             <p class="mb-1 text-truncate">
                                 <i class="bi bi-upc-scan"></i> <strong>Reg. Code:</strong> {{ product.registration_code }}
                             </p>
@@ -51,11 +64,45 @@
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.toggle-details').forEach(button => {
+    const targetId = button.getAttribute('data-bs-target');
+    const collapseElement = document.querySelector(targetId);
+    const icon = button.querySelector('i');
+    const text = button.querySelector('.toggle-text');
+
+    if (!collapseElement) {
+        console.error(`Collapse element not found for target: ${targetId}`);
+        return;
+    }
+
+    // Manual toggle on click
+    button.addEventListener('click', () => {
+        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElement, { toggle: false });
+        bsCollapse.toggle();
+    });
+
+    // Update icon and text on show
+    collapseElement.addEventListener('show.bs.collapse', () => {
+        button.setAttribute('aria-expanded', 'true');
+        icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+        text.textContent = 'Hide Details';
+    });
+
+    // Update icon and text on hide
+    collapseElement.addEventListener('hide.bs.collapse', () => {
+        button.setAttribute('aria-expanded', 'false');
+        icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
+        text.textContent = 'More Details';
+    });
+});
+</script>
 
 <style>
 .card-link {
@@ -64,7 +111,7 @@
     display: block;
 }
 
-.card-link:hover .card {
+.card-link:hover .card-body.bg-white {
     transform: scale(1.02);
 }
 
@@ -88,6 +135,19 @@ h2 {
     font-size: 0.95rem;
 }
 
+/* Button Styling */
+.btn-link {
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+/* Gray Background for Bottom Part */
+.bg-light {
+    background-color: #f8f9fa; /* Bootstrap's bg-light color */
+}
 </style>
 
 {% endblock %}
