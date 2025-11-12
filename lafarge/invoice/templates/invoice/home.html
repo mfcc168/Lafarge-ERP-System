@@ -69,7 +69,7 @@
                         </td>
                         <td class="fw-semibold">{{ invoice.customer.name }} {% if invoice.customer.care_of %} ({{ invoice.customer.care_of }}) {% endif %}</td>
                         <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
-                        <td><span class="badge bg-secondary text-white">{{ invoice.deliveryman.name }}</span></td>
+                        <td><span class="badge bg-secondary text-white">{{ invoice.deliveryman.code }}</span></td>
                         <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
                         <td>
                             <ul class="list-unstyled mb-0 small">

@@ -24,7 +24,7 @@ def home(request):
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
     invoices_today = Invoice.objects.filter(delivery_date=today).select_related(
-        'customer', 'salesman'
+        'customer', 'salesman', 'deliveryman',
     ).prefetch_related('invoiceitem_set__product')
 
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
@@ -75,6 +75,7 @@ def home(request):
             'delivery_date': invoice.delivery_date,
             'number': invoice.number,
             'customer': invoice.customer,
+            'deliveryman': invoice.deliveryman,
             'salesman': invoice.salesman,
             'total_price': invoice.total_price,
             'items': [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
