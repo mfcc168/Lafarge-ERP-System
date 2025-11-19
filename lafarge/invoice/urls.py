@@ -23,6 +23,8 @@ from .views.salesman_page_views import (
     salesman_list, SalesmanInvoiceView, salesman_monthly_sales, salesman_monthly_preview, salesman_monthly_report
 )
 
+from .views.deliveryman_page_views import (deliveryman_list,deliveryman_monthly_preview, deliveryman_monthly_report)
+
 from .views.payment_page_views import (monthly_payment_preview, monthly_payment_report)
 from .views.analyze_page_views import (monthly_analyze_preview, monthly_analyze_detail, monthly_analyze_api)
 
@@ -77,6 +79,11 @@ urlpatterns = [
     # Sales
     path("invoices/monthly/", monthly_preview, name="monthly_preview"),
     path("invoices/monthly/<int:year>/<int:month>/", monthly_report, name="monthly_report"),
+
+    # Deliverymen
+    path('deliverymen/', deliveryman_list, name='deliveryman_list'),
+    path('deliveryman/<int:deliveryman_id>/monthly/', deliveryman_monthly_preview, name='deliveryman_monthly_preview'),
+    path('deliveryman/<int:deliveryman_id>/monthly/<int:year>/<int:month>/', deliveryman_monthly_report, name='deliveryman_monthly_report'),
 
     # Analysis
     path("analyze/monthly/", monthly_analyze_preview, name="monthly_analyze_preview"),

@@ -1,0 +1,43 @@
+{% extends 'invoice/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Deliveryman List</h2>
+
+    <div class="row justify-content-center g-4">
+        {% for deliveryman in deliverymen %}
+        <div class="col-md-4">
+            <a href="{% url 'deliveryman_monthly_preview' deliveryman.id %}" class="text-decoration-none card-link">
+                <div class="card shadow-lg border-0 text-center py-4 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-dark fw-bold">{{ deliveryman.name }}</h5>
+                        <p class="card-text text-muted fs-6">Code: <span class="fw-semibold">{{ deliveryman.code }}</span>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+/* Make the entire card clickable */
+.card-link {
+    text-decoration: none; /* Remove underline */
+    display: block;
+}
+
+.card-link .card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 12px;
+}
+
+.card-link .card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+    background-color: rgba(0, 123, 255, 0.1); /* Subtle hover color */
+}
+
+</style>
+
+{% endblock %}

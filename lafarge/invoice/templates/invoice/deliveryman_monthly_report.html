@@ -1,0 +1,100 @@
+{% extends "invoice/base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid py-4 py-lg-5">
+    {% include "invoice/components/breadcrumb.html" %}
+
+    <!-- Header + TOTAL MONTHLY COUNT (Now 100% accurate) -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4 mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-dark mb-2">{{ deliveryman.name }}</h1>
+            <p class="text-muted fs-5 mb-3">
+                Delivery Report — {{ year }}-{{ month|stringformat:"02d" }}
+            </p>
+
+            <!-- Total Invoice Count – Now CORRECT -->
+            <div class="d-inline-flex align-items-center gap-3 bg-white border px-5 py-3 shadow-sm">
+                <span class="fw-semibold text-dark">Total Deliveries This Month:</span>
+                <span class="fs-3 fw-bold text-primary">{{ total_monthly_invoices }}</span>
+                <span class="text-muted fw-medium">invoice{{ total_monthly_invoices|pluralize }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Breakdown -->
+    {% if daily_groups %}
+        {% for date, invoices in daily_groups %}
+        <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white border-0 py-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold fs-4">{{ date|date:"l, j F Y" }}</h5>
+                    <span class="badge bg-white text-dark fs-6 px-3 py-2 rounded-pill">
+                        {{ invoices|length }} invoice{{ invoices|length|pluralize }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-dark fw-semibold">Invoice</th>
+                            <th class="py-3 text-dark fw-semibold">Customer</th>
+                            <th class="py-3 text-dark fw-semibold">Items Delivered</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        {% for inv in invoices %}
+                        <tr class="border-bottom">
+                            <td class="ps-4 py-4">
+                                <span class="fw-bold text-primary fs-5">#{{ inv.number }}</span>
+                            </td>
+                            <td class="py-4 text-dark">{{ inv.customer.name }}</td>
+                            <td class="py-4">
+                                <div class="small text-secondary lh-lg">
+                                    {% for item in inv.display_items %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-dark">•</span> {{ item }}
+                                        </div>
+                                    {% empty %}
+                                        <em class="text-muted">— No items recorded —</em>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="text-center py-5 my-5">
+            <i class="bi bi-truck display-1 text-muted opacity-25 mb-4"></i>
+            <h4 class="text-muted fw-light">No deliveries this month</h4>
+            <p class="text-muted">Nothing recorded for {{ year }}-{{ month|stringformat:"02d" }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Styling -->
+<style>
+    body { background-color: #f5f5f5; color: #495057; }
+    .card { border-radius: 1rem !important; overflow: hidden; }
+    .card-header.bg-dark { background: linear-gradient(135deg, #2c3034, #212529) !important; }
+    .badge.bg-white { font-weight: 600; }
+    .table-hover tbody tr:hover { background-color: #f1f3f5 !important; }
+    .text-primary { color: #0d6efd !important; }
+
+    @media print {
+        body { background: white; color: black; }
+        .card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+        .card-header { background: #212529 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        .btn { display: none; }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+{% endblock %}
