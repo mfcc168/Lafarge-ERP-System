@@ -39,7 +39,7 @@ def invoice_detail(request, invoice_number):
     }
     return render(request, 'invoice/invoice_detail.html', context)
 
-@user_is_lafarge_or_superuser
+@staff_member_required
 def monthly_preview(request):
     latest_invoice = Invoice.objects.filter(delivery_date__isnull=False).order_by('-delivery_date').first()
 
@@ -72,7 +72,7 @@ def monthly_preview(request):
     return render(request, 'invoice/monthly_preview.html', {'months': months})
 
 
-@user_is_lafarge_or_superuser
+@staff_member_required
 def monthly_report(request, year, month):
     first_day = make_aware(datetime(int(year), int(month), 1))
     last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
