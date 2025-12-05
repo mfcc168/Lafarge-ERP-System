@@ -51,8 +51,9 @@ def monthly_payment_preview(request):
 
 @staff_member_required
 def monthly_payment_report(request, year, month):
+    start_date = datetime(int(year), int(month), 1)
     first_day = make_aware(datetime(int(year), int(month), 1))
-    last_day = make_aware(datetime(int(year), int(month) + 1, 1) - timedelta(days=1))
+    last_day = make_aware(start_date + relativedelta(months=1) - timedelta(days=1))
 
     invoices = Invoice.objects.filter(payment_date__range=(first_day, last_day)).prefetch_related(
         "invoiceitem_set", "invoiceitem_set__product"
