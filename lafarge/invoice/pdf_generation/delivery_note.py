@@ -8,6 +8,64 @@ from reportlab.platypus import Table, TableStyle
 from ..check_utils import prefix_check
 
 
+def draw_left_aligned_wrapped(pdf, x_left, y_bottom, text, max_width=145, fontsize=10, fontname="Helvetica"):
+    """
+    Draw text left-aligned starting at x_left.
+    If too wide, split into two lines (both left-aligned).
+    y_bottom is the baseline of the **bottom** line.
+    max_width = how much horizontal space you have (pixels).
+    """
+    pdf.setFont(fontname, fontsize)
+    
+    # Single line is fine
+    if pdf.stringWidth(text) <= max_width:
+        pdf.drawString(x_left, y_bottom, text)
+        return
+    
+    # Try smart word-based wrap into two lines
+    words = text.split()
+    line1 = []  # upper line
+    line2 = []  # bottom line
+    
+    current = []
+    for word in words:
+        test = " ".join(current + [word])
+        if pdf.stringWidth(test) <= max_width and len(line2) == 0:
+            current.append(word)
+        else:
+            if current:
+                if len(line1) == 0:
+                    line1 = current
+                    current = [word]
+                else:
+                    current.append(word)  # force into last line if already 2 lines
+    if current:
+        if len(line1) == 0:
+            line1 = current
+        else:
+            line2 = current
+    
+    # Fallback: rough split if couldn't wrap nicely
+    if not line2 and len(text) > 20:
+        mid = len(text) // 2
+        split_pos = text.rfind(" ", 0, mid + 10)
+        if split_pos == -1:
+            split_pos = mid
+        line1_str = text[:split_pos].rstrip()
+        line2_str = text[split_pos:].lstrip()
+    else:
+        line1_str = " ".join(line1)
+        line2_str = " ".join(line2)
+    
+    # Draw: bottom line at y_bottom, upper line above
+    line_height = fontsize * 1.2   # 12 pt spacing for 10 pt font — adjust if needed
+    
+    pdf.drawString(x_left, y_bottom,          line2_str)
+    pdf.drawString(x_left, y_bottom + line_height, line1_str)
+
+
+
+
 def draw_delivery_note(pdf, invoice):
     """
     Draw the content of an invoice page in the PDF.
@@ -57,7 +115,7 @@ def draw_delivery_note(pdf, invoice):
     pdf.drawString(50, height - 296, f"Invoice No. : {invoice.number}")
     # Salesman and Date
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(50, height - 105, f"Date: ")
+    pdf.drawString(322, height - 140, f"Date: ")
 
     data = [["Product", "Quantity"]]
     for item in invoice.invoiceitem_set.all():
@@ -92,7 +150,13 @@ def draw_delivery_note(pdf, invoice):
     # Draw the table, positioning it to expand downward
     table.drawOn(pdf, 50, height - 306 - table_height)
 
-    if prefix_check(invoice.customer.delivery_to.lower()):
-        pdf.drawString(410, height - 670, f"{invoice.customer.delivery_to}")
-    else:
-        pdf.drawString(410, height - 670, f"{invoice.customer.delivery_to}")
+    draw_left_aligned_wrapped(
+        pdf               = pdf,
+        x_left            = 410,
+        y_bottom          = height - 690,
+        text              = invoice.customer.delivery_to.strip(),
+        max_width         = 145,       
+        fontsize          = 12,
+        fontname          = "Helvetica",
+    )
+
