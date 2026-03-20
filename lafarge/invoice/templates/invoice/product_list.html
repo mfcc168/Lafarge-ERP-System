@@ -3,150 +3,222 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-primary text-uppercase">Product List</h2>
 
-    <div class="row g-3">
-        {% for product in products %}
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-3 bg-white">
-                <!-- Top Part: White Background, Clickable -->
-                <a href="{% url 'product_transactions' product.id %}" class="card-link">
-                    <div class="card-body p-4 bg-white">
-                        <!-- Product Title -->
-                        <h5 class="card-title fw-bold text-dark mb-2">
-                            {{ product.name }}
-                        </h5>
+    <!-- In Stock -->
+    <h2 class="mb-4 text-primary text-uppercase fs-4 fw-bold">In Stock Products</h2>
 
-                        <!-- Primary Details: Price and Quantity -->
-                        <div class="row gy-2">
-                            <div class="col-md-6">
-                                <p class="text-muted d-flex justify-content-between fs-6">
-                                    <span><i class="bi bi-tag"></i> Price:</span>
-                                    <span class="fw-bold text-dark">${{ product.price }}</span>
-                                </p>
+    <div class="table-responsive mb-5">
+        <table class="table table-modern align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" class="ps-4">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" class="text-center">Boxes</th>
+                    <th scope="col" class="text-center">Opened remain</th>
+                    <th scope="col">Reg. Code</th>
+                    <th scope="col">Expiry</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    {% if product.quantity > 0 %}
+                    <tr class="product-row">
+                        <td class="ps-4 fw-medium">
+                            <a href="{% url 'product_transactions' product.id %}" 
+                               class="text-dark text-decoration-none product-link">
+                                {{ product.name }}
+                            </a>
+                        </td>
+                        <td class="text-nowrap">${{ product.price }}</td>
+                        <td>{{ product.quantity|intcomma }}</td>
+                        <td class="text-center">{{ product.box_amount }} × {{ product.unit_per_box }}</td>
+                        <td class="text-center">{{ product.box_remain }}</td>
+                        <td class="text-muted small">{{ product.registration_code|default:"—" }}</td>
+                        <td class="text-muted small">{{ product.expiry_date|date:"Y-m-d"|default:"—" }}</td>
+                        <td class="text-end pe-3">
+                            <button class="btn btn-link p-0 toggle-btn" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#details-{{ product.id }}"
+                                    aria-expanded="false"
+                                    aria-controls="details-{{ product.id }}">
+                                <i class="bi bi-chevron-down fs-5"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr class="collapse detail-row" id="details-{{ product.id }}">
+                        <td colspan="8" class="p-3 bg-light-subtle">
+                            <div class="row g-4 small text-muted">
+                                <div class="col-6 col-md-3">
+                                    <strong>Full boxes:</strong><br>{{ product.box_amount }} boxes × {{ product.unit_per_box }} units
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Opened remain:</strong><br>{{ product.box_remain }} units
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Reg. Code:</strong><br>{{ product.registration_code|default:"Not set" }}
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Expiry:</strong><br>{{ product.expiry_date|date:"d M Y"|default:"Not set" }}
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <p class="text-muted d-flex justify-content-between fs-6">
-                                    <span><i class="bi bi-layers"></i> Quantity:</span>
-                                    <span class="fw-bold">{{ product.quantity|intcomma }}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Bottom Part: Gray Background, Non-Clickable -->
-                <div class="card-body p-4 bg-light">
-                    <!-- Dropdown Toggle Button -->
-                    <div class="mt-2">
-                        <button class="btn btn-link text-primary p-0 fs-6 toggle-details" type="button" data-bs-target="#details-{{ product.id }}" aria-expanded="false">
-                            <i class="bi bi-chevron-down"></i> <span class="toggle-text">More Details</span>
-                        </button>
-                    </div>
-
-                    <!-- Collapsible Details -->
-                    <div class="collapse" id="details-{{ product.id }}">
-                        <div class="border-top pt-3 mt-3 text-muted fs-6">
-                            <p class="text-muted d-flex justify-content-between fs-6">
-                                <span><i class="bi bi-box"></i> Unopened Total:</span>
-                                <span class="fw-bold">{{ product.box_amount }} boxes x {{ product.unit_per_box }} units</span>
-                            </p>
-                            <p class="text-muted d-flex justify-content-between fs-6">
-                                <span><i class="bi bi-box-seam"></i> Opened Box Remain Units:</span>
-                                <span class="fw-bold">{{ product.box_remain }}</span>
-                            </p>
-                            <p class="mb-1 text-truncate">
-                                <i class="bi bi-upc-scan"></i> <strong>Reg. Code:</strong> {{ product.registration_code }}
-                            </p>
-                            <p class="mb-0">
-                                <i class="bi bi-calendar-check"></i> <strong>Expiry:</strong> {{ product.expiry_date }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% empty %}
+                <tr><td colspan="8" class="text-center py-4 text-muted">No products in stock.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+    <!-- Out of Stock -->
+    <h2 class="mb-4 text-danger text-uppercase fs-4 fw-bold">Out of Stock (Zero Quantity)</h2>
+
+    <div class="table-responsive">
+        <table class="table table-modern align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" class="ps-4">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" class="text-center">Boxes</th>
+                    <th scope="col" class="text-center">Opened remain</th>
+                    <th scope="col">Reg. Code</th>
+                    <th scope="col">Expiry</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    {% if product.quantity == 0 %}
+                    <tr class="product-row">
+                        <td class="ps-4 fw-medium">
+                            <a href="{% url 'product_transactions' product.id %}" 
+                               class="text-dark text-decoration-none product-link">
+                                {{ product.name }}
+                            </a>
+                        </td>
+                        <td class="text-nowrap">${{ product.price }}</td>
+                        <td class="text-danger fw-bold">0</td>
+                        <td class="text-center">{{ product.box_amount }} × {{ product.unit_per_box }}</td>
+                        <td class="text-center">{{ product.box_remain }}</td>
+                        <td class="text-muted small">{{ product.registration_code|default:"—" }}</td>
+                        <td class="text-muted small">{{ product.expiry_date|date:"Y-m-d"|default:"—" }}</td>
+                        <td class="text-end pe-3">
+                            <button class="btn btn-link p-0 toggle-btn" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#details-{{ product.id }}"
+                                    aria-expanded="false"
+                                    aria-controls="details-{{ product.id }}">
+                                <i class="bi bi-chevron-down fs-5"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr class="collapse detail-row" id="details-{{ product.id }}">
+                        <td colspan="8" class="p-3 bg-light-subtle">
+                            <div class="row g-4 small text-muted">
+                                <div class="col-6 col-md-3">
+                                    <strong>Full boxes:</strong><br>{{ product.box_amount }} boxes × {{ product.unit_per_box }} units
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Opened remain:</strong><br>{{ product.box_remain }} units
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Reg. Code:</strong><br>{{ product.registration_code|default:"Not set" }}
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong>Expiry:</strong><br>{{ product.expiry_date|date:"d M Y"|default:"Not set" }}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% empty %}
+                <tr><td colspan="8" class="text-center py-4 text-muted">No zero-quantity products.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <script>
-document.querySelectorAll('.toggle-details').forEach(button => {
-    const targetId = button.getAttribute('data-bs-target');
-    const collapseElement = document.querySelector(targetId);
-    const icon = button.querySelector('i');
-    const text = button.querySelector('.toggle-text');
+// Only handle icon rotation — Bootstrap handles the actual show/hide
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.detail-row').forEach(function (collapse) {
+        const btn = document.querySelector('[data-bs-target="#' + collapse.id + '"]');
+        if (!btn) return;
+        const icon = btn.querySelector('i');
 
-    if (!collapseElement) {
-        console.error(`Collapse element not found for target: ${targetId}`);
-        return;
-    }
+        collapse.addEventListener('show.bs.collapse', function () {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+            btn.setAttribute('aria-expanded', 'true');
+        });
 
-    // Manual toggle on click
-    button.addEventListener('click', () => {
-        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElement, { toggle: false });
-        bsCollapse.toggle();
+        collapse.addEventListener('hide.bs.collapse', function () {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+            btn.setAttribute('aria-expanded', 'false');
+        });
     });
 
-    // Update icon and text on show
-    collapseElement.addEventListener('show.bs.collapse', () => {
-        button.setAttribute('aria-expanded', 'true');
-        icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
-        text.textContent = 'Hide Details';
-    });
-
-    // Update icon and text on hide
-    collapseElement.addEventListener('hide.bs.collapse', () => {
-        button.setAttribute('aria-expanded', 'false');
-        icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
-        text.textContent = 'More Details';
+    // Optional: Prevent clicks on row from bubbling (safety)
+    document.querySelectorAll('.product-row').forEach(row => {
+        row.addEventListener('click', e => {
+            // Let Bootstrap handle button clicks, let <a> handle link clicks
+            // Stop other row clicks from doing anything
+            if (!e.target.closest('a') && !e.target.closest('button')) {
+                e.stopPropagation();
+            }
+        });
     });
 });
 </script>
 
 <style>
-.card-link {
-    text-decoration: none;
-    color: inherit;
+.table-modern {
+    --bs-table-bg: white;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.table-modern thead th {
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table-modern tbody tr.product-row:hover {
+    background-color: #f8fafc;
+}
+
+.product-link {
     display: block;
+    padding: 0.75rem 1rem;
+    margin: -0.75rem -1rem;
+    height: 100%;
 }
 
-.card-link:hover .card-body.bg-white {
-    transform: scale(1.02);
+.toggle-btn {
+    padding: 0.75rem 0.5rem;
+    line-height: 1;
 }
 
-h2 {
-    font-size: 1.6rem;
-    font-weight: bold;
-}
-
-/* Card Styling */
-.card {
-    border-radius: 12px;
-    transition: transform 0.2s ease-in-out;
-}
-
-/* Font Adjustments */
-.fs-6 {
-    font-size: 1rem;
-}
-
-.text-muted {
-    font-size: 0.95rem;
-}
-
-/* Button Styling */
-.btn-link {
-    text-decoration: none;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-/* Gray Background for Bottom Part */
-.bg-light {
-    background-color: #f8f9fa; /* Bootstrap's bg-light color */
+.detail-row td {
+    background: #f9fafb !important;
+    border-top: none;
 }
 </style>
 
