@@ -13,11 +13,12 @@
                     <thead class="bg-light text-dark">
                     <tr>
                         <th style="width: 95px;">Date</th>
+                        <th style="min-width: 160px; max-width: 200px;">Customer</th>
                         <th style="width: 115px;">Invoice</th>
                         <th style="width: 40px;"></th>
-                        <th style="min-width: 160px; max-width: 200px;">Customer</th>
-                        <th style="min-width: 240px;">Product</th>
-                        <th class="text-end" style="width: 100px;">Qty</th>
+                        <th style="min-width: 220px;">Product</th>
+                        <th class="text-end" style="width: 90px;">Qty</th>
+                        <th class="text-end" style="width: 100px;">Total Qty</th>
                         <th class="text-end" style="width: 120px;">Amount</th>
                         <th style="width: 40px;"></th>
                         <th style="width: 40px;"></th>
@@ -32,8 +33,20 @@
                         <!-- Normal Items with Bonus Support -->
                         {% for item in invoice.invoiceitem_set.all %}
                         {% if item.product_type == "normal" %}
+                        {% with total_qty=item.quantity %}
+                        {% for bonus in invoice.invoiceitem_set.all %}
+                            {% if bonus.product.id == item.product.id and bonus.product_type != "normal" %}
+                                {% with total_qty=total_qty|add:bonus.quantity %}
+                                {% endwith %}
+                            {% endif %}
+                        {% endfor %}
                         <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
-                            <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                            <td class="text-nowrap">
+                                {{ invoice.delivery_date|date:"d/m/Y" }}
+                            </td>
+                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
+                                {{ invoice.customer.name }}
+                            </td>
                             <td>
                                 <a href="{% url 'invoice_detail' invoice.number %}"
                                    class="text-decoration-none fw-bold text-primary">
@@ -41,20 +54,19 @@
                                 </a>
                             </td>
                             <td></td>
-                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
-                                {{ invoice.customer.name }}
-                            </td>
                             <td class="fw-medium">
                                 {{ item.product.name }}
                             </td>
                             <td class="text-end fw-semibold">
                                 {{ item.quantity }}
-                                <!-- Bonus indicator -->
                                 {% for bonus in invoice.invoiceitem_set.all %}
                                     {% if bonus.product.id == item.product.id and bonus.product_type != "normal" %}
                                         <span class="badge bg-warning text-dark ms-1">+{{ bonus.quantity }}</span>
                                     {% endif %}
                                 {% endfor %}
+                            </td>
+                            <td class="text-end fw-bold">
+                                {{ total_qty }}
                             </td>
                             <td class="text-end fw-bold text-success">
                                 HK$ {{ item.sum_price|currency }}
@@ -63,13 +75,19 @@
                             <td></td>
                             <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
                         </tr>
+                        {% endwith %}
                         {% endif %}
                         {% endfor %}
 
                         <!-- Additional Items -->
                         {% for item in invoice.additionalitem_set.all %}
                         <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
-                            <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                            <td class="text-nowrap">
+                                {{ invoice.delivery_date|date:"d/m/Y" }}
+                            </td>
+                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
+                                {{ invoice.customer.name }}
+                            </td>
                             <td>
                                 <a href="{% url 'invoice_detail' invoice.number %}"
                                    class="text-decoration-none fw-bold text-primary">
@@ -77,10 +95,8 @@
                                 </a>
                             </td>
                             <td></td>
-                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
-                                {{ invoice.customer.name }}
-                            </td>
                             <td class="fw-medium text-info">{{ item.description }}</td>
+                            <td class="text-end text-muted">-</td>
                             <td class="text-end text-muted">-</td>
                             <td class="text-end fw-bold text-info">
                                 HK$ {{ item.price|currency }}
