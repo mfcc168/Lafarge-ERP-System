@@ -6,90 +6,99 @@
         <h2 class="text-primary">Monthly Report - {{ month }}/{{ year }}</h2>
     </div>
 
-    {% for week_num, data in weeks.items %}
-    {% with valid_invoices=data.invoices|dictsort:"delivery_date" %}
-    {% if valid_invoices|length > 0 %}
-    <div class="card shadow-sm mb-4 border-0 rounded-3">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold text-dark">Week {{ week_num }}</h5>
-            <span class="fs-5 fw-bold text-muted">Total: ${{ data.total|currency }}</span>
-        </div>
-        <div class="card-body bg-white rounded-bottom">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body bg-white p-0">
             <div class="table-responsive">
-                <table class="table align-middle border-0 table-sm">
+                <table class="table align-middle border-0 table-sm mb-0">
                     <thead class="bg-light text-dark">
                     <tr>
-                        <th style="width: 90px;">Date</th>
-                        <th style="width: 110px;">Invoice</th>
-                        <th style="min-width: 140px; max-width: 180px;">Customer</th>
-                        <th style="width: 80px;">Salesman</th>
-                        <th class="text-end" style="width: 100px;">Total Price</th>
-                        <th style="min-width: 280px;">Items</th>
+                        <th style="width: 95px;">Date</th>
+                        <th style="width: 115px;">Invoice</th>
+                        <th style="width: 40px;"></th>
+                        <th style="min-width: 160px; max-width: 200px;">Customer</th>
+                        <th style="min-width: 240px;">Product</th>
+                        <th class="text-end" style="width: 100px;">Qty</th>
+                        <th class="text-end" style="width: 120px;">Amount</th>
+                        <th style="width: 40px;"></th>
+                        <th style="width: 40px;"></th>
+                        <th style="width: 85px;">Salesman</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for invoice in valid_invoices %}
+                    {% for week_num, data in weeks.items %}
+                    {% for invoice in data.invoices|dictsort:"delivery_date" %}
                     {% if invoice.total_price > 0 %}
-                    <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
-                        <td class="text-nowrap">{{ invoice.delivery_date }}</td>
-                        <td>
-                            <a href="{% url 'invoice_detail' invoice.number %}"
-                               class="text-decoration-none fw-bold text-primary">
-                                #{{ invoice.number }}
-                            </a>
-                        </td>
-                        <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
-                            {{ invoice.customer.name }}
-                        </td>
-                        <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
-                        <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
-                        
-                        <!-- Items Column - Price aligned LEFT -->
-                        <td>
-                            <ul class="list-unstyled mb-0 small">
-                                {% for item in invoice.invoiceitem_set.all %}
-                                <li class="mb-3">
-                                    {% if item.product_type == "normal" %}
-                                        <div>
-                                            <span class="fw-semibold">{{ item.product.name }}</span>
-                                            <span class="ms-2 text-muted">({{ item.quantity }})</span>
-                                        </div>
-                                        <div class="fw-bold text-success mt-1">
-                                            HK$ {{ item.sum_price|currency }}
-                                        </div>
-                                    {% else %}
-                                        <div class="text-danger">
-                                            <span class="fw-semibold">{{ item.product.name }}</span>
-                                            <span class="ms-2">({{ item.quantity }})</span>
-                                            <span class="badge bg-danger text-white ms-2">{{ item.product_type }}</span>
-                                        </div>
-                                    {% endif %}
-                                </li>
-                                {% endfor %}
 
-                                {% for item in invoice.additionalitem_set.all %}
-                                <li class="mb-3 text-info">
-                                    <div>
-                                        <span>{{ item.description }}</span>
-                                    </div>
-                                    <div class="fw-bold text-info mt-1">
-                                        HK$ {{ item.price|currency }}
-                                    </div>
-                                </li>
+                        <!-- Normal Items with Bonus Support -->
+                        {% for item in invoice.invoiceitem_set.all %}
+                        {% if item.product_type == "normal" %}
+                        <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                            <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                            <td>
+                                <a href="{% url 'invoice_detail' invoice.number %}"
+                                   class="text-decoration-none fw-bold text-primary">
+                                    #{{ invoice.number }}
+                                </a>
+                            </td>
+                            <td></td>
+                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
+                                {{ invoice.customer.name }}
+                            </td>
+                            <td class="fw-medium">
+                                {{ item.product.name }}
+                            </td>
+                            <td class="text-end fw-semibold">
+                                {{ item.quantity }}
+                                <!-- Bonus indicator -->
+                                {% for bonus in invoice.invoiceitem_set.all %}
+                                    {% if bonus.product.id == item.product.id and bonus.product_type != "normal" %}
+                                        <span class="badge bg-warning text-dark ms-1">+{{ bonus.quantity }}</span>
+                                    {% endif %}
                                 {% endfor %}
-                            </ul>
-                        </td>
-                    </tr>
+                            </td>
+                            <td class="text-end fw-bold text-success">
+                                HK$ {{ item.sum_price|currency }}
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+
+                        <!-- Additional Items -->
+                        {% for item in invoice.additionalitem_set.all %}
+                        <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
+                            <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                            <td>
+                                <a href="{% url 'invoice_detail' invoice.number %}"
+                                   class="text-decoration-none fw-bold text-primary">
+                                    #{{ invoice.number }}
+                                </a>
+                            </td>
+                            <td></td>
+                            <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
+                                {{ invoice.customer.name }}
+                            </td>
+                            <td class="fw-medium text-info">{{ item.description }}</td>
+                            <td class="text-end text-muted">-</td>
+                            <td class="text-end fw-bold text-info">
+                                HK$ {{ item.price|currency }}
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
+                        </tr>
+                        {% endfor %}
+
                     {% endif %}
+                    {% endfor %}
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    {% endif %}
-    {% endwith %}
-    {% endfor %}
 
     {% if monthly_total > 0 %}
     <div class="alert alert-secondary text-center mt-4 shadow-sm">
@@ -112,7 +121,7 @@
 .table th, .table td {
     border: none !important;
     padding: 10px 12px;
-    vertical-align: top !important;
+    vertical-align: middle !important;
 }
 
 /* Alternating Row Colors */
@@ -122,17 +131,6 @@
 
 .table-row-dark {
     background-color: #ffffff !important;
-}
-
-/* Items list styling */
-ul.list-unstyled li {
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #eee;
-}
-
-ul.list-unstyled li:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
 }
 
 /* Card Styling */
