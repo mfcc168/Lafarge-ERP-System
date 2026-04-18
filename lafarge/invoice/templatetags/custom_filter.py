@@ -41,3 +41,12 @@ def get_item(dictionary, key):
     if isinstance(dictionary, dict):
         return dictionary.get(key, 0)
     return 0
+
+@register.filter
+def get_total_qty(item, invoice):
+    bonus_items = invoice.invoiceitem_set.all()
+    bonus_qty = sum(
+        b.quantity for b in bonus_items 
+        if b.product.id == item.product.id and b.product_type != "normal"
+    )
+    return item.quantity + bonus_qty

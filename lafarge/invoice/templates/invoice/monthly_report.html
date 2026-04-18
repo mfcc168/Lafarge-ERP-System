@@ -14,7 +14,7 @@
                     <tr>
                         <th style="width: 95px;">Date</th>
                         <th style="min-width: 160px; max-width: 200px;">Customer</th>
-                        <th style="width: 40px;"></th>           <!-- Empty column between Customer and Invoice -->
+                        <th style="width: 40px;"></th>
                         <th style="width: 115px;">Invoice</th>
                         <th style="min-width: 220px;">Product</th>
                         <th class="text-end" style="width: 90px;">Qty</th>
@@ -30,16 +30,8 @@
                     {% for invoice in data.invoices|dictsort:"delivery_date" %}
                     {% if invoice.total_price > 0 %}
 
-                        <!-- Normal Items with Bonus Support -->
                         {% for item in invoice.invoiceitem_set.all %}
                         {% if item.product_type == "normal" %}
-                        {% with total_qty=item.quantity %}
-                        {% for bonus in invoice.invoiceitem_set.all %}
-                            {% if bonus.product.id == item.product.id and bonus.product_type != "normal" %}
-                                {% with total_qty=total_qty|add:bonus.quantity %}
-                                {% endwith %}
-                            {% endif %}
-                        {% endfor %}
                         <tr class="{% cycle 'table-row-light' 'table-row-dark' %}">
                             <td class="text-nowrap">
                                 {{ invoice.delivery_date|date:"d/m/Y" }}
@@ -47,16 +39,14 @@
                             <td class="fw-semibold" style="word-break: break-word; line-height: 1.3;">
                                 {{ invoice.customer.name }}
                             </td>
-                            <td></td>                                      <!-- Empty cell -->
+                            <td></td>
                             <td>
                                 <a href="{% url 'invoice_detail' invoice.number %}"
                                    class="text-decoration-none fw-bold text-primary">
                                     #{{ invoice.number }}
                                 </a>
                             </td>
-                            <td class="fw-medium">
-                                {{ item.product.name }}
-                            </td>
+                            <td class="fw-medium">{{ item.product.name }}</td>
                             <td class="text-end fw-semibold">
                                 {{ item.quantity }}
                                 {% for bonus in invoice.invoiceitem_set.all %}
@@ -65,8 +55,9 @@
                                     {% endif %}
                                 {% endfor %}
                             </td>
+                            <!-- Total Qty = Qty + Bonus -->
                             <td class="text-end fw-bold">
-                                {{ total_qty }}
+                                {{ item|get_total_qty:invoice }}
                             </td>
                             <td class="text-end fw-bold text-success">
                                 $ {{ item.sum_price|currency }}
@@ -75,7 +66,6 @@
                             <td></td>
                             <td><span class="badge bg-secondary text-white">{{ invoice.salesman.code }}</span></td>
                         </tr>
-                        {% endwith %}
                         {% endif %}
                         {% endfor %}
 
@@ -128,35 +118,16 @@
 </div>
 
 <style>
-/* Table Styling */
-.table {
-    border-radius: 12px !important;
-    overflow: hidden;
-}
-
+.table { border-radius: 12px !important; overflow: hidden; }
 .table th, .table td {
     border: none !important;
     padding: 10px 12px;
     vertical-align: middle !important;
 }
-
-/* Alternating Row Colors */
-.table-row-light {
-    background-color: #f9f9f9 !important;
-}
-
-.table-row-dark {
-    background-color: #ffffff !important;
-}
-
-/* Card Styling */
-.card {
-    border-radius: 12px !important;
-}
-
-.bg-light {
-    background-color: #f8f9fa !important;
-}
+.table-row-light { background-color: #f9f9f9 !important; }
+.table-row-dark  { background-color: #ffffff !important; }
+.card { border-radius: 12px !important; }
+.bg-light { background-color: #f8f9fa !important; }
 </style>
 
 {% endblock %}
