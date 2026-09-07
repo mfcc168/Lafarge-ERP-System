@@ -27,7 +27,7 @@ def monthly_payment_preview(request):
 
     months = []
 
-    for i in range(12):  # Get the last 12 months
+    for i in range(24):  # Get the last 24 months
         date = today.replace(day=1) - relativedelta(months=i)  # Correct month rollback
         year, month = date.year, date.month
         # Exclude January 2025
