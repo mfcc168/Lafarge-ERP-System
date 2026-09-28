@@ -1,5 +1,5 @@
 {% extends "invoice/base.html" %}
-{% load custom_filter %}
+{% load custom_filter l10n static %}
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -10,18 +10,35 @@
 
     <div class="card shadow-sm mb-4 border-0 rounded-3">
         <div class="card-body bg-white rounded-bottom">
+            <p id="payment-sort-help" class="small text-muted mb-3">Click a column heading to sort. Grouped prices are totals for matching payment details.</p>
             <div class="table-responsive">
-                <table class="table align-middle border-0">
+                <table id="monthly-payment-table" class="table align-middle border-0" aria-describedby="payment-sort-help">
                     <thead class="bg-light text-dark">
                     <tr>
-                        <th>Payment Date</th>
-                        <th>Deposit Date</th>
-                        <th>Customer</th>
-                        <th>Invoice</th>
-                        <th>Details</th>
-                        <th>Method</th>
-                        <th class="text-end">Price</th>
-                        <th class="text-end">Grouped Price</th>
+                        <th scope="col" data-sort-type="date" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Payment Date" only %}
+                        </th>
+                        <th scope="col" data-sort-type="date" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Deposit Date" only %}
+                        </th>
+                        <th scope="col" data-sort-type="text" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Customer" only %}
+                        </th>
+                        <th scope="col" data-sort-type="text" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Invoice" only %}
+                        </th>
+                        <th scope="col" data-sort-type="text" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Details" only %}
+                        </th>
+                        <th scope="col" data-sort-type="text" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Method" only %}
+                        </th>
+                        <th scope="col" class="text-end" data-sort-type="number" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Price" only %}
+                        </th>
+                        <th scope="col" class="text-end" data-sort-type="number" aria-sort="none">
+                            {% include "invoice/components/table_sort_button.html" with label="Grouped Price" only %}
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,8 +55,8 @@
                                             border-start border-end border-secondary
                                             {% endif %}
                                         {% endif %}">
-                                        <td class="text-nowrap">{{ invoice.payment_date }}</td>
-                                        <td class="text-nowrap">{{ invoice.deposit_date|default:"—" }}</td>
+                                        <td class="text-nowrap" data-sort-value="{{ invoice.payment_date|date:'Y-m-d' }}">{{ invoice.payment_date }}</td>
+                                        <td class="text-nowrap" data-sort-value="{{ invoice.deposit_date|date:'Y-m-d' }}">{{ invoice.deposit_date|default:"—" }}</td>
                                         <td class="fw-semibold">{{ invoice.customer.name }}</td>
                                         <td>
                                             <a href="{% url 'invoice_detail' invoice.number %}"
@@ -47,8 +64,8 @@
                                                 #{{ invoice.number }}
                                             </a>
                                         </td>
-                                        <td><span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span></td>
-                                        <td>
+                                        <td data-sort-value="{{ invoice.cheque_detail|default_if_none:'' }}"><span class="badge bg-secondary text-white">{{ invoice.cheque_detail }}</span></td>
+                                        <td{% if not invoice.payment_method %} data-sort-value=""{% endif %}>
                                             {% if invoice.payment_method == "cash" %}
                                                 <span class="badge bg-secondary text-white">Cash</span>
                                             {% elif invoice.payment_method == "cheque" %}
@@ -61,10 +78,10 @@
                                                 {{ invoice.payment_method }}
                                             {% endif %}
                                         </td>
-                                        <td class="text-end fw-bold text-success">${{ invoice.total_price|currency }}</td>
-                                        <td class="text-end fw-bold text-danger">
+                                        <td class="text-end fw-bold text-success" data-sort-value="{{ invoice.total_price|unlocalize }}">${{ invoice.total_price|currency }}</td>
+                                        <td class="text-end fw-bold text-danger" data-sort-value="{% if cheque_detail and data.invoices|length > 1 and forloop.last %}{{ data.total_price|unlocalize }}{% endif %}">
                                             {% if cheque_detail and data.invoices|length > 1 and forloop.last %}
-                                                ${{ data.total_price|currency }}
+                                                <span title="Total for payment details: {{ cheque_detail }}">${{ data.total_price|currency }}</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -80,6 +97,82 @@
 </div>
 
 <style>
+/* Compact sort controls; the active direction follows the header's aria state. */
+#monthly-payment-table .payment-sort-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease,
+                color 160ms ease, box-shadow 160ms ease;
+}
+
+#monthly-payment-table .payment-sort-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+}
+
+#monthly-payment-table .payment-sort-button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .payment-sort-button,
+#monthly-payment-table th[aria-sort="descending"] .payment-sort-button {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+
+#monthly-payment-table .sort-indicator {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #64748b;
+}
+
+#monthly-payment-table .sort-indicator path {
+    transition: opacity 160ms ease;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .sort-indicator,
+#monthly-payment-table th[aria-sort="descending"] .sort-indicator {
+    color: #2563eb;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .sort-down,
+#monthly-payment-table th[aria-sort="descending"] .sort-up {
+    opacity: 0.2;
+}
+
+@media (pointer: coarse) {
+    #monthly-payment-table .payment-sort-button {
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #monthly-payment-table .payment-sort-button,
+    #monthly-payment-table .sort-indicator path {
+        transition: none;
+    }
+}
+
 /* Table Styling */
 .table {
     border-radius: 12px !important;
@@ -116,5 +209,7 @@
 }
 
 </style>
+
+<script src="{% static 'js/monthly_payment_report.js' %}" defer></script>
 
 {% endblock %}
