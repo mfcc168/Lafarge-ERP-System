@@ -5,7 +5,7 @@
 <div class="container mt-5">
     {% include "invoice/components/breadcrumb.html" %}
 
-    <h2 class="mb-5 text-center text-dark fw-bold">{{ deliveryman.name }} – Monthly Delivery Summary</h2>
+    <h1 class="page-heading">{{ deliveryman.name }} – Monthly Delivery Summary</h1>
 
     {% if months %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -34,13 +34,4 @@
     {% endif %}
 </div>
 
-<style>
-    .card-link { display: block; color: inherit; text-decoration: none; }
-    .card-link .card { transition: all 0.3s ease; }
-    .card-link:hover .card {
-        transform: translateY(-8px);
-        box-shadow: 0 1rem 2rem rgba(0,0,0,0.15) !important;
-    }
-    .transition-all { transition: all 0.3s ease; }
-</style>
 {% endblock %}

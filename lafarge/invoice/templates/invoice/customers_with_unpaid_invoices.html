@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-body">
-            <h2 class="mb-4 text-uppercase text-primary">Customers with Unpaid Invoices</h2>
+            <h1 class="page-heading">Customers with Unpaid Invoices</h1>
 
             <!-- Total Unpaid Amount -->
             <div class="alert alert-warning rounded-3 p-4 text-center shadow-sm">
@@ -15,9 +15,9 @@
             </div>
 
             <!-- Monthly Unpaid Totals -->
-            <div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
+            <div class="bg-light p-3 rounded-3 mb-4">
                 <h3 class="text-dark">Monthly Unpaid Totals</h3>
-                <div class="table-responsive">
+                <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
                     <table class="table align-middle shadow-sm rounded-3">
                         <thead class="table-dark text-white">
                         <tr>
@@ -45,7 +45,7 @@
 
             <!-- Customers and Unpaid Invoices -->
             <h3 class="mt-4 text-secondary">Customers & Unpaid Invoices</h3>
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
                 <table class="table align-middle shadow-sm rounded-3">
                     <thead class="table-dark text-white">
                     <tr>
@@ -99,40 +99,6 @@
     </div>
 </div>
 
-<!-- Additional Styling -->
-<style>
-/* Table Styling */
-.table {
-    border-radius: 12px !important;
-    overflow: hidden;
-}
-
-/* Table Headers */
-.table th {
-    padding: 12px 16px;
-}
-
-/* Alternating Row Colors */
-.table-row-light {
-    background-color: #f9f9f9 !important;
-}
-
-.table-row-dark {
-    background-color: #ffffff !important;
-}
-
-/* Hover Effect */
-.table-hover tbody tr:hover, .clickable-row:hover {
-    background-color: rgba(0, 123, 255, 0.1) !important; /* Light blue */
-    cursor: pointer;
-}
-
-/* Clickable Row */
-.clickable-row {
-    transition: background-color 0.2s ease-in-out;
-}
-
-</style>
 
 <!-- JavaScript for Clickable Rows -->
 <script>

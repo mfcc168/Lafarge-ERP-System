@@ -2,8 +2,10 @@
 {% load custom_filter %}
 {% block content %}
 <div class="container-fluid mt-4">
+    <h1 class="page-heading">Overview</h1>
+    <p class="page-description">Sales, deliveries and payments at a glance.</p>
     {% if user.is_superuser or user.username == 'lafarge' %}
-    <h2 class="text-center mb-4">Data Analysis</h2>
+    <h2 class="mb-3">Data Analysis</h2>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <!-- Sales Trend -->
@@ -40,9 +42,9 @@
 
     <!-- Today's Invoices -->
     <div class="mt-5">
-        <h3 class="text-center mb-3">Invoices Delivered Today</h3>
-        <div class="card-body bg-white rounded-bottom">
-            <div class="table-responsive">
+        <h3 class="mb-3">Invoices Delivered Today</h3>
+        <div class="card-body surface">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
                 <table class="table align-middle">
                     <thead class="bg-light text-dark">
                     <tr>
@@ -81,7 +83,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No invoices delivered today.</td>
+                        <td colspan="7" class="text-center text-muted">No invoices delivered today.</td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -92,9 +94,9 @@
     </div>
 
     <div class="mt-5">
-        <h3 class="text-center mb-3">Payments Received Pending Deposit</h3>
-        <div class="card-body bg-white rounded-bottom">
-            <div class="table-responsive">
+        <h3 class="mb-3">Payments Received Pending Deposit</h3>
+        <div class="card-body surface">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
                 <table class="table align-middle">
                     <thead class="bg-light text-dark">
                     <tr>
@@ -286,49 +288,7 @@ async function fetchProductInsights() {
 
 fetchProductInsights();
 
-
-
-
 </script>
 
-<style>
-    tr[data-href] {
-        transition: background-color 0.2s ease-in-out;
-    }
-
-    tr[data-href]:hover {
-        background-color: #f8f9fa; /* Light gray background on hover */
-    }
-    .card {
-        border-radius: 15px;
-        transition: transform 0.2s ease-in-out;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    .card-title {
-        font-weight: bold;
-    }
-    .shadow-sm {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-    }
-    .border-left-primary {
-        border-left: 5px solid #007bff;
-    }
-    .border-left-success {
-        border-left: 5px solid #28a745;
-    }
-    .border-left-warning {
-        border-left: 5px solid #ffc107;
-    }
-    canvas {
-        width: 100% !important;
-        height: 250px !important;
-    }
-
-
-
-
-</style>
 
 {% endblock %}

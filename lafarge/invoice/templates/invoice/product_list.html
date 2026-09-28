@@ -3,11 +3,13 @@
 
 {% block content %}
 <div class="container mt-4">
+    <h1 class="page-heading">Products</h1>
+    <p class="page-description">Current stock, pricing and product details.</p>
 
     <!-- In Stock -->
-    <h2 class="mb-4 text-primary text-uppercase fs-4 fw-bold">In Stock Products</h2>
+    <h2 class="mb-3">In Stock Products</h2>
 
-    <div class="table-responsive mb-5">
+    <div class="table-responsive mb-5" tabindex="0" role="region" aria-label="Scrollable data table">
         <table class="table table-modern align-middle">
             <thead>
                 <tr>
@@ -42,6 +44,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#details-{{ product.id }}"
                                     aria-expanded="false"
+                                    aria-label="Details for {{ product.name }}"
                                     aria-controls="details-{{ product.id }}">
                                 <i class="bi bi-chevron-down fs-5"></i>
                             </button>
@@ -75,9 +78,9 @@
     </div>
 
     <!-- Out of Stock -->
-    <h2 class="mb-4 text-danger text-uppercase fs-4 fw-bold">Out of Stock (Zero Quantity)</h2>
+    <h2 class="mb-3 text-danger">Out of Stock (Zero Quantity)</h2>
 
-    <div class="table-responsive">
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
         <table class="table table-modern align-middle">
             <thead>
                 <tr>
@@ -112,6 +115,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#details-{{ product.id }}"
                                     aria-expanded="false"
+                                    aria-label="Details for {{ product.name }}"
                                     aria-controls="details-{{ product.id }}">
                                 <i class="bi bi-chevron-down fs-5"></i>
                             </button>
@@ -180,46 +184,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<style>
-.table-modern {
-    --bs-table-bg: white;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-.table-modern thead th {
-    background: #f1f5f9;
-    color: #1e293b;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    padding: 0.85rem 1rem;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.table-modern tbody tr.product-row:hover {
-    background-color: #f8fafc;
-}
-
-.product-link {
-    display: block;
-    padding: 0.75rem 1rem;
-    margin: -0.75rem -1rem;
-    height: 100%;
-}
-
-.toggle-btn {
-    padding: 0.75rem 0.5rem;
-    line-height: 1;
-}
-
-.detail-row td {
-    background: #f9fafb !important;
-    border-top: none;
-}
-</style>
 
 {% endblock %}

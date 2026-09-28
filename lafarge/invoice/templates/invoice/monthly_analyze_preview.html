@@ -2,7 +2,7 @@
 {% load custom_filter %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Monthly Product Analysis</h2>
+    <h1 class="page-heading">Monthly Product Analysis</h1>
 
     {% if months %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
@@ -33,40 +33,5 @@
     {% endif %}
 </div>
 
-<style>
-/* Ensure the entire card is clickable */
-.card-link {
-    text-decoration: none;
-    display: block;
-}
-
-.analyze-card {
-    transition: all 0.3s ease-in-out;
-    border-left: 4px solid #007bff;
-}
-
-.analyze-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
-    border-left-color: #0056b3;
-}
-
-.analyze-card .card-body {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-}
-
-.analyze-card:hover .card-title {
-    color: #0056b3 !important;
-}
-
-/* Add some visual hierarchy */
-.analyze-card .fw-bold {
-    font-size: 1.1em;
-}
-
-.analyze-card .small {
-    font-size: 0.85em;
-}
-</style>
 
 {% endblock %}

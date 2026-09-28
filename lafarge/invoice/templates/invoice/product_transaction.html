@@ -1,26 +1,29 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
 {% block content %}
-<h2>Transaction History for {{ product.name }} {{product.registration_code}}</h2>
+<h1 class="page-heading">Transaction History for {{ product.name }} {{product.registration_code}}</h1>
 
 <!-- Add filter form -->
-<form method="get" class="mb-4">
-    <div class="row">
+<form method="get" class="filter-panel mb-4">
+    <div class="row g-3">
         <div class="col-md-5">
+            <label for="customer_filter">Customer name</label>
             <input type="text" id="customer_filter" name="customer_filter" class="form-control"
                    value="{{ request.GET.customer_filter }}" placeholder="Customer Name">
         </div>
         <div class="col-md-5">
+            <label for="invoice_filter">Invoice number</label>
             <input type="text" id="invoice_filter" name="invoice_filter" class="form-control"
                    value="{{ request.GET.invoice_filter }}" placeholder="Invoice Number">
         </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">Filter</button>
+        <div class="col-md-2 d-flex flex-wrap align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">Filter</button>
             <a href="?clear=1" class="btn btn-secondary">Clear</a>
         </div>
     </div>
 </form>
 
+<div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
 <table class="table">
     <thead>
     <tr>
@@ -54,5 +57,6 @@
     {% endfor %}
     </tbody>
 </table>
+</div>
 
 {% endblock %}
