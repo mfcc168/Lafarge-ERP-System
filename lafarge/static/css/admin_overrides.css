@@ -199,8 +199,8 @@ body {
 /* Left align the "Add other Invoice item" button */
 .inline-related .add-row a {
     float: left !important;
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
+    background-color: #285da7 !important;
+    border-color: #285da7 !important;
     color: #fff !important;
     padding: 0.375rem 0.75rem !important;
     font-size: 1rem !important;
@@ -221,14 +221,14 @@ body {
     font-weight: 650;
 }
 :is(.main-sidebar, .app-sidebar) :is(.nav-link, .nav-header, .user-panel a) {
-    color: #667c6d !important;
+    color: #666f7c !important;
 }
 :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
     .nav-link.active {
-    background: #e9f3ed !important;
-    color: #145c4b !important;
-    box-shadow: inset 3px 0 #14634f;
+    background: #e9edf3 !important;
+    color: #1e40af !important;
+    box-shadow: inset 3px 0 #2563eb;
 }
 :is(.content-header, .app-content-header) h1 {
     font-size: 1.8rem;
@@ -240,8 +240,8 @@ body {
     padding: 18px 22px;
 }
 :is(.content-wrapper, .app-main) .table thead th {
-    background: #f4f7f5;
-    color: #687f6f;
+    background: #f4f5f7;
+    color: #68727f;
     font-size: 0.72rem;
 }
 :is(.content-wrapper, .app-main) .table td {
@@ -252,7 +252,7 @@ body {
     border-color: var(--erp-primary);
 }
 :is(.content-wrapper, .app-main) .btn-info {
-    background: #eef5f0;
-    border-color: #d5e3d9;
-    color: #466653;
+    background: #eef1f5;
+    border-color: #d5dbe3;
+    color: #465366;
 }
