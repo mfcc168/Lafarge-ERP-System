@@ -4,13 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#145c4b">
+    <meta name="theme-color" content="#2563eb">
     <title>{% block title %}Lafarge ERP{% endblock %}</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive_tables.css' %}">
+    <script src="{% static 'js/responsive_tables.js' %}" defer></script>
 </head>
 <body class="erp-app page-{{ request.resolver_match.url_name }}">
 <a class="skip-link" href="#content">Skip to content</a>

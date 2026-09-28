@@ -90,6 +90,7 @@
 
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>Chart.defaults.font.size = parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.75;</script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     async function fetchAnalysisData() {

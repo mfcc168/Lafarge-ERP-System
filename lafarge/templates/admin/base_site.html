@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/responsive_tables.css' %}">
+{% endblock %}
+{% block extrajs %}
+    {{ block.super }}
+    <script src="{% static 'js/responsive_tables.js' %}" defer></script>
+{% endblock %}

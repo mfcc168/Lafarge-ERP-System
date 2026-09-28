@@ -1,0 +1,515 @@
+/* Loaded after the workspace or Jazzmin theme; no record content is duplicated. */
+@media screen {
+  .responsive-table-viewport {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .responsive-table-host {
+    overflow: visible !important;
+  }
+  .responsive-data-table {
+    width: 100%;
+  }
+  .responsive-table-viewport.is-overflowing {
+    background:
+      linear-gradient(to right, #ffffff 30%, transparent),
+      linear-gradient(to left, #ffffff 30%, transparent),
+      linear-gradient(to right, #d7dfe9, transparent),
+      linear-gradient(to left, #d7dfe9, transparent);
+    background-size:
+      32px 100%,
+      32px 100%,
+      10px 100%,
+      10px 100%;
+    background-position: left, right, left, right;
+    background-repeat: no-repeat;
+    background-attachment: local, local, scroll, scroll;
+  }
+  .responsive-table-viewport.is-overflowing .erp-sticky-key {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--erp-surface) !important;
+    max-width: min(18rem, 40vw);
+    overflow-wrap: anywhere;
+    box-shadow: 1px 0 var(--erp-border);
+  }
+  .responsive-table-viewport.is-overflowing thead .erp-sticky-key {
+    z-index: 2;
+    background: var(--erp-subtle) !important;
+  }
+  .table-scroll-hint {
+    margin: 0;
+    padding: 10px 16px;
+    color: var(--erp-muted);
+    background: var(--erp-subtle);
+    border-bottom: 1px solid var(--erp-border);
+    font-size: 0.75rem;
+  }
+  .table-scroll-hint[hidden],
+  .record-table-controls {
+    display: none;
+  }
+  .erp-app .page-header h1 {
+    font-size: clamp(1.5rem, 2.76vw, 1.95rem);
+  }
+  .erp-app .panel-toolbar :is(h2, h5, .card-title) {
+    flex-wrap: wrap;
+  }
+  .erp-app .brand-mark {
+    flex-shrink: 0;
+  }
+  .erp-app :is(.page-header, .panel-toolbar, .workspace-tools) {
+    min-width: 0;
+  }
+  .erp-app .page-header {
+    flex-wrap: wrap;
+  }
+  .erp-app :is(.period-link, .person-link) {
+    min-width: 0;
+  }
+  .erp-app .chart-body {
+    min-height: 300px;
+  }
+  .erp-app .page-actions {
+    max-width: 100%;
+  }
+  :is(.erp-app, .change-form, .change-list)
+    :is(.btn, button, .page-link, summary) {
+    min-height: 44px;
+  }
+  :is(.erp-app, .change-form, .change-list)
+    :is(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+      select,
+      textarea
+    ) {
+    font-size: max(16px, 0.85rem);
+  }
+  :is(.app-main, .content-wrapper) :is(.col-12, .card, .card-body),
+  #content-main,
+  #changelist {
+    min-width: 0;
+  }
+  #changelist .actions,
+  #changelist-search {
+    max-width: 100%;
+  }
+  #changelist .actions :is(label, .select2-container) {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+  #changelist .actions .select2-container {
+    width: min(100%, 16rem) !important;
+  }
+  .inline-group .responsive-data-table :is(input, select, textarea) {
+    min-width: 110px;
+  }
+  .inline-group .responsive-data-table input[type="checkbox"] {
+    min-width: 0;
+  }
+  .admin-model-actions {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 991px) {
+  .erp-app .data-panel .table > :not(caption) > * > * {
+    padding: 12px 14px;
+  }
+  .erp-app .table thead th {
+    white-space: normal;
+    min-width: 6rem;
+  }
+  .erp-app .table td {
+    overflow-wrap: break-word;
+  }
+  .erp-app .workspace-header {
+    gap: 10px;
+  }
+  .erp-app .workspace-name {
+    white-space: normal;
+  }
+  .erp-app .workspace-user > span:last-child {
+    display: none;
+  }
+  .erp-app .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  }
+  :is(.content-header, .app-content-header) :is(h1, h3),
+  .breadcrumb {
+    overflow-wrap: anywhere;
+  }
+  .change-form .select2-container {
+    max-width: 100%;
+  }
+  .change-form .nav-tabs {
+    flex-wrap: wrap;
+  }
+  .change-form .nav-tabs .nav-link {
+    padding: 10px;
+  }
+  :is(.change-form, .change-list) .btn {
+    white-space: normal;
+  }
+  #result_list :is(td, th) {
+    padding: 12px !important;
+  }
+  .admin-model-row {
+    flex-wrap: wrap;
+  }
+}
+/* Portrait records keep every field and action, with a user-selectable table view. */
+@media screen and (max-width: 700px) and (orientation: portrait) {
+  .record-table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--erp-border);
+    background: var(--erp-surface);
+  }
+  .record-view-toggle,
+  .record-sort-menu summary,
+  .record-sort-options button {
+    border: 1px solid var(--erp-border);
+    border-radius: var(--erp-control-radius);
+    padding: 9px 12px;
+    min-height: 44px;
+    color: var(--erp-primary);
+    background: white;
+    font: 600 0.8rem/1.4 var(--erp-font);
+    cursor: pointer;
+  }
+  .record-view-toggle[aria-pressed="true"] {
+    background: var(--erp-primary-soft);
+  }
+  .record-sort-menu {
+    flex: 1;
+    min-width: 0;
+  }
+  .record-sort-menu summary {
+    width: fit-content;
+  }
+  .record-sort-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .responsive-table-viewport:not(.show-table) > .record-table {
+    display: block;
+    min-width: 0;
+  }
+  .responsive-table-viewport:not(.show-table) > .record-table > thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .responsive-table-viewport:not(.show-table) > .record-table > tbody {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border: 0;
+    background: var(--erp-subtle);
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-data-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    border: 1px solid var(--erp-border) !important;
+    border-radius: 9px;
+    background: white;
+    overflow: hidden;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > tr
+    > td {
+    position: static;
+    display: block;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    padding: 12px 14px !important;
+    border: 0;
+    font-size: 0.85rem;
+    text-align: left !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    box-shadow: none;
+    background: transparent;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-data-row
+    > td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 5px;
+    color: var(--erp-muted);
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > tr
+    > .record-key-cell {
+    grid-column: 1 / -1;
+    order: -1;
+    border-bottom: 1px solid var(--erp-border);
+    background: #f1f5fd !important;
+    font-weight: 650;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > tr
+    > :is(.record-wide-cell, .record-nested-cell) {
+    grid-column: 1 / -1;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > tr
+    > .record-spacer {
+    display: none;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-full-row:not(.collapse),
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-full-row.show {
+    display: block;
+    border-radius: 7px;
+    background: white;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-summary-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border-radius: 7px;
+    background: var(--erp-primary-soft);
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tbody
+    > .record-summary-row
+    > td {
+    flex: 1 1 40%;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    :is(.badge, .product-name) {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    :is(.period-icon, .person-avatar) {
+    flex-shrink: 0;
+  }
+  .erp-app .data-panel .card-body {
+    padding: 14px;
+  }
+  .erp-app .table td.record-nested-cell {
+    padding: 0 !important;
+  }
+  .erp-app .table .table {
+    font-size: inherit;
+  }
+}
+@media screen and (max-width: 600px) {
+  .erp-app .content {
+    padding-inline: 12px;
+  }
+  .erp-app .workspace-name {
+    font-size: 0.72rem;
+  }
+  .erp-app .workspace-name i {
+    display: none;
+  }
+  .erp-app .filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .erp-app .page-actions {
+    width: 100%;
+  }
+  .erp-app .page-actions .btn {
+    flex: 1 1 140px;
+  }
+  .erp-app .profile-grid {
+    padding: 16px;
+  }
+  .erp-app .chart-container {
+    height: 460px;
+  }
+  .admin-panel-heading {
+    flex-wrap: wrap;
+  }
+  .admin-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .login-box {
+    max-width: calc(100vw - 24px);
+  }
+}
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  .erp-app .content {
+    padding: 18px 16px;
+  }
+  .erp-app .workspace-header {
+    min-height: 56px;
+    padding-block: 6px;
+  }
+  .erp-app .mobile-menu nav {
+    max-height: calc(100dvh - 76px);
+  }
+  .erp-app .page-header {
+    margin-bottom: 18px;
+  }
+  .erp-app .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #jazzy-actions {
+    position: static !important;
+  }
+}
+@media print {
+  .record-table-controls,
+  .table-scroll-hint {
+    display: none !important;
+  }
+  .responsive-table-viewport {
+    overflow: visible;
+  }
+}
+@media screen and (max-width: 700px) and (orientation: portrait) {
+  .responsive-table-viewport:not(.show-table) > .record-table > tfoot {
+    display: block;
+    padding: 0 14px 14px;
+    background: var(--erp-subtle);
+  }
+  .responsive-table-viewport:not(.show-table) > .record-table > tfoot > tr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--erp-border);
+  }
+  .responsive-table-viewport:not(.show-table)
+    > .record-table
+    > tfoot
+    > tr
+    > td {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    border: 0;
+    padding: 12px 8px;
+    text-align: left !important;
+  }
+  .content-header .row .col-auto {
+    width: 100%;
+  }
+  .content-header h1 {
+    float: none;
+    border-right: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .content-header .breadcrumb {
+    float: none !important;
+    padding-left: 0;
+    margin: 12px 0 0;
+    font-size: 0.75rem;
+  }
+  .content-header .page-actions {
+    justify-content: flex-start !important;
+    margin-top: 14px;
+  }
+}
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  :is(.main-header, .app-header) {
+    min-height: 56px;
+  }
+  :is(.content-header, .app-content-header) {
+    padding-block: 12px;
+  }
+  #change-list-filters {
+    padding: 12px !important;
+    margin-bottom: 12px;
+  }
+  #changelist {
+    padding: 12px;
+  }
+  .erp-app .panel-toolbar {
+    min-height: 60px;
+    padding: 12px 16px;
+  }
+}
+/* Jazzmin 2 uses an inline heading/breadcrumb row instead of app-content-header. */
+@media screen and (max-width: 700px) and (orientation: portrait) {
+  .content-wrapper > .content.border-bottom .d-flex.align-items-center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .content-wrapper > .content.border-bottom h1 {
+    width: 100%;
+    border-right: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .content-wrapper > .content.border-bottom .breadcrumb {
+    margin: 0;
+    padding: 0;
+    font-size: 0.75rem;
+  }
+  .content-wrapper > .content.border-bottom .page-actions {
+    justify-content: flex-start !important;
+    padding-top: 12px;
+  }
+}
+@media screen {
+  .erp-app .page-stack > .row {
+    --bs-gutter-x: 0;
+  }
+}
+@media screen {
+  .responsive-table-viewport {
+    position: relative;
+  }
+  /* Select2 keeps its native select clipped; minimum field sizes must not unclip it. */
+  .select2-hidden-accessible {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 1px !important;
+  }
+  .inline-group .add-row a {
+    position: sticky;
+    left: 0;
+    float: none !important;
+    max-width: calc(100vw - 110px);
+    white-space: normal;
+  }
+}
