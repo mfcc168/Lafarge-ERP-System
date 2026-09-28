@@ -2,163 +2,96 @@
 {% load bootstrap5 %}
 {% load render_table from django_tables2 %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm border-0 rounded-3 p-3">
-        <div class="card-body">
-            <h2 class="mb-4 text-primary">Invoice List</h2>
-            {% if filter %}
-            <div class="bg-light p-3 rounded-3 mb-4 shadow-sm">
-                <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#filterSection">
-                    <i class="bi bi-funnel"></i> Show Filters
-                </button>
+{% block page_section %}Operations{% endblock %}
+{% block page_title %}Invoices{% endblock %}
+{% block page_description %}Find, review and manage your invoice records.{% endblock %}
+{% block page_actions %}{% if perms.invoice.add_invoice %}<a href="{% url 'admin:invoice_invoice_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> New invoice</a>{% endif %}{% endblock %}
 
-                <div class="collapse" id="filterSection">
-                    <form action="" method="get">
+{% block content %}
+<section class="data-panel">
+    <div class="panel-toolbar">
+        <div><h2>Invoice register <span class="count-pill">{{ table.rows|length }}</span></h2>
+        <p>Search and review your invoices.</p></div>
+        {% if filter %}<button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-controls="filterSection" aria-expanded="false"><i class="bi bi-sliders" aria-hidden="true"></i> Filters</button>{% endif %}
+    </div>
+    {% if filter %}
+    <div class="collapse filter-drawer filter-panel" id="filterSection">
+        <form action="" method="get">
                         <div class="row g-3">
                             <!-- Customer Filter -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Customer</label>
+                                <label class="form-label" for="{{ filter.form.customer_name.id_for_label }}">Customer</label>
                                 {{ filter.form.customer_name }}
                             </div>
 
                             <!-- Care Of Filter -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Care Of</label>
+                                <label class="form-label" for="{{ filter.form.customer_care_of.id_for_label }}">Care Of</label>
                                 {{ filter.form.customer_care_of }}
                             </div>
 
                             <!-- Invoice Number  -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Invoice Number</label>
+                                <label class="form-label" for="{{ filter.form.number.id_for_label }}">Invoice Number</label>
                                 {{ filter.form.number }}
                             </div>
 
-
                             <!-- Delivery Date Filters -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Delivery Date (From)</label>
+                                <label class="form-label" for="{{ filter.form.delivery_date.id_for_label }}">Delivery Date (From)</label>
                                 {{ filter.form.delivery_date }}
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Delivery Date (To)</label>
+                                <label class="form-label" for="{{ filter.form.delivery_date_to.id_for_label }}">Delivery Date (To)</label>
                                 {{ filter.form.delivery_date_to }}
                             </div>
 
                             <!-- Salesman Filters -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Salesman</label>
+                                <label class="form-label" for="{{ filter.form.salesman.id_for_label }}">Salesman</label>
                                 {{ filter.form.salesman }}
                             </div>
 
                             <!-- Payment Date Filters -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Payment Date (From)</label>
+                                <label class="form-label" for="{{ filter.form.payment_date.id_for_label }}">Payment Date (From)</label>
                                 {{ filter.form.payment_date }}
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Payment Date (To)</label>
+                                <label class="form-label" for="{{ filter.form.payment_date_to.id_for_label }}">Payment Date (To)</label>
                                 {{ filter.form.payment_date_to }}
                             </div>
 
                             <!-- Deposit Date Filters -->
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Deposit Date (From)</label>
+                                <label class="form-label" for="{{ filter.form.deposit_date.id_for_label }}">Deposit Date (From)</label>
                                 {{ filter.form.deposit_date }}
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Deposit Date (To)</label>
+                                <label class="form-label" for="{{ filter.form.deposit_date_to.id_for_label }}">Deposit Date (To)</label>
                                 {{ filter.form.deposit_date_to }}
                             </div>
 
                             <!-- Filter & Reset Buttons -->
                             <div class="col-12 text-end">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-funnel"></i> Apply Filters
+                                    <i class="bi bi-funnel" aria-hidden="true"></i> Apply Filters
                                 </button>
                                 <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-                                    <i class="bi bi-x-circle"></i> Reset
+                                    <i class="bi bi-x-circle" aria-hidden="true"></i> Reset
                                 </a>
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-            {% endif %}
-
-
-            <div class="table-responsive rounded-3">
-                <table class="table table-hover table-striped align-middle border-0 rounded-3 invoice-table">
-                    {% render_table table %}
-                </table>
-            </div>
-        </div>
     </div>
-</div>
-
-<style>
-
-/* Make form fields more readable */
-.bg-light input, .bg-light select {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-/* Improve spacing */
-.form-label {
-    margin-bottom: 4px;
-}
-
-/* Hide the default date picker icon */
-input[type="date"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-right: 10px;
-}
-
-
-
-td.column-customer, th[data-orderable*="customer"] {
-    max-width: 200px; /* Adjust this width as needed */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.table {
-    border-radius: 12px !important;
-    overflow: hidden;
-}
-
-.table th, .table td {
-    border: none !important;  /* Remove all harsh table borders */
-    padding: 12px 16px;        /* Add more breathing space */
-}
-
-.table a {
-    color: #555 !important; /* Slightly darker on hover */
-    text-decoration: none !important;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1) !important; /* Soft hover effect */
-}
-
-.card {
-    border-radius: 12px !important;
-}
-
-.bg-light {
-    background-color: #f8f9fa !important; /* Softer background */
-}
-
-</style>
+    {% endif %}
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Invoice register">
+        {% render_table table %}
+    </div>
+</section>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll(".invoice-table tbody tr").forEach(row => {

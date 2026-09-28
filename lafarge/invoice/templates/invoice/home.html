@@ -1,49 +1,18 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
+{% block page_section %}Workspace{% endblock %}
+{% block page_title %}Overview{% endblock %}
+{% block page_description %}A clear view of deliveries, payments and sales.{% endblock %}
+{% block page_actions %}<a href="{% url 'invoice_list' %}" class="btn btn-outline-primary">View invoices <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-    {% if user.is_superuser or user.username == 'lafarge' %}
-    <h2 class="text-center mb-4">Data Analysis</h2>
-
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <!-- Sales Trend -->
-        <div class="col">
-            <div class="card shadow-sm border-left-primary">
-                <div class="card-body">
-                    <h5 class="card-title text-center"><i class="bi bi-graph-up"></i> Sales Trend</h5>
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sales by Salesman -->
-        <div class="col">
-            <div class="card shadow-sm border-left-success">
-                <div class="card-body">
-                    <h5 class="card-title text-center"><i class="bi bi-person-lines-fill"></i> Sales by Salesman</h5>
-                    <canvas id="salesmanChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Insights -->
-        <div class="col">
-            <div class="card shadow-sm border-left-warning">
-                <div class="card-body">
-                    <h5 id="productTitle" class="card-title text-center"><i class="bi bi-box"></i> Product Insights</h5>
-                    <canvas id="productChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Today's Invoices -->
-    <div class="mt-5">
-        <h3 class="text-center mb-3">Invoices Delivered Today</h3>
-        <div class="card-body bg-white rounded-bottom">
-            <div class="table-responsive">
-                <table class="table align-middle">
+<div class="metrics-grid"><div class="metric-card"><div class="metric-top"><span>Deliveries today</span><i class="bi bi-truck" aria-hidden="true"></i></div><strong>{{ invoices_today|length }}</strong><small>Invoices delivered today</small></div><div class="metric-card"><div class="metric-top"><span>Pending deposit records</span><i class="bi bi-receipt" aria-hidden="true"></i></div><strong>{{ pending_deposits|length }}</strong><small>Includes scheduled payments</small></div><div class="metric-card"><div class="metric-top"><span>Awaiting deposit</span><i class="bi bi-wallet2" aria-hidden="true"></i></div><strong>${{ total_pending_deposit|currency }}</strong><small>Excludes post-dated payments</small></div></div>{% if user.is_superuser or user.username == 'lafarge' %}
+<div class="dashboard-charts">
+<section class="data-panel trend-panel"><div class="panel-toolbar"><div><h2>Sales trend</h2><p>Monthly sales performance</p></div><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></div><div class="chart-body"><canvas id="salesChart"></canvas></div></section>
+<section class="data-panel border-left-success"><div class="panel-toolbar"><h2 class="card-title">Sales by salesman</h2></div><div class="chart-body"><canvas id="salesmanChart"></canvas></div></section>
+<section class="data-panel"><div class="panel-toolbar"><h2 id="productTitle" class="card-title">Product insights</h2></div><div class="chart-body"><canvas id="productChart"></canvas></div></section>
+</div>{% endif %}
+<div class="page-stack"><section class="data-panel"><div class="panel-toolbar"><div><h2>Today's deliveries</h2><p>Delivered invoices and their items.</p></div><a class="row-action" href="{% url 'invoice_list' %}">All invoices <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div><div class="table-responsive" tabindex="0" role="region" aria-label="Today's deliveries"><table class="table align-middle">
                     <thead class="bg-light text-dark">
                     <tr>
                         <th>Date</th>
@@ -81,21 +50,12 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No invoices delivered today.</td>
+                        <td colspan="7" class="text-center text-muted">No invoices delivered today.</td>
                     </tr>
                     {% endfor %}
                     </tbody>
 
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-5">
-        <h3 class="text-center mb-3">Payments Received Pending Deposit</h3>
-        <div class="card-body bg-white rounded-bottom">
-            <div class="table-responsive">
-                <table class="table align-middle">
+                </table></div></section><section class="data-panel"><div class="panel-toolbar"><div><h2>Payments awaiting deposit</h2><p>Payment records, current totals and scheduled amounts.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Payments awaiting deposit"><table class="table align-middle">
                     <thead class="bg-light text-dark">
                     <tr>
                         <th>Invoice</th>
@@ -119,13 +79,13 @@
                         <td class="text-nowrap">{{ invoice.payment_date }}</td>
                         <td>
                             {% if invoice.payment_method == "cash" %}
-                            <i class="bi bi-cash-coin text-warning"></i> Cash
+                            <i class="bi bi-cash-coin text-warning" aria-hidden="true"></i> Cash
                             {% elif invoice.payment_method == "cheque" %}
-                            <i class="bi bi-cash text-warning"></i> Cheque
+                            <i class="bi bi-cash text-warning" aria-hidden="true"></i> Cheque
                             {% elif invoice.payment_method == "fps" %}
-                            <i class="bi bi-wallet2 text-warning"></i> FPS
+                            <i class="bi bi-wallet2 text-warning" aria-hidden="true"></i> FPS
                             {% elif invoice.payment_method == "credit(cq)" %}
-                            <i class="bi bi-credit-card text-warning"></i> Credit Cheque
+                            <i class="bi bi-credit-card text-warning" aria-hidden="true"></i> Credit Cheque
                             {% else %}
                             {{ invoice.payment_method }}
                             {% endif %}
@@ -167,17 +127,7 @@
                     {% endfor %}
                     </tfoot>
 
-
-                </table>
-            </div>
-        </div>
-    </div>
-
-
-</div>
-
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                </table></div></section></div><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("tr[data-href]").forEach(row => {
@@ -215,8 +165,8 @@ async function fetchSalesmanInsights() {
                 datasets: [{
                     label: "Total Sales",
                     data: sales,
-                    borderColor: "#007bff",
-                    backgroundColor: "rgba(0, 123, 255, 0.2)",
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37, 99, 235, 0.10)",
                     fill: true
                 }]
             },
@@ -224,7 +174,7 @@ async function fetchSalesmanInsights() {
         });
         // Update Sales by Salesman Chart Title
                 document.querySelector(".border-left-success .card-title").innerHTML =
-                    `<i class="bi bi-person-lines-fill"></i> Top Salesmen (${data.last_month_name})`;
+                    `<i class="bi bi-person-lines-fill" aria-hidden="true"></i> Top Salesmen (${data.last_month_name})`;
         // Sales by Salesman Chart
         new Chart(document.getElementById("salesmanChart"), {
             type: "bar",
@@ -233,8 +183,8 @@ async function fetchSalesmanInsights() {
                 datasets: [{
                     label: "Sales Amount",
                     data: salesAmounts,
-                    backgroundColor: "rgba(40, 167, 69, 0.6)",
-                    borderColor: "rgba(40, 167, 69, 1)",
+                    backgroundColor: "rgba(96, 145, 219, 0.8)",
+                    borderColor: "#687c97",
                     borderWidth: 1
                 }]
             },
@@ -259,7 +209,7 @@ async function fetchProductInsights() {
         }
 
         // Update the title with the previous month's name
-        document.getElementById("productTitle").innerHTML = `<i class="bi bi-box"></i> Top Products (${data.last_month_name})`;
+        document.getElementById("productTitle").innerHTML = `<i class="bi bi-box" aria-hidden="true"></i> Top Products (${data.last_month_name})`;
 
         const products = data.product_sales.map(item => item.invoiceitem__product__name);
         const revenues = data.product_sales.map(item => item.total_revenue);
@@ -271,7 +221,7 @@ async function fetchProductInsights() {
                 datasets: [{
                     label: "Total Revenue",
                     data: revenues,
-                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+                    backgroundColor: ["#2563eb", "#8297b4", "#c9ad72", "#8e9aaa", "#58626f", "#d5d9de"],
                     borderColor: "#fff",
                     borderWidth: 1
                 }]
@@ -286,49 +236,5 @@ async function fetchProductInsights() {
 
 fetchProductInsights();
 
-
-
-
 </script>
-
-<style>
-    tr[data-href] {
-        transition: background-color 0.2s ease-in-out;
-    }
-
-    tr[data-href]:hover {
-        background-color: #f8f9fa; /* Light gray background on hover */
-    }
-    .card {
-        border-radius: 15px;
-        transition: transform 0.2s ease-in-out;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    .card-title {
-        font-weight: bold;
-    }
-    .shadow-sm {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-    }
-    .border-left-primary {
-        border-left: 5px solid #007bff;
-    }
-    .border-left-success {
-        border-left: 5px solid #28a745;
-    }
-    .border-left-warning {
-        border-left: 5px solid #ffc107;
-    }
-    canvas {
-        width: 100% !important;
-        height: 250px !important;
-    }
-
-
-
-
-</style>
-
 {% endblock %}

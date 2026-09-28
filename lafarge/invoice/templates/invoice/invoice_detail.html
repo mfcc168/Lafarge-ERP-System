@@ -1,44 +1,36 @@
 {% extends 'invoice/base.html' %}
 {% load bootstrap5 %}
 {% load custom_filter %}
+{% block page_section %}Operations{% endblock %}
+{% block page_title %}Invoice #{{ invoice.number }}{% endblock %}
+{% block page_description %}Invoice details, customer information and documents.{% endblock %}
+
+{% block page_actions %}
+                    {% if invoice.number|slice:":2" != "S-" %}
+                    <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i> Invoice
+                    </button>
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-file-earmark me-2" aria-hidden="true"></i> Order Form
+                    </button>
+                    {% endif %}
+                    {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-truck me-2" aria-hidden="true"></i> Delivery Note
+                    </button>
+                    {% endif %}
+                    {% if invoice.number|slice:":2" == "S-" %}
+                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
+                            onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
+                        <i class="bi bi-search me-2" aria-hidden="true"></i> Sample
+                    </button>
+                    {% endif %}
+                {% endblock %}
 {% block content %}
-<section class="py-3 py-md-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-9 col-xl-8 col-xxl-7 position-relative">
-                <div class="bg-white shadow-sm rounded-3 p-4">
-                    <div class="row align-items-center mb-3">
-                        <div class="col">
-                            <h2 class="text-uppercase text-primary">Invoice #{{ invoice.number }}</h2>
-                        </div>
-                    </div>
-
-                    <!-- Invoice Details -->
-                    <div class="row gy-2">
-                        <div class="col-6"><strong>Salesman:</strong> {{ invoice.salesman.name }}</div>
-                        <div class="col-6"><strong>Delivery Date:</strong> {{ invoice.delivery_date }}</div>
-                        <div class="col-6"><strong>Terms:</strong> {{ invoice.terms }}</div>
-                        <div class="col-6"><strong>Payment Date:</strong> {{ invoice.payment_date }}</div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <!-- Customer Info -->
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h4 class="text-secondary">Sold To</h4>
-                            <address class="mb-0">
-                                <strong class="text-dark">{{ invoice.customer.name }} {% if invoice.customer.care_of %} ({{ invoice.customer.care_of }}) {% endif %}</strong><br>
-                                {{ invoice.customer.address|linebreaksbr }}
-                            </address>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <!-- Invoice Items Table -->
-                    <div class="table-responsive">
-                        <table class="table align-middle border-0">
+<div class="page-stack"><section class="data-panel"><div class="panel-toolbar"><h2>Invoice details</h2><span class="panel-label">#{{ invoice.number }}</span></div><div class="document-summary"><div class="sold-to"><span class="detail-label">Bill to</span><h2>{{ invoice.customer.name }} {% if invoice.customer.care_of %}({{ invoice.customer.care_of }}){% endif %}</h2><address>{{ invoice.customer.address|linebreaksbr }}</address></div><dl class="detail-grid"><div><dt>Salesman</dt><dd>{{ invoice.salesman.name|default:"—" }}</dd></div><div><dt>Terms</dt><dd>{{ invoice.terms|default:"—" }}</dd></div><div><dt>Delivery date</dt><dd>{{ invoice.delivery_date|default:"—" }}</dd></div><div><dt>Payment date</dt><dd>{{ invoice.payment_date|default:"—" }}</dd></div></dl></div></section><section class="data-panel"><div class="panel-toolbar"><div><h2>Invoice items</h2><p>Products, quantities and charges.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Invoice items"><table class="table align-middle border-0">
                             <thead class="bg-light text-dark">
                             <tr>
                                 <th>Quantity</th>
@@ -76,99 +68,5 @@
                             </tr>
                             {% endif %}
                             </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Floating Buttons (Right Side) -->
-            <div class="col-auto d-none d-lg-block">
-                <div class="sticky-buttons">
-                    {% if invoice.number|slice:":2" != "S-" %}
-                    <button type="button" class="btn btn-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                            onclick="window.open('{% url 'download_invoice_legacy_pdf' invoice.number %}', '_blank')">
-                        <i class="bi bi-file-earmark-text me-2"></i> Invoice
-                    </button>
-                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                            onclick="window.open('{% url 'download_order_form_pdf' invoice.number %}', '_blank')">
-                        <i class="bi bi-file-earmark me-2"></i> Order Form
-                    </button>
-                    {% endif %}
-                    {% if invoice.customer.delivery_to and invoice.customer.delivery_address %}
-                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                            onclick="window.open('{% url 'download_delivery_note_pdf' invoice.number %}', '_blank')">
-                        <i class="bi bi-truck me-2"></i> Delivery Note
-                    </button>
-                    {% endif %}
-                    {% if invoice.number|slice:":2" == "S-" %}
-                    <button type="button" class="btn btn-outline-primary d-flex align-items-center px-3 py-2 shadow-sm"
-                            onclick="window.open('{% url 'download_sample_pdf' invoice.number %}', '_blank')">
-                        <i class="bi bi-search me-2"></i> Sample
-                    </button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<style>
-/* Table Styling */
-.table {
-    border-radius: 12px !important;
-    overflow: hidden;
-}
-
-.table th, .table td {
-    border: none !important;
-    padding: 12px 16px;
-}
-
-/* Alternating Row Colors */
-.table-row-light {
-    background-color: #f9f9f9 !important;
-}
-
-.table-row-dark {
-    background-color: #ffffff !important;
-}
-
-/* Hover Effect */
-.table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Bold Total Row */
-.bg-secondary {
-    background-color: #343a40 !important;
-}
-
-/* Card Styling */
-.card {
-    border-radius: 12px !important;
-}
-
-/* Softer Background */
-.bg-light {
-    background-color: #f8f9fa !important;
-}
-
-/* Floating Buttons */
-.sticky-buttons {
-    position: sticky;
-    top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.product-name {
-    max-width: 150px;
-    word-break: break-word;
-    white-space: normal;
-}
-
-</style>
-
+                        </table></div></section></div>
 {% endblock %}

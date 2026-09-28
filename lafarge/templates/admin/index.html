@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+{% load i18n log %}
+{% block bodyclass %}{{ block.super }} dashboard erp-admin-dashboard{% endblock %}
+{% block content_title %}{% trans "Administration" %}{% endblock %}
+{% block breadcrumbs %}
+<ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">{% trans "Business workspace" %}</a></li><li class="breadcrumb-item active">{% trans "Administration" %}</li></ol>
+{% endblock %}
+{% block content %}
+<div class="admin-overview">
+    <div class="admin-overview-intro">
+        <div><span class="admin-eyebrow">{% trans "Manage your workspace" %}</span><h2>{% trans "Records & access" %}</h2><p>{% trans "Manage business records, team access and recent changes in one place." %}</p></div>
+        <a class="btn btn-primary" href="/">{% trans "Open workspace" %} <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="admin-overview-grid">
+        <div class="admin-modules">
+            {% for app in app_list %}
+            <section class="admin-module" aria-labelledby="module-{{ app.app_label }}">
+                <header class="admin-panel-heading"><div><h2 id="module-{{ app.app_label }}">{{ app.name }}</h2><p>{% trans "Browse records or add a new entry." %}</p></div><span class="admin-count">{{ app.models|length }}</span></header>
+                <div class="admin-models">
+                    {% for model in app.models %}
+                    <div class="admin-model-row">
+                        <span class="admin-model-icon" aria-hidden="true">{{ model.name|first }}</span>
+                        <div class="admin-model-name">{% if model.admin_url %}<a href="{{ model.admin_url }}">{{ model.name }}</a>{% else %}<span>{{ model.name }}</span>{% endif %}</div>
+                        <div class="admin-model-actions">
+                            {% if model.add_url %}<a class="admin-add" href="{{ model.add_url }}" aria-label="{% trans 'Add' %} {{ model.name }}"><span aria-hidden="true">+</span> {% trans "Add" %}</a>{% endif %}
+                            {% if model.admin_url %}<a class="admin-browse" href="{{ model.admin_url }}" aria-label="{% trans 'View' %} {{ model.name }}">{% trans "View" %} <span aria-hidden="true">↗</span></a>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% empty %}<section class="admin-module admin-empty">{% trans "You do not have permission to view or edit any records." %}</section>{% endfor %}
+        </div>
+        <section class="admin-module admin-activity" aria-labelledby="recent-actions-title">
+            <header class="admin-panel-heading"><div><h2 id="recent-actions-title">{% trans "Recent activity" %}</h2><p>{% trans "Your latest changes in the admin." %}</p></div></header>
+            {% get_admin_log 6 as admin_log for_user user %}
+            {% if admin_log %}<ol class="admin-activity-list">
+                {% for entry in admin_log %}<li>
+                    <div class="admin-activity-meta"><span class="admin-event{% if entry.is_deletion %} admin-event-delete{% endif %}">{% if entry.is_addition %}{% trans "Added" %}{% elif entry.is_deletion %}{% trans "Deleted" %}{% else %}{% trans "Updated" %}{% endif %}</span><time datetime="{{ entry.action_time|date:'c' }}">{{ entry.action_time|timesince }} {% trans "ago" %}</time></div>
+                    <div class="admin-activity-object">{% if entry.is_deletion or not entry.get_admin_url %}{{ entry.object_repr }}{% else %}<a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>{% endif %}</div>
+                    {% if entry.content_type %}<span class="admin-activity-type">{{ entry.content_type.name|capfirst }}</span>{% endif %}
+                    <p>{{ entry.get_change_message }}</p>
+                </li>{% endfor %}
+            </ol>{% else %}<div class="admin-empty"><strong>{% trans "No recent changes" %}</strong><p>{% trans "Your additions, edits and deletions will appear here." %}</p></div>{% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

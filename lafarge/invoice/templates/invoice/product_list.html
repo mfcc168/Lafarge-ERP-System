@@ -1,14 +1,13 @@
 {% extends 'invoice/base.html' %}
 {% load humanize %}
 
+{% block page_section %}Operations{% endblock %}
+{% block page_title %}Products{% endblock %}
+{% block page_description %}Browse inventory, pricing and batch details.{% endblock %}
+{% block page_actions %}{% if perms.invoice.add_product %}<a href="{% url 'admin:invoice_product_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add product</a>{% endif %}{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-
-    <!-- In Stock -->
-    <h2 class="mb-4 text-primary text-uppercase fs-4 fw-bold">In Stock Products</h2>
-
-    <div class="table-responsive mb-5">
-        <table class="table table-modern align-middle">
+<div class="page-stack"><section class="data-panel"><div class="panel-toolbar"><div><h2>In-stock products</h2><p>Pricing, stock and packaging details.</p></div><span class="status-label"><span></span> In stock</span></div><div class="table-responsive" tabindex="0" role="region" aria-label="In-stock products"><table class="table table-modern align-middle">
             <thead>
                 <tr>
                     <th scope="col" class="ps-4">Product</th>
@@ -26,7 +25,7 @@
                     {% if product.quantity > 0 %}
                     <tr class="product-row">
                         <td class="ps-4 fw-medium">
-                            <a href="{% url 'product_transactions' product.id %}" 
+                            <a href="{% url 'product_transactions' product.id %}"
                                class="text-dark text-decoration-none product-link">
                                 {{ product.name }}
                             </a>
@@ -42,8 +41,9 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#details-{{ product.id }}"
                                     aria-expanded="false"
+                                    aria-label="Details for {{ product.name }}"
                                     aria-controls="details-{{ product.id }}">
-                                <i class="bi bi-chevron-down fs-5"></i>
+                                <i class="bi bi-chevron-down fs-5" aria-hidden="true"></i>
                             </button>
                         </td>
                     </tr>
@@ -71,14 +71,7 @@
                 <tr><td colspan="8" class="text-center py-4 text-muted">No products in stock.</td></tr>
                 {% endfor %}
             </tbody>
-        </table>
-    </div>
-
-    <!-- Out of Stock -->
-    <h2 class="mb-4 text-danger text-uppercase fs-4 fw-bold">Out of Stock (Zero Quantity)</h2>
-
-    <div class="table-responsive">
-        <table class="table table-modern align-middle">
+        </table></div></section><section class="data-panel"><div class="panel-toolbar"><div><h2>Out-of-stock products</h2><p>Products with zero available quantity.</p></div><span class="status-label muted"><span></span> Out of stock</span></div><div class="table-responsive" tabindex="0" role="region" aria-label="Out-of-stock products"><table class="table table-modern align-middle">
             <thead>
                 <tr>
                     <th scope="col" class="ps-4">Product</th>
@@ -96,7 +89,7 @@
                     {% if product.quantity == 0 %}
                     <tr class="product-row">
                         <td class="ps-4 fw-medium">
-                            <a href="{% url 'product_transactions' product.id %}" 
+                            <a href="{% url 'product_transactions' product.id %}"
                                class="text-dark text-decoration-none product-link">
                                 {{ product.name }}
                             </a>
@@ -112,8 +105,9 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#details-{{ product.id }}"
                                     aria-expanded="false"
+                                    aria-label="Details for {{ product.name }}"
                                     aria-controls="details-{{ product.id }}">
-                                <i class="bi bi-chevron-down fs-5"></i>
+                                <i class="bi bi-chevron-down fs-5" aria-hidden="true"></i>
                             </button>
                         </td>
                     </tr>
@@ -141,12 +135,7 @@
                 <tr><td colspan="8" class="text-center py-4 text-muted">No zero-quantity products.</td></tr>
                 {% endfor %}
             </tbody>
-        </table>
-    </div>
-
-</div>
-
-<script>
+        </table></div></section></div><script>
 // Only handle icon rotation — Bootstrap handles the actual show/hide
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.detail-row').forEach(function (collapse) {
@@ -179,47 +168,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-
-<style>
-.table-modern {
-    --bs-table-bg: white;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-.table-modern thead th {
-    background: #f1f5f9;
-    color: #1e293b;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    padding: 0.85rem 1rem;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.table-modern tbody tr.product-row:hover {
-    background-color: #f8fafc;
-}
-
-.product-link {
-    display: block;
-    padding: 0.75rem 1rem;
-    margin: -0.75rem -1rem;
-    height: 100%;
-}
-
-.toggle-btn {
-    padding: 0.75rem 0.5rem;
-    line-height: 1;
-}
-
-.detail-row td {
-    background: #f9fafb !important;
-    border-top: none;
-}
-</style>
-
 {% endblock %}

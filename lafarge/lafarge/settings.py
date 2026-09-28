@@ -43,7 +43,7 @@ ROOT_URLCONF = 'lafarge.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -98,11 +98,22 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
-    "topmenu_links": [{"name": "Lafarge Dashboard", "url": "/", "new_window": False},
-                      {"name": "Products", "url": "/products", "new_window": False},
-                      {"name": "Salesmen", "url": "/salesmen", "new_window": False},
-                      {"name": "Customers", "url": "/customers", "new_window": False},
-                      {"name": "Invoices", "url": "/invoices", "new_window": False}],
+    "topmenu_links": [{"name": "Business workspace", "url": "/", "new_window": False}],
+    "site_brand": "Lafarge",
+    "site_logo": "images/lafarge-mark.svg",
+    "site_logo_classes": "",
+    "copyright": "Lafarge ERP",
+    "icons": {
+        "auth": "fas fa-shield-alt",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        "invoice.product": "fas fa-box",
+        "invoice.customer": "fas fa-address-book",
+        "invoice.invoice": "fas fa-file-invoice",
+        "invoice.producttransaction": "fas fa-exchange-alt",
+        "invoice.salesman": "fas fa-user-tie",
+        "invoice.deliveryman": "fas fa-truck",
+    },
     "site_title": "Lafarge Admin",
     "site_header": "Lafarge Admin",
     "welcome_sign": "Welcome to Lafarge Admin",
@@ -110,7 +121,7 @@ JAZZMIN_SETTINGS = {
     "related_modal_active": True,
     "sidebar": "collapsed",
     "custom_css": "css/admin_overrides.css",
-    "show_ui_builder": True,
+    "show_ui_builder": False,  # Keep the shared application appearance consistent.
     "custom_js": "js/custom_admin.js",
     # Additional modal settings
     "modal_backdrop": "static",
@@ -129,7 +140,7 @@ JAZZMIN_UI_TWEAKS = {
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
+    "sidebar": "sidebar-light-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,

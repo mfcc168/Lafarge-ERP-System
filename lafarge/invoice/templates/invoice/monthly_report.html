@@ -1,15 +1,12 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
-{% block content %}
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Monthly Report - {{ month }}/{{ year }}</h2>
-    </div>
+{% block page_section %}Sales reports{% endblock %}
+{% block page_title %}Monthly sales · {{ month }}/{{ year }}{% endblock %}
+{% block page_description %}Invoice items and sales amounts for the selected month.{% endblock %}
+{% block page_actions %}<a href="{% url 'monthly_preview' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
 
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body bg-white p-0">
-            <div class="table-responsive">
-                <table class="table align-middle border-0 table-sm mb-0">
+{% block content %}
+<div class="balance-banner sales-balance"><div><span class="detail-label">Monthly sales</span><strong>${{ monthly_total|currency }}</strong></div><p>{{ month }}/{{ year }} · Invoice items</p></div><section class="data-panel"><div class="panel-toolbar"><div><h2>Sales register</h2><p>Products, quantities and invoice amounts.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Sales register"><table class="table align-middle border-0 table-sm mb-0">
                     <thead class="bg-light text-dark">
                     <tr>
                         <th style="width: 95px;">Date</th>
@@ -101,33 +98,5 @@
                     {% endfor %}
                     {% endfor %}
                     </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    {% if monthly_total > 0 %}
-    <div class="alert alert-secondary text-center mt-4 shadow-sm">
-        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|currency }}</strong></h4>
-    </div>
-    {% else %}
-    <div class="alert alert-light border text-center mt-4 shadow-sm">
-        <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> No invoices found for this month.</h4>
-    </div>
-    {% endif %}
-</div>
-
-<style>
-.table { border-radius: 12px !important; overflow: hidden; }
-.table th, .table td {
-    border: none !important;
-    padding: 10px 12px;
-    vertical-align: middle !important;
-}
-.table-row-light { background-color: #f9f9f9 !important; }
-.table-row-dark  { background-color: #ffffff !important; }
-.card { border-radius: 12px !important; }
-.bg-light { background-color: #f8f9fa !important; }
-</style>
-
+                </table></div></section>{% if monthly_total <= 0 %}<div class="empty-state">No invoices found for this month.</div>{% endif %}
 {% endblock %}

@@ -1,27 +1,29 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
-{% block content %}
-<h2>Transaction History for {{ product.name }} {{product.registration_code}}</h2>
+{% block page_section %}Inventory{% endblock %}
+{% block page_title %}Transaction history{% endblock %}
+{% block page_description %}{{ product.name }} · {{ product.registration_code|default:"Product movements" }}{% endblock %}
+{% block page_actions %}<a href="{% url 'product_list' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> Products</a>{% endblock %}
 
-<!-- Add filter form -->
-<form method="get" class="mb-4">
-    <div class="row">
-        <div class="col-md-5">
+{% block content %}
+<section class="data-panel"><div class="panel-toolbar"><div><h2>Stock movements</h2><p>Trace product quantities by customer and invoice.</p></div></div><form method="get" class="filter-panel filter-drawer">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="customer_filter">Customer name</label>
             <input type="text" id="customer_filter" name="customer_filter" class="form-control"
                    value="{{ request.GET.customer_filter }}" placeholder="Customer Name">
         </div>
-        <div class="col-md-5">
+        <div class="col-md-4">
+            <label for="invoice_filter">Invoice number</label>
             <input type="text" id="invoice_filter" name="invoice_filter" class="form-control"
                    value="{{ request.GET.invoice_filter }}" placeholder="Invoice Number">
         </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">Filter</button>
+        <div class="col-md-4 d-flex flex-wrap align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">Filter</button>
             <a href="?clear=1" class="btn btn-secondary">Clear</a>
         </div>
     </div>
-</form>
-
-<table class="table">
+</form><div class="table-responsive" tabindex="0" role="region" aria-label="Stock movements"><table class="table">
     <thead>
     <tr>
         <th>Date</th>
@@ -53,6 +55,5 @@
     </tr>
     {% endfor %}
     </tbody>
-</table>
-
+</table></div></section>
 {% endblock %}

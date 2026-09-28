@@ -1,266 +1,44 @@
+{% load static bootstrap5 %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lafarge Dashboard</title>
-    {% load static %}
-    {% load bootstrap5 %}
+    <meta name="theme-color" content="#145c4b">
+    <title>{% block title %}Lafarge ERP{% endblock %}</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
-    <style>
-        /* Sidebar Styles */
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            background-color: #343a40;
-            padding-top: 20px;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            display: block;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-
-        .sidebar .sidebar-header {
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-            padding-bottom: 10px;
-        }
-
-        .sidebar .nav-item i {
-            margin-right: 10px;
-        }
-
-        /* Main Content Area */
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: margin-left 0.3s;
-            padding-bottom: 70px; /* Space for mobile navbar */
-        }
-
-        /* Collapsed Sidebar */
-        .sidebar.collapsed {
-            width: 80px;
-        }
-
-        .sidebar.collapsed .nav-item span {
-            display: none;
-        }
-
-        .sidebar.collapsed .sidebar-header {
-            font-size: 16px;
-        }
-
-        .content.collapsed {
-            margin-left: 80px;
-        }
-
-        /* Sidebar Toggle Button */
-        .sidebar-toggle {
-            position: absolute;
-            top: 15px;
-            right: -20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .sidebar-toggle:hover {
-            background: #0056b3;
-        }
-
-        /* Mobile Bottom Navbar */
-        .mobile-navbar {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #343a40;
-            z-index: 1000;
-            padding: 5px 0;
-        }
-
-        .mobile-navbar a {
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            padding: 10px 5px;
-            font-size: 12px;
-            flex: 1;
-        }
-
-        .mobile-navbar a i {
-            display: block;
-            margin: 0 auto 5px;
-            font-size: 18px;
-        }
-
-        .mobile-navbar a span {
-            display: block;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px), (max-height: 500px) {
-            .sidebar {
-                display: none;
-            }
-
-            .mobile-navbar {
-                display: flex;
-                justify-content: space-around;
-            }
-
-            .content {
-                margin-left: 0;
-                padding-bottom: 70px;
-            }
-
-            .content.collapsed {
-                margin-left: 0;
-            }
-        }
-
-        @media (min-width: 769px) and (min-height: 501px) {
-            .mobile-navbar {
-                display: none !important;
-            }
-
-            .sidebar {
-                display: block;
-            }
-
-            .content {
-                margin-left: 250px;
-                padding-bottom: 20px;
-            }
-
-            .content.collapsed {
-                margin-left: 80px;
-            }
-        }
-.page-title {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    padding: 16px 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.title-text {
-    margin: 0;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        Lafarge Dashboard
-    </div>
-    <a href="{% url 'home' %}" class="nav-item"><i class="bi bi-house-door"></i> <span>Home</span></a>
-    <a href="{% url 'product_list' %}" class="nav-item"><i class="bi bi-box"></i> <span>Products</span></a>
-    {% if user.is_superuser or user.username == 'lafarge' %}
-    <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
-    <a href="{% url 'monthly_analyze_preview' %}" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Analysis</span></a>
-    <a href="{% url 'salesman_list' %}" class="nav-item"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
-    <a href="{% url 'deliveryman_list' %}" class="nav-item"><i class="bi bi-truck"></i> <span>Deliverymen</span></a>
-    {% endif %}
-    <a href="{% url 'customer_list' %}" class="nav-item"><i class="bi bi-people"></i> <span>Customers</span></a>
-    <a href="{% url 'invoice_list' %}" class="nav-item"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
-    <a href="{% url 'unpaid_invoices' %}" class="nav-item"><i class="bi bi-file-earmark-x"></i> <span>Statements</span></a>
-    <a href="{% url 'monthly_payment_preview' %}" class="nav-item"><i class="bi bi-credit-card-2-back"></i> <span>Payments</span></a>
-    <a href="{% url 'admin:index' %}" class="nav-item"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
+<body class="erp-app page-{{ request.resolver_match.url_name }}">
+<a class="skip-link" href="#content">Skip to content</a>
+<aside class="sidebar" id="sidebar" aria-label="Workspace sidebar">
+    <a class="sidebar-brand" href="{% url 'home' %}"><span class="brand-mark" aria-hidden="true">L</span><span>Lafarge<span class="brand-caption">Business workspace</span></span></a>
+    <nav class="sidebar-nav" aria-label="Main navigation">{% include "invoice/components/navigation.html" %}</nav>
+    <div class="sidebar-footer"><span class="footer-mark" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span><div>Lafarge ERP<small>Operations & reporting</small></div></div>
+</aside>
+<div class="workspace">
+    <header class="workspace-header">
+        <details class="mobile-menu">
+            <summary aria-label="Open navigation"><i class="bi bi-list" aria-hidden="true"></i><span>Menu</span></summary>
+            <nav aria-label="Mobile navigation">{% include "invoice/components/navigation.html" %}</nav>
+        </details>
+        <a href="{% url 'home' %}" class="workspace-name"><i class="bi bi-grid" aria-hidden="true"></i><span>Business workspace</span></a>
+        <div class="workspace-tools">
+            <span class="workspace-date">{% now "j M Y" %}</span>
+            {% if user.is_authenticated %}<div class="workspace-user"><span class="user-avatar" aria-hidden="true">{{ user.get_username|first|upper }}</span><span>{{ user.get_full_name|default:user.get_username }}<small>{% if user.is_superuser %}Administrator{% else %}Team member{% endif %}</small></span></div>{% endif %}
+        </div>
+    </header>
+    <main class="content" id="content" tabindex="-1">
+        <header class="page-header">
+            <div class="page-heading-group"><div class="page-eyebrow">{% block page_section %}Workspace{% endblock %}</div><h1>{% block page_title %}Lafarge{% endblock %}</h1><p>{% block page_description %}{% endblock %}</p></div>
+            <div class="page-actions">{% block page_actions %}{% endblock %}</div>
+        </header>
+        {% block content %}{% endblock %}
+        <footer class="workspace-footer"><span>Lafarge ERP</span><span>Operations, clearly organized.</span></footer>
+    </main>
 </div>
-
-<!-- Main Content -->
-<div class="content" id="content">
-    {% block content %}
-    {% endblock %}
-</div>
-
-<!-- Mobile Bottom Navbar -->
-<div class="mobile-navbar">
-    <a href="{% url 'home' %}"><i class="bi bi-house-door"></i> <span>Home</span></a>
-    <a href="{% url 'product_list' %}"><i class="bi bi-box"></i> <span>Products</span></a>
-    {% if user.is_superuser or user.username == 'lafarge' %}
-    <a href="{% url 'monthly_preview' %}" class="nav-item"><i class="bi bi-bar-chart"></i> <span>Sales</span></a>
-    <a href="{% url 'monthly_analyze_preview' %}" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Analysis</span></a>
-    <a href="{% url 'salesman_list' %}"><i class="bi bi-person-badge"></i> <span>Salesmen</span></a>
-    {% endif %}
-    <a href="{% url 'customer_list' %}"><i class="bi bi-people"></i> <span>Customers</span></a>
-    <a href="{% url 'invoice_list' %}"><i class="bi bi-file-earmark-text"></i> <span>Invoices</span></a>
-    <a href="{% url 'unpaid_invoices' %}" class="nav-item"><i class="bi bi-file-earmark-x"></i> <span>Statements</span></a>
-    <a href="{% url 'monthly_payment_preview' %}" class="nav-item"><i class="bi bi-credit-card-2-back"></i> <span>Payments</span></a>
-    <a href="{% url 'admin:index' %}"><i class="bi bi-shield-lock"></i> <span>Admin</span></a>
-</div>
-
-<!-- Sidebar Toggle Script -->
-<script>
-    function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("collapsed");
-        document.getElementById("content").classList.toggle("collapsed");
-    }
-
-    // Handle orientation changes
-    function handleResponsive() {
-        const sidebar = document.getElementById("sidebar");
-        const mobileNavbar = document.querySelector(".mobile-navbar");
-        const content = document.getElementById("content");
-
-        if (window.innerWidth <= 768 || window.innerHeight <= 500) {
-            // Mobile view
-            sidebar.style.display = "none";
-            mobileNavbar.style.display = "flex";
-            content.style.marginLeft = "0";
-            content.style.paddingBottom = "70px";
-        } else {
-            // Desktop view
-            sidebar.style.display = "block";
-            mobileNavbar.style.display = "none";
-            content.style.marginLeft = sidebar.classList.contains("collapsed") ? "80px" : "250px";
-            content.style.paddingBottom = "20px";
-        }
-    }
-
-    // Initial check
-    handleResponsive();
-
-    // Add event listener for resize and orientation changes
-    window.addEventListener("resize", handleResponsive);
-    window.addEventListener("orientationchange", handleResponsive);
-</script>
-{% bootstrap_javascript %}
 </body>
 </html>

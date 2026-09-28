@@ -1,0 +1,23 @@
+/* Shared by the Django workspace and Jazzmin. No build step or web fonts. */
+:root {
+    --erp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --erp-bg: #f4f5f6;
+    --erp-surface: #ffffff;
+    --erp-subtle: #f7f8f9;
+    --erp-border: #e0e3e7;
+    --erp-text: #1c2430;
+    --erp-muted: #6c727b;
+    --erp-primary: #2563eb;
+    --erp-primary-hover: #1d4ed8;
+    --erp-primary-soft: #eaeef4;
+    --erp-success: #163b70;
+    --erp-danger: #bb3345;
+    --erp-warning: #946200;
+    --erp-info: #0e6980;
+    --erp-sidebar: #ffffff;
+    --erp-sidebar-text: #5e6670;
+    --erp-radius: 10px;
+    --erp-control-radius: 7px;
+    --erp-shadow: 0 2px 6px rgba(25, 42, 67, 0.035);
+    --erp-focus: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
