@@ -1,37 +1,23 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
+{% block page_section %}Reporting{% endblock %}
+{% block page_title %}Product analysis{% endblock %}
+{% block page_description %}Monthly product revenue and sales performance.{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h1 class="page-heading">Monthly Product Analysis</h1>
-
-    {% if months %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-        {% for month in months %}
-        {% if month.total_revenue > 0 %}
-        <div class="col">
-            <a href="{{ month.url }}" class="text-decoration-none card-link">
-                <div class="card shadow-sm border-0 h-100 analyze-card">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">
-                            <i class="bi bi-graph-up-arrow"></i> {{ month.name }}
-                        </h5>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted small">Total Revenue:</span>
-                            <span class="fw-bold text-success">${{ month.total_revenue|currency }}</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endif %}
-        {% endfor %}
+<section class="data-panel">
+    <div class="panel-toolbar"><div><h2>Monthly records</h2><p>Select a period to open its detailed report.</p></div><span class="panel-label"><i class="bi bi-calendar3" aria-hidden="true"></i> By month</span></div>
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Monthly records">
+        <table class="table period-table">
+            <thead><tr><th scope="col">Period</th><th scope="col" class="text-end">Product revenue</th><th scope="col" class="text-end">Report</th></tr></thead>
+            <tbody>
+            {% with largest=months|dictsort:"total_revenue"|last %}{% if largest.total_revenue > 0 %}{% for month in months %}{% if month.total_revenue > 0 %}
+                <tr><td><a class="period-link" href="{{ month.url }}"><span class="period-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span>{{ month.name }}</a></td>
+                <td class="text-end amount">${{ month.total_revenue|currency }}</td>
+                <td class="text-end"><a class="row-action" href="{{ month.url }}">View report <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></td></tr>
+            {% endif %}{% endfor %}{% else %}<tr><td colspan="3" class="empty-state">No monthly records available.</td></tr>{% endif %}{% endwith %}
+            </tbody>
+        </table>
     </div>
-    {% else %}
-    <div class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle"></i> No product data available for analysis.
-    </div>
-    {% endif %}
-</div>
-
-
+</section>
 {% endblock %}

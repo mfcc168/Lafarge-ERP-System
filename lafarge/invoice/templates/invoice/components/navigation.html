@@ -2,23 +2,10 @@
 <a href="{% url 'home' %}" class="nav-item{% if route == 'home' %} active{% endif %}"{% if route == 'home' %} aria-current="page"{% endif %}>
     <i class="bi bi-house-door" aria-hidden="true"></i><span>Home</span>
 </a>
+<div class="nav-group"><div class="nav-caption">Operations</div>
 <a href="{% url 'product_list' %}" class="nav-item{% if route == 'product_list' or route == 'product_transactions' or route == 'product_transaction_detail' %} active{% endif %}"{% if route == 'product_list' %} aria-current="page"{% endif %}>
     <i class="bi bi-box" aria-hidden="true"></i><span>Products</span>
 </a>
-{% if user.is_superuser or user.username == 'lafarge' %}
-<a href="{% url 'monthly_preview' %}" class="nav-item{% if route == 'monthly_preview' or route == 'monthly_report' %} active{% endif %}"{% if route == 'monthly_preview' %} aria-current="page"{% endif %}>
-    <i class="bi bi-bar-chart" aria-hidden="true"></i><span>Sales</span>
-</a>
-<a href="{% url 'monthly_analyze_preview' %}" class="nav-item{% if route == 'monthly_analyze_preview' or route == 'monthly_analyze_detail' %} active{% endif %}"{% if route == 'monthly_analyze_preview' %} aria-current="page"{% endif %}>
-    <i class="bi bi-graph-up-arrow" aria-hidden="true"></i><span>Analysis</span>
-</a>
-<a href="{% url 'salesman_list' %}" class="nav-item{% if route == 'salesman_list' or route == 'salesman_detail' or route == 'salesman_monthly_preview' or route == 'salesman_monthly_report' %} active{% endif %}"{% if route == 'salesman_list' %} aria-current="page"{% endif %}>
-    <i class="bi bi-person-badge" aria-hidden="true"></i><span>Salesmen</span>
-</a>
-<a href="{% url 'deliveryman_list' %}" class="nav-item{% if route == 'deliveryman_list' or route == 'deliveryman_monthly_preview' or route == 'deliveryman_monthly_report' %} active{% endif %}"{% if route == 'deliveryman_list' %} aria-current="page"{% endif %}>
-    <i class="bi bi-truck" aria-hidden="true"></i><span>Deliverymen</span>
-</a>
-{% endif %}
 <a href="{% url 'customer_list' %}" class="nav-item{% if route == 'customer_list' or route == 'customer_detail' %} active{% endif %}"{% if route == 'customer_list' %} aria-current="page"{% endif %}>
     <i class="bi bi-people" aria-hidden="true"></i><span>Customers</span>
 </a>
@@ -31,7 +18,30 @@
 <a href="{% url 'monthly_payment_preview' %}" class="nav-item{% if route == 'monthly_payment_preview' or route == 'monthly_payment_report' %} active{% endif %}"{% if route == 'monthly_payment_preview' %} aria-current="page"{% endif %}>
     <i class="bi bi-credit-card-2-back" aria-hidden="true"></i><span>Payments</span>
 </a>
+</div>
+{% if user.is_superuser or user.username == 'lafarge' %}
+<div class="nav-group"><div class="nav-caption">Reporting</div>
+<a href="{% url 'monthly_preview' %}" class="nav-item{% if route == 'monthly_preview' or route == 'monthly_report' %} active{% endif %}"{% if route == 'monthly_preview' %} aria-current="page"{% endif %}>
+    <i class="bi bi-bar-chart" aria-hidden="true"></i><span>Sales</span>
+</a>
+<a href="{% url 'monthly_analyze_preview' %}" class="nav-item{% if route == 'monthly_analyze_preview' or route == 'monthly_analyze_detail' %} active{% endif %}"{% if route == 'monthly_analyze_preview' %} aria-current="page"{% endif %}>
+    <i class="bi bi-graph-up-arrow" aria-hidden="true"></i><span>Analysis</span>
+</a>
+</div>
+{% endif %}
+{% if user.is_superuser or user.username == 'lafarge' %}
+<div class="nav-group"><div class="nav-caption">Team</div>
+<a href="{% url 'salesman_list' %}" class="nav-item{% if route == 'salesman_list' or route == 'salesman_detail' or route == 'salesman_monthly_preview' or route == 'salesman_monthly_report' %} active{% endif %}"{% if route == 'salesman_list' %} aria-current="page"{% endif %}>
+    <i class="bi bi-person-badge" aria-hidden="true"></i><span>Salesmen</span>
+</a>
+<a href="{% url 'deliveryman_list' %}" class="nav-item{% if route == 'deliveryman_list' or route == 'deliveryman_monthly_preview' or route == 'deliveryman_monthly_report' %} active{% endif %}"{% if route == 'deliveryman_list' %} aria-current="page"{% endif %}>
+    <i class="bi bi-truck" aria-hidden="true"></i><span>Deliverymen</span>
+</a>
+</div>
+{% endif %}
+<div class="nav-group"><div class="nav-caption">Manage</div>
 <a href="{% url 'admin:index' %}" class="nav-item">
     <i class="bi bi-shield-lock" aria-hidden="true"></i><span>Admin</span>
 </a>
+</div>
 {% endwith %}

@@ -1,32 +1,16 @@
 {% extends "invoice/base.html" %}
 {% load humanize %}
 
+{% block page_section %}Delivery reports{% endblock %}
+{% block page_title %}{{ deliveryman.name }} · {{ month }}/{{ year }}{% endblock %}
+{% block page_description %}Delivered invoices, grouped by date.{% endblock %}
+{% block page_actions %}<a href="{% url 'deliveryman_monthly_preview' deliveryman.id %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
+
 {% block content %}
-<div class="container-fluid py-4 py-lg-5">
-    {% include "invoice/components/breadcrumb.html" %}
-
-    <!-- Header + TOTAL MONTHLY COUNT (Now 100% accurate) -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4 mb-4">
-        <div>
-            <h1 class="page-heading">{{ deliveryman.name }}</h1>
-            <p class="text-muted mb-3">
-                Delivery Report — {{ year }}-{{ month|stringformat:"02d" }}
-            </p>
-
-            <!-- Total Invoice Count – Now CORRECT -->
-            <div class="d-inline-flex flex-wrap align-items-center gap-3 surface px-3 py-3">
-                <span class="fw-semibold text-dark">Total Deliveries This Month:</span>
-                <span class="fs-3 fw-bold text-primary">{{ total_monthly_invoices }}</span>
-                <span class="text-muted fw-medium">invoice{{ total_monthly_invoices|pluralize }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Daily Breakdown -->
-    {% if daily_groups %}
+<div class="page-stack"><div class="balance-banner sales-balance"><div><span class="detail-label">Deliveries this month</span><strong>{{ total_monthly_invoices }}</strong></div><p>{{ month }}/{{ year }} · Delivered invoices</p></div>{% if daily_groups %}
         {% for date, invoices in daily_groups %}
-        <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="card-header bg-dark text-white border-0 py-4">
+        <div class="data-panel">
+            <div class="panel-toolbar">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-semibold fs-4">{{ date|date:"l, j F Y" }}</h5>
                     <span class="badge bg-white text-dark fs-6 px-3 py-2 rounded-pill">
@@ -51,7 +35,7 @@
                                 <span class="fw-bold text-primary fs-5">#{{ inv.number }}</span>
                             </td>
                             <td class="py-3 text-dark">{{ inv.customer.name }}</td>
-                            <td class="py-3">
+                            <td class="">
                                 <div class="small text-secondary lh-lg">
                                     {% for item in inv.display_items %}
                                         <div class="d-flex align-items-center gap-2">
@@ -72,7 +56,7 @@
 
     {% else %}
         <div class="text-center py-5 my-5">
-            <i class="bi bi-truck display-1 text-muted opacity-25 mb-4"></i>
+            <i class="bi bi-truck display-1 text-muted opacity-25 mb-4" aria-hidden="true"></i>
             <h4 class="text-muted fw-light">No deliveries this month</h4>
             <p class="text-muted">Nothing recorded for {{ year }}-{{ month|stringformat:"02d" }}</p>
         </div>

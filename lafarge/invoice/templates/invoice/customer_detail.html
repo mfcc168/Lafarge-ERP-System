@@ -3,56 +3,25 @@
 {% load export_url from django_tables2 %}
 {% load render_table from django_tables2 %}
 
+{% block page_section %}Customers{% endblock %}
+{% block page_title %}{{ customer.name }}{% if customer.care_of %} · {{ customer.care_of }}{% endif %}{% endblock %}
+{% block page_description %}Account information and purchase history.{% endblock %}
+
+{% block page_actions %}
+                <a href="{% export_url 'xlsx' %}" class="btn btn-success">
+                    <i class="bi bi-file-earmark-spreadsheet" aria-hidden="true"></i> Export to XLSX
+                </a>
+                <a href="{% url 'customer_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to Customer List
+                </a>
+            {% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            {% if customer.care_of %}
-            <h1 class="page-heading">{{ customer.name }} {{ customer.care_of }}'s Profile</h1>
-            {% else %}
-            <h1 class="page-heading">{{ customer.name }}'s Profile</h1>
-            {% endif %}
-
-            <!-- Customer Details -->
-            <div class="bg-light p-4 rounded-3 shadow-sm mb-4">
-                <p class="mb-1"><strong>Address:</strong> {{ customer.address }}</p>
-                <p class="mb-0"><strong>Office Hours:</strong> {{ customer.office_hour }}</p>
-                <p class="mb-0"><strong>Telephone Number:</strong> {{ customer.telephone_number }}</p>
-                <p class="mb-0"><strong>Salesman:</strong> {{ customer.salesman.name }}</p>
-            </div>
-
-            <!-- Invoices Header -->
-            <h3 class="mt-4 text-secondary">Purchase Records</h3>
-
-            <!-- Filter Form -->
-            <div class="filter-panel mb-4">
-                <form action="" method="get" class="form">
+<div class="page-stack"><section class="data-panel"><div class="panel-toolbar"><h2>Account details</h2><span class="panel-label"><i class="bi bi-building" aria-hidden="true"></i> Customer profile</span></div><dl class="profile-grid"><div><dt>Address</dt><dd>{{ customer.address }}</dd></div><div><dt>Office hours</dt><dd>{{ customer.office_hour|default:"—" }}</dd></div><div><dt>Telephone</dt><dd>{{ customer.telephone_number|default:"—" }}</dd></div><div><dt>Salesman</dt><dd>{{ customer.salesman.name|default:"—" }}</dd></div></dl></section><section class="data-panel"><div class="panel-toolbar"><div><h2>Purchase records <span class="count-pill">{{ table.rows|length }}</span></h2><p>Filter by date to find the records you need.</p></div><button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#purchaseFilters" aria-controls="purchaseFilters" aria-expanded="false"><i class="bi bi-sliders" aria-hidden="true"></i> Filters</button></div><div class="collapse filter-drawer filter-panel" id="purchaseFilters"><form action="" method="get" class="form">
                     <div class="row g-3">
                         {% bootstrap_form filter.form layout='inline' %}
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">
-                        <i class="bi bi-funnel"></i> Apply Filter
+                        <i class="bi bi-funnel" aria-hidden="true"></i> Apply Filter
                     </button>
-                </form>
-            </div>
-
-            <!-- Export & Back Buttons -->
-            <div class="page-actions justify-content-between mb-3">
-                <a href="{% export_url 'xlsx' %}" class="btn btn-success">
-                    <i class="bi bi-file-earmark-spreadsheet"></i> Export to XLSX
-                </a>
-                <a href="{% url 'customer_list' %}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Customer List
-                </a>
-            </div>
-
-            <!-- Invoices Table -->
-            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
-                {% render_table table %}
-            </div>
-        </div>
-    </div>
-</div>
-
-
+                </form></div><div class="table-responsive" tabindex="0" role="region" aria-label="Purchase records">{% render_table table %}</div></section></div>
 {% endblock %}

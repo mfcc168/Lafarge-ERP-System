@@ -110,7 +110,7 @@ JAZZMIN_SETTINGS = {
     "related_modal_active": True,
     "sidebar": "collapsed",
     "custom_css": "css/admin_overrides.css",
-    "show_ui_builder": True,
+    "show_ui_builder": False,  # Keep the shared application appearance consistent.
     "custom_js": "js/custom_admin.js",
     # Additional modal settings
     "modal_backdrop": "static",

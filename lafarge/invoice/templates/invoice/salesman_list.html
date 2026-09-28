@@ -1,26 +1,17 @@
 {% extends 'invoice/base.html' %}
+{% block page_section %}Team{% endblock %}
+{% block page_title %}Salesmen{% endblock %}
+{% block page_description %}Sales representatives and their monthly performance.{% endblock %}
+{% block page_actions %}{% if perms.invoice.add_salesman %}<a href="{% url 'admin:invoice_salesman_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add salesman</a>{% endif %}{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h1 class="page-heading">Salesman List</h1>
-
-    <div class="row g-3">
-        {% for salesman in salesmen %}
-        <div class="col-md-4">
-            <a href="{% url 'salesman_monthly_preview' salesman.id %}" class="text-decoration-none card-link">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-dark fw-bold">{{ salesman.name }}</h5>
-                        <p class="card-text text-muted fs-6">Code: <span class="fw-semibold">{{ salesman.code }}</span>
-                        </p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% empty %}
-        <div class="col-12"><div class="alert alert-light border">No salesmen available.</div></div>
-        {% endfor %}
-    </div>
-</div>
-
-
+<section class="data-panel">
+    <div class="panel-toolbar"><div><h2>Team directory <span class="count-pill">{{ salesmen|length }}</span></h2><p>Open a team member's monthly records.</p></div></div>
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Team directory">
+    <table class="table directory-table"><thead><tr><th scope="col">Name</th><th scope="col">Code</th><th scope="col" class="text-end">Reports</th></tr></thead><tbody>
+    {% for salesman in salesmen %}
+    <tr><td><a class="person-link" href="{% url 'salesman_monthly_preview' salesman.id %}"><span class="person-avatar" aria-hidden="true">{{ salesman.name|first }}</span>{{ salesman.name }}</a></td><td><span class="badge bg-secondary">{{ salesman.code }}</span></td><td class="text-end"><a class="row-action" href="{% url 'salesman_monthly_preview' salesman.id %}">Monthly records <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></td></tr>
+    {% empty %}<tr><td colspan="3" class="empty-state">No team members available.</td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
 {% endblock %}

@@ -2,22 +2,13 @@
 {% load bootstrap5 %}
 {% load custom_filter %}
 
+{% block page_section %}Statements{% endblock %}
+{% block page_title %}{{ year_month }}{% endblock %}
+{% block page_description %}Outstanding invoices for the selected month.{% endblock %}
+{% block page_actions %}<a href="{% url 'unpaid_invoices' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All statements</a>{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            <h1 class="page-heading">Unpaid Invoices for {{ year_month }}</h1>
-
-            <!-- Total Unpaid Amount -->
-            <div class="alert alert-warning rounded-3 p-4 text-center shadow-sm">
-                <h2 class="mb-0">Total Unpaid Amount:
-                    <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong>
-                </h2>
-            </div>
-
-            <!-- Unpaid Invoices Table -->
-            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
-                <table class="table align-middle shadow-sm rounded-3">
+<div class="balance-banner"><div><span class="detail-label">Outstanding balance</span><strong>HK$ {{ total_unpaid|currency }}</strong></div><p>{{ year_month }}</p></div><section class="data-panel"><div class="panel-toolbar"><div><h2>Unpaid invoices</h2><p>Customer balances for this period.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Unpaid invoices"><table class="table align-middle shadow-sm rounded-3">
                     <thead class="table-dark text-white">
                     <tr>
                         <th>Invoice Number</th>
@@ -40,11 +31,5 @@
                     </tr>
                     {% endfor %}
                     </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
-
+                </table></div></section>
 {% endblock %}

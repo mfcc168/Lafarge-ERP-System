@@ -1,26 +1,17 @@
 {% extends 'invoice/base.html' %}
+{% block page_section %}Team{% endblock %}
+{% block page_title %}Deliverymen{% endblock %}
+{% block page_description %}Delivery team and monthly delivery records.{% endblock %}
+{% block page_actions %}{% if perms.invoice.add_deliveryman %}<a href="{% url 'admin:invoice_deliveryman_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add deliveryman</a>{% endif %}{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h1 class="page-heading">Deliveryman List</h1>
-
-    <div class="row g-3">
-        {% for deliveryman in deliverymen %}
-        <div class="col-md-4">
-            <a href="{% url 'deliveryman_monthly_preview' deliveryman.id %}" class="text-decoration-none card-link">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-dark fw-bold">{{ deliveryman.name }}</h5>
-                        <p class="card-text text-muted fs-6">Code: <span class="fw-semibold">{{ deliveryman.code }}</span>
-                        </p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% empty %}
-        <div class="col-12"><div class="alert alert-light border">No deliverymen available.</div></div>
-        {% endfor %}
-    </div>
-</div>
-
-
+<section class="data-panel">
+    <div class="panel-toolbar"><div><h2>Team directory <span class="count-pill">{{ deliverymen|length }}</span></h2><p>Open a team member's monthly records.</p></div></div>
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Team directory">
+    <table class="table directory-table"><thead><tr><th scope="col">Name</th><th scope="col">Code</th><th scope="col" class="text-end">Reports</th></tr></thead><tbody>
+    {% for deliveryman in deliverymen %}
+    <tr><td><a class="person-link" href="{% url 'deliveryman_monthly_preview' deliveryman.id %}"><span class="person-avatar" aria-hidden="true">{{ deliveryman.name|first }}</span>{{ deliveryman.name }}</a></td><td><span class="badge bg-secondary">{{ deliveryman.code }}</span></td><td class="text-end"><a class="row-action" href="{% url 'deliveryman_monthly_preview' deliveryman.id %}">Monthly records <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></td></tr>
+    {% empty %}<tr><td colspan="3" class="empty-state">No team members available.</td></tr>{% endfor %}
+    </tbody></table></div>
+</section>
 {% endblock %}

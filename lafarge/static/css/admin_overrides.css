@@ -20,7 +20,9 @@ body {
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link {
     border-radius: var(--erp-control-radius);
 }
-:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link.active {
+:is(.main-sidebar, .app-sidebar)
+    :is(.nav-sidebar, .sidebar-menu)
+    .nav-link.active {
     background: var(--erp-primary) !important;
     color: white !important;
 }
@@ -206,4 +208,51 @@ body {
     border-radius: 0.25rem !important;
     text-align: center !important;
     display: inline-block !important;
+}
+
+/* The admin uses the same light navigation and green action hierarchy. */
+:is(.main-sidebar, .app-sidebar) {
+    border-right: 1px solid var(--erp-border);
+    box-shadow: none !important;
+}
+:is(.main-sidebar, .app-sidebar) .brand-link {
+    color: var(--erp-text) !important;
+    border-color: var(--erp-border);
+    font-weight: 650;
+}
+:is(.main-sidebar, .app-sidebar) :is(.nav-link, .nav-header, .user-panel a) {
+    color: #667c6d !important;
+}
+:is(.main-sidebar, .app-sidebar)
+    :is(.nav-sidebar, .sidebar-menu)
+    .nav-link.active {
+    background: #e9f3ed !important;
+    color: #145c4b !important;
+    box-shadow: inset 3px 0 #14634f;
+}
+:is(.content-header, .app-content-header) h1 {
+    font-size: 1.8rem;
+    letter-spacing: -0.035em;
+    color: var(--erp-text);
+}
+:is(.content-wrapper, .app-main) .card-header {
+    background: white;
+    padding: 18px 22px;
+}
+:is(.content-wrapper, .app-main) .table thead th {
+    background: #f4f7f5;
+    color: #687f6f;
+    font-size: 0.72rem;
+}
+:is(.content-wrapper, .app-main) .table td {
+    padding: 12px 16px;
+}
+:is(.content-wrapper, .app-main) .btn-success {
+    background: var(--erp-primary);
+    border-color: var(--erp-primary);
+}
+:is(.content-wrapper, .app-main) .btn-info {
+    background: #eef5f0;
+    border-color: #d5e3d9;
+    color: #466653;
 }

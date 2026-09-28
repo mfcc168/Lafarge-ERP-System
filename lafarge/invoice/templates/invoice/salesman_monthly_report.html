@@ -1,22 +1,26 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
-{% block content %}
-<div class="container mt-5">
-    {% include "invoice/components/breadcrumb.html" %}
+{% block page_section %}Sales reports{% endblock %}
+{% block page_title %}{{ salesman.name }} · {{ month }}/{{ year }}{% endblock %}
+{% block page_description %}Monthly sales, grouped by week.{% endblock %}
+{% block page_actions %}<a href="{% url 'salesman_monthly_preview' salesman.id %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
 
-    <div class="page-toolbar d-flex justify-content-between align-items-center mb-4">
-        <h1 class="page-heading">Monthly Report - {{ month }}/{{ year }}</h1>
-    </div>
+{% block content %}
+
+<div class="page-stack"><div class="balance-banner sales-balance"><div><span class="detail-label">Monthly sales</span><strong>${{ monthly_total|currency }}</strong></div><p>{{ month }}/{{ year }}</p></div>
+
+
+
 
     {% for week_num, data in weeks.items %}
     {% with valid_invoices=data.invoices|dictsort:"delivery_date" %}
     {% if valid_invoices|length > 0 %}
-    <div class="card shadow-sm mb-4 border-0 rounded-3">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+    <div class="data-panel mb-4">
+        <div class="panel-toolbar">
             <h5 class="mb-0 fw-bold text-dark">Week {{ week_num }}</h5>
-            <span class="fs-5 fw-bold text-muted">Total: ${{ data.total|currency }}</span>
+            <span class="period-total">Total: ${{ data.total|currency }}</span>
         </div>
-        <div class="card-body bg-white rounded-bottom">
+        <div class="panel-table-body">
             <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
                 <table class="table align-middle border-0">
                     <thead class="bg-light text-dark">
@@ -62,17 +66,5 @@
     {% endwith %}
     {% endfor %}
 
-    {% if monthly_total > 0 %}
-    <div class="alert alert-secondary text-center mt-4 shadow-sm">
-        <h4 class="mb-0">Total for {{ month }}/{{ year }}: <strong>${{ monthly_total|currency }}</strong></h4>
     </div>
-
-    {% else %}
-    <div class="alert alert-light border text-center mt-4 shadow-sm">
-        <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> No invoices found for this month.</h4>
-    </div>
-    {% endif %}
-</div>
-
-
 {% endblock %}

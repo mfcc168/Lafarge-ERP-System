@@ -1,29 +1,23 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
+{% block page_section %}Finance{% endblock %}
+{% block page_title %}Payments{% endblock %}
+{% block page_description %}Choose a month to review payment records.{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h1 class="page-heading">Monthly Payment Summary</h1>
-
-    {% if months %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-        {% for month in months %}
-        {% if month.total > 0 %}
-        <div class="col">
-            <a href="{% url 'monthly_payment_report' year=month.year month=month.month %}" class="text-decoration-none card-link">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ month.name }}</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endif %}
-        {% endfor %}
+<section class="data-panel">
+    <div class="panel-toolbar"><div><h2>Monthly records</h2><p>Select a period to open its detailed report.</p></div><span class="panel-label"><i class="bi bi-calendar3" aria-hidden="true"></i> By month</span></div>
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Monthly records">
+        <table class="table period-table">
+            <thead><tr><th scope="col">Period</th><th scope="col" class="text-end">Payments received</th><th scope="col" class="text-end">Report</th></tr></thead>
+            <tbody>
+            {% with largest=months|dictsort:"total"|last %}{% if largest.total > 0 %}{% for month in months %}{% if month.total > 0 %}
+                <tr><td><a class="period-link" href="{% url 'monthly_payment_report' year=month.year month=month.month %}"><span class="period-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span>{{ month.name }}</a></td>
+                <td class="text-end amount">${{ month.total|currency }}</td>
+                <td class="text-end"><a class="row-action" href="{% url 'monthly_payment_report' year=month.year month=month.month %}">View report <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></td></tr>
+            {% endif %}{% endfor %}{% else %}<tr><td colspan="3" class="empty-state">No monthly records available.</td></tr>{% endif %}{% endwith %}
+            </tbody>
+        </table>
     </div>
-    {% else %}
-    <div class="alert alert-warning">No invoices available.</div>
-    {% endif %}
-</div>
-
-
+</section>
 {% endblock %}

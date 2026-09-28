@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#152238">
+    <meta name="theme-color" content="#145c4b">
     <title>{% block title %}Lafarge ERP{% endblock %}</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -14,36 +14,31 @@
 </head>
 <body class="erp-app page-{{ request.resolver_match.url_name }}">
 <a class="skip-link" href="#content">Skip to content</a>
-
 <aside class="sidebar" id="sidebar" aria-label="Workspace sidebar">
-    <a class="sidebar-brand" href="{% url 'home' %}">
-        <span class="brand-mark" aria-hidden="true">L</span>
-        <span>Lafarge<span class="brand-caption">ERP workspace</span></span>
-    </a>
-    <div class="nav-caption">Workspace</div>
-    <nav class="sidebar-nav" aria-label="Main navigation">
-        {% include "invoice/components/navigation.html" %}
-    </nav>
-    <div class="sidebar-footer">Lafarge ERP System</div>
+    <a class="sidebar-brand" href="{% url 'home' %}"><span class="brand-mark" aria-hidden="true">L</span><span>Lafarge<span class="brand-caption">Business workspace</span></span></a>
+    <nav class="sidebar-nav" aria-label="Main navigation">{% include "invoice/components/navigation.html" %}</nav>
+    <div class="sidebar-footer"><span class="footer-mark" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span><div>Lafarge ERP<small>Operations & reporting</small></div></div>
 </aside>
-
 <div class="workspace">
     <header class="workspace-header">
-        <a href="{% url 'home' %}" class="workspace-name">Lafarge <span> / Workspace</span></a>
-        {% if user.is_authenticated %}
-        <div class="workspace-user">
-            <span class="user-avatar" aria-hidden="true">{{ user.get_username|first|upper }}</span>
-            <span>{{ user.get_full_name|default:user.get_username }}</span>
+        <details class="mobile-menu">
+            <summary aria-label="Open navigation"><i class="bi bi-list" aria-hidden="true"></i><span>Menu</span></summary>
+            <nav aria-label="Mobile navigation">{% include "invoice/components/navigation.html" %}</nav>
+        </details>
+        <a href="{% url 'home' %}" class="workspace-name"><i class="bi bi-grid" aria-hidden="true"></i><span>Business workspace</span></a>
+        <div class="workspace-tools">
+            <span class="workspace-date">{% now "j M Y" %}</span>
+            {% if user.is_authenticated %}<div class="workspace-user"><span class="user-avatar" aria-hidden="true">{{ user.get_username|first|upper }}</span><span>{{ user.get_full_name|default:user.get_username }}<small>{% if user.is_superuser %}Administrator{% else %}Team member{% endif %}</small></span></div>{% endif %}
         </div>
-        {% endif %}
     </header>
     <main class="content" id="content" tabindex="-1">
+        <header class="page-header">
+            <div class="page-heading-group"><div class="page-eyebrow">{% block page_section %}Workspace{% endblock %}</div><h1>{% block page_title %}Lafarge{% endblock %}</h1><p>{% block page_description %}{% endblock %}</p></div>
+            <div class="page-actions">{% block page_actions %}{% endblock %}</div>
+        </header>
         {% block content %}{% endblock %}
+        <footer class="workspace-footer"><span>Lafarge ERP</span><span>Operations, clearly organized.</span></footer>
     </main>
 </div>
-
-<nav class="mobile-navbar" aria-label="Mobile navigation">
-    {% include "invoice/components/navigation.html" %}
-</nav>
 </body>
 </html>

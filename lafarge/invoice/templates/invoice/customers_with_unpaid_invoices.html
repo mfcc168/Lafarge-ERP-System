@@ -1,24 +1,12 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
 
+{% block page_section %}Finance{% endblock %}
+{% block page_title %}Statements{% endblock %}
+{% block page_description %}Outstanding balances by month and customer.{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            <h1 class="page-heading">Customers with Unpaid Invoices</h1>
-
-            <!-- Total Unpaid Amount -->
-            <div class="alert alert-warning rounded-3 p-4 text-center shadow-sm">
-                <h2 class="mb-0">Total Unpaid Amount:
-                    <strong class="text-danger">HK$ {{ total_unpaid|currency }}</strong>
-                </h2>
-            </div>
-
-            <!-- Monthly Unpaid Totals -->
-            <div class="bg-light p-3 rounded-3 mb-4">
-                <h3 class="text-dark">Monthly Unpaid Totals</h3>
-                <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
-                    <table class="table align-middle shadow-sm rounded-3">
+<div class="balance-banner"><div><span class="detail-label">Outstanding balance</span><strong>HK$ {{ total_unpaid|currency }}</strong></div><p>Total across unpaid invoices</p><span class="balance-icon" aria-hidden="true"><i class="bi bi-receipt"></i></span></div><div class="page-stack"><section class="data-panel"><div class="panel-toolbar"><div><h2>Monthly balances</h2><p>Open a month to review its unpaid invoices.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Monthly balances"><table class="table align-middle shadow-sm rounded-3">
                         <thead class="table-dark text-white">
                         <tr>
                             <th>Month</th>
@@ -39,14 +27,7 @@
                         </tr>
                         {% endfor %}
                         </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Customers and Unpaid Invoices -->
-            <h3 class="mt-4 text-secondary">Customers & Unpaid Invoices</h3>
-            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
-                <table class="table align-middle shadow-sm rounded-3">
+                    </table></div></section><section class="data-panel"><div class="panel-toolbar"><div><h2>Customer balances</h2><p>Outstanding invoices grouped by account.</p></div></div><div class="table-responsive" tabindex="0" role="region" aria-label="Customer balances"><table class="table align-middle shadow-sm rounded-3">
                     <thead class="table-dark text-white">
                     <tr>
                         <th style="width: 30%;">Customer Name</th>
@@ -92,16 +73,7 @@
                     </tr>
                     {% endfor %}
                     </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
-<!-- JavaScript for Clickable Rows -->
-<script>
+                </table></div></section></div><script>
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".clickable-row").forEach(row => {
         row.addEventListener("click", function () {
@@ -111,5 +83,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
-
 {% endblock %}

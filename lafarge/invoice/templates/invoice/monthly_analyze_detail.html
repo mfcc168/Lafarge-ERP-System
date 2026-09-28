@@ -1,27 +1,14 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter %}
-{% block content %}
-<div class="container-fluid mt-4">
-    <!-- Header -->
-    <div class="page-toolbar d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="page-heading">
-                <i class="bi bi-bar-chart-fill text-primary"></i> 
-                Product Analysis - {{ month_name }}
-            </h1>
-            <p class="text-muted mb-0">
-                <i class="bi bi-info-circle"></i> 
-                Revenue-based analysis of {{ total_products }} products | Total: ${{ total_revenue|currency }}
-            </p>
-        </div>
-        <a href="{% url 'monthly_analyze_preview' %}" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-left"></i> Back to Overview
-        </a>
-    </div>
+{% block page_section %}Product analysis{% endblock %}
+{% block page_title %}{{ month_name }}{% endblock %}
+{% block page_description %}Revenue and quantity breakdown for {{ total_products }} products.{% endblock %}
 
-    <!-- Summary Cards -->
+{% block page_actions %}<a href="{% url 'monthly_analyze_preview' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
+{% block content %}
+<div class="page-stack">    <!-- Summary Cards -->
     <div>
-            <div class="card border-0 shadow-sm summary-card revenue-card">
+            <div class="data-panel summary-card revenue-card">
                 <div class="card-body text-center">
                     <h3 class="fw-bold text-success">${{ total_revenue|currency }}</h3>
                     <p class="text-muted mb-0">Total Revenue</p>
@@ -32,10 +19,10 @@
     <!-- Chart Section -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0">
+            <div class="data-panel">
+                <div class="panel-toolbar">
                     <h5 class="mb-0">
-                        <i class="bi bi-graph-up"></i> 
+                        <i class="bi bi-graph-up" aria-hidden="true"></i>
                         Product Revenue Analysis
                         <small class="text-muted">(Top 20 Products)</small>
                     </h5>
@@ -52,10 +39,10 @@
     <!-- Data Table -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0">
+            <div class="data-panel">
+                <div class="panel-toolbar">
                     <h5 class="mb-0">
-                        <i class="bi bi-table"></i> 
+                        <i class="bi bi-table" aria-hidden="true"></i>
                         Detailed Product Data
                     </h5>
                 </div>

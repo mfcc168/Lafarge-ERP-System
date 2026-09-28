@@ -2,20 +2,21 @@
 {% load bootstrap5 %}
 {% load render_table from django_tables2 %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            <h1 class="page-heading">Invoice List</h1>
-            {% if filter %}
-            <div class="filter-panel mb-4">
-                <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#filterSection" aria-controls="filterSection" aria-expanded="false">
-                    <i class="bi bi-funnel"></i> Show Filters
-                </button>
+{% block page_section %}Operations{% endblock %}
+{% block page_title %}Invoices{% endblock %}
+{% block page_description %}Find, review and manage your invoice records.{% endblock %}
+{% block page_actions %}{% if perms.invoice.add_invoice %}<a href="{% url 'admin:invoice_invoice_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> New invoice</a>{% endif %}{% endblock %}
 
-                <div class="collapse" id="filterSection">
-                    <form action="" method="get">
+{% block content %}
+<section class="data-panel">
+    <div class="panel-toolbar">
+        <div><h2>Invoice register <span class="count-pill">{{ table.rows|length }}</span></h2>
+        <p>Search and review your invoices.</p></div>
+        {% if filter %}<button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-controls="filterSection" aria-expanded="false"><i class="bi bi-sliders" aria-hidden="true"></i> Filters</button>{% endif %}
+    </div>
+    {% if filter %}
+    <div class="collapse filter-drawer filter-panel" id="filterSection">
+        <form action="" method="get">
                         <div class="row g-3">
                             <!-- Customer Filter -->
                             <div class="col-md-4">
@@ -34,7 +35,6 @@
                                 <label class="form-label" for="{{ filter.form.number.id_for_label }}">Invoice Number</label>
                                 {{ filter.form.number }}
                             </div>
-
 
                             <!-- Delivery Date Filters -->
                             <div class="col-md-4">
@@ -78,26 +78,20 @@
                             <!-- Filter & Reset Buttons -->
                             <div class="col-12 text-end">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-funnel"></i> Apply Filters
+                                    <i class="bi bi-funnel" aria-hidden="true"></i> Apply Filters
                                 </button>
                                 <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
-                                    <i class="bi bi-x-circle"></i> Reset
+                                    <i class="bi bi-x-circle" aria-hidden="true"></i> Reset
                                 </a>
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-            {% endif %}
-
-
-            <div class="table-responsive rounded-3" tabindex="0" role="region" aria-label="Scrollable data table">
-                {% render_table table %}
-            </div>
-        </div>
     </div>
-</div>
-
+    {% endif %}
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Invoice register">
+        {% render_table table %}
+    </div>
+</section>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll(".invoice-table tbody tr").forEach(row => {

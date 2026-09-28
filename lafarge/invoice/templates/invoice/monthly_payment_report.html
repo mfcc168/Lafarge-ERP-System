@@ -1,16 +1,12 @@
 {% extends "invoice/base.html" %}
 {% load custom_filter l10n static %}
-{% block content %}
-<div class="container mt-5">
-    <div class="page-toolbar d-flex justify-content-between align-items-center mb-4">
-        <h1 class="page-heading">Monthly Payment Report - {{ month }}/{{ year }}</h1>
-    </div>
+{% block page_section %}Payments{% endblock %}
+{% block page_title %}Monthly payments · {{ month }}/{{ year }}{% endblock %}
+{% block page_description %}Payment dates, methods and grouped amounts.{% endblock %}
+{% block page_actions %}<a href="{% url 'monthly_payment_preview' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
 
-    <div class="card shadow-sm mb-4 border-0 rounded-3">
-        <div class="card-body bg-white rounded-bottom">
-            <p id="payment-sort-help" class="small text-muted mb-3">Click a column heading to sort. Grouped prices are totals for matching payment details.</p>
-            <div class="table-responsive" tabindex="0" role="region" aria-label="Scrollable data table">
-                <table id="monthly-payment-table" class="table align-middle border-0" aria-describedby="payment-sort-help">
+{% block content %}
+<section class="data-panel"><div class="panel-toolbar"><div><h2>Payment register</h2><p>Sort by any column to review payments and grouped totals.</p></div><span class="panel-label"><i class="bi bi-arrow-down-up" aria-hidden="true"></i> Sortable columns</span></div><p id="payment-sort-help" class="table-help">Grouped prices are totals for matching payment details.</p><div class="table-responsive" tabindex="0" role="region" aria-label="Payment register"><table id="monthly-payment-table" class="table align-middle border-0" aria-describedby="payment-sort-help">
                     <thead class="bg-light text-dark">
                     <tr>
                         <th scope="col" data-sort-type="date" aria-sort="none">
@@ -87,14 +83,5 @@
                             {% endfor %}
                         {% endfor %}
                     </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-<script src="{% static 'js/monthly_payment_report.js' %}" defer></script>
-
+                </table></div></section><script src="{% static 'js/monthly_payment_report.js' %}" defer></script>
 {% endblock %}
