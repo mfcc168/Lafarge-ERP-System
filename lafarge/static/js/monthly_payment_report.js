@@ -58,7 +58,6 @@
             headers.forEach((otherHeader) => {
                 const active = otherHeader === header;
                 otherHeader.setAttribute('aria-sort', active ? (ascending ? 'ascending' : 'descending') : 'none');
-                otherHeader.querySelector('.sort-indicator').textContent = active ? (ascending ? '↑' : '↓') : '↕';
             });
         });
     });

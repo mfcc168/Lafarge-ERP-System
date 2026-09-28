@@ -16,28 +16,28 @@
                     <thead class="bg-light text-dark">
                     <tr>
                         <th scope="col" data-sort-type="date" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Payment Date <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Payment Date" only %}
                         </th>
                         <th scope="col" data-sort-type="date" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Deposit Date <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Deposit Date" only %}
                         </th>
                         <th scope="col" data-sort-type="text" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Customer <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Customer" only %}
                         </th>
                         <th scope="col" data-sort-type="text" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Invoice <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Invoice" only %}
                         </th>
                         <th scope="col" data-sort-type="text" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Details <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Details" only %}
                         </th>
                         <th scope="col" data-sort-type="text" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Method <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Method" only %}
                         </th>
                         <th scope="col" class="text-end" data-sort-type="number" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Price <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Price" only %}
                         </th>
                         <th scope="col" class="text-end" data-sort-type="number" aria-sort="none">
-                            <button type="button" class="payment-sort-button">Grouped Price <span class="sort-indicator" aria-hidden="true">↕</span></button>
+                            {% include "invoice/components/table_sort_button.html" with label="Grouped Price" only %}
                         </th>
                     </tr>
                     </thead>
@@ -97,32 +97,80 @@
 </div>
 
 <style>
-/* Sort controls keep the native button keyboard behavior. */
+/* Compact sort controls; the active direction follows the header's aria state. */
 #monthly-payment-table .payment-sort-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    width: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: inherit;
+    gap: 0.5rem;
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease,
+                color 160ms ease, box-shadow 160ms ease;
 }
 
-#monthly-payment-table .text-end .payment-sort-button {
-    justify-content: flex-end;
+#monthly-payment-table .payment-sort-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
 }
 
 #monthly-payment-table .payment-sort-button:focus-visible {
-    outline: 2px solid #0d6efd;
-    outline-offset: 4px;
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .payment-sort-button,
+#monthly-payment-table th[aria-sort="descending"] .payment-sort-button {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
 }
 
 #monthly-payment-table .sort-indicator {
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
+    color: #64748b;
+}
+
+#monthly-payment-table .sort-indicator path {
+    transition: opacity 160ms ease;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .sort-indicator,
+#monthly-payment-table th[aria-sort="descending"] .sort-indicator {
+    color: #2563eb;
+}
+
+#monthly-payment-table th[aria-sort="ascending"] .sort-down,
+#monthly-payment-table th[aria-sort="descending"] .sort-up {
+    opacity: 0.2;
+}
+
+@media (pointer: coarse) {
+    #monthly-payment-table .payment-sort-button {
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #monthly-payment-table .payment-sort-button,
+    #monthly-payment-table .sort-indicator path {
+        transition: none;
+    }
 }
 
 /* Table Styling */
