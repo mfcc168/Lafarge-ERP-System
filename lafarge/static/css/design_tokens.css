@@ -1,4 +1,8 @@
 /* Shared by the Django workspace and Jazzmin. No build step or web fonts. */
+/* Scale rem-based text with the reader's browser preference; leave print sizing alone. */
+@media screen {
+    :root { font-size: 120%; }
+}
 :root {
     --erp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --erp-bg: #f4f5f6;
