@@ -1,0 +1,75 @@
+/* Shared Bootstrap 4/5 presentation. Keep status words, icons and native controls. */
+:root body :is(.text-primary, .text-success, .text-danger, .text-warning, .text-info, .text-dark, .text-red) {
+    color: var(--erp-text) !important;
+}
+:root :is(.text-muted, .text-secondary) {
+    color: var(--erp-muted) !important;
+}
+:root :is(.badge, .alert, .callout) {
+    color: var(--erp-text) !important;
+    background: var(--erp-subtle) !important;
+    border-color: var(--erp-border) !important;
+}
+:root :is(.badge, .alert, .callout) a {
+    color: inherit !important;
+    text-decoration: underline;
+}
+:root :is(.bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger) {
+    color: var(--erp-text) !important;
+    background-color: var(--erp-subtle) !important;
+}
+:root :is(.border-primary, .border-success, .border-info, .border-warning, .border-danger, .border-secondary) {
+    border-color: var(--erp-border) !important;
+}
+/* A solid primary action, softly raised secondary actions, and a clear pressed state. */
+:root .btn {
+    border-radius: var(--erp-control-radius);
+    box-shadow: var(--erp-raised) !important;
+}
+:root :is(.btn-primary, .btn-success) {
+    color: #ffffff !important;
+    background-color: var(--erp-primary) !important;
+    border-color: var(--erp-primary) !important;
+}
+:root :is(.btn-primary, .btn-success):is(:hover, :active, :focus) {
+    color: #ffffff !important;
+    background-color: var(--erp-primary-hover) !important;
+    border-color: var(--erp-primary-hover) !important;
+}
+:root :is(.btn-secondary, .btn-info, .btn-warning, .btn-danger,
+    .btn-outline-primary, .btn-outline-secondary, .btn-outline-success,
+    .btn-outline-info, .btn-outline-warning, .btn-outline-danger, .btn-default) {
+    color: var(--erp-text) !important;
+    background-color: var(--erp-surface) !important;
+    border-color: var(--erp-control-border) !important;
+}
+:root :is(.btn-secondary, .btn-info, .btn-warning, .btn-danger,
+    .btn-outline-primary, .btn-outline-secondary, .btn-outline-success,
+    .btn-outline-info, .btn-outline-warning, .btn-outline-danger, .btn-default):is(:hover, :active, :focus) {
+    color: var(--erp-primary-hover) !important;
+    background-color: var(--erp-primary-soft) !important;
+    border-color: var(--erp-muted) !important;
+}
+:root .btn:is(:active, .active),
+:root .btn[aria-expanded="true"] {
+    box-shadow: var(--erp-inset) !important;
+}
+:root .btn-link {
+    color: var(--erp-text);
+    box-shadow: none !important;
+}
+:root :is(input, select, textarea) {
+    accent-color: var(--erp-primary);
+}
+:root :is(a, button, summary, input, select, textarea):focus-visible {
+    outline: 2px solid var(--erp-text);
+    outline-offset: 3px;
+}
+@media print {
+    :root { --erp-shadow: none; --erp-raised: none; --erp-inset: none; }
+}
+@media (forced-colors: active) {
+    :root :is(.btn, .data-panel, .metric-card, .admin-module, .record-data-row) {
+        border: 1px solid CanvasText !important;
+    }
+}

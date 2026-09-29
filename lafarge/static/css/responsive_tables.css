@@ -17,8 +17,8 @@
     background:
       linear-gradient(to right, #ffffff 30%, transparent),
       linear-gradient(to left, #ffffff 30%, transparent),
-      linear-gradient(to right, #d7dfe9, transparent),
-      linear-gradient(to left, #d7dfe9, transparent);
+      linear-gradient(to right, #d6d6d6, transparent),
+      linear-gradient(to left, #d6d6d6, transparent);
     background-size:
       32px 100%,
       32px 100%,
@@ -41,12 +41,19 @@
     z-index: 2;
     background: var(--erp-subtle) !important;
   }
+  .responsive-table-viewport.is-overflowing .table-row-light > .erp-sticky-key,
+  .responsive-table-viewport.is-overflowing .table-striped > tbody > tr:nth-of-type(odd) > .erp-sticky-key {
+    background: #fafafa !important;
+  }
+  .responsive-table-viewport.is-overflowing .table-hover > tbody > tr:hover > .erp-sticky-key {
+    background: var(--erp-subtle) !important;
+  }
   .table-scroll-hint {
     margin: 0;
     padding: 10px 16px;
     color: var(--erp-muted);
     background: var(--erp-subtle);
-    border-bottom: 1px solid var(--erp-border);
+    border-bottom: 0;
     font-size: 0.75rem;
   }
   .table-scroll-hint[hidden],
@@ -169,7 +176,7 @@
     align-items: start;
     gap: 8px;
     padding: 12px 14px;
-    border-bottom: 1px solid var(--erp-border);
+    border-bottom: 0;
     background: var(--erp-surface);
   }
   .record-view-toggle,
@@ -179,12 +186,14 @@
     border-radius: var(--erp-control-radius);
     padding: 9px 12px;
     min-height: 44px;
-    color: var(--erp-primary);
+    color: var(--erp-text);
     background: white;
+    box-shadow: var(--erp-raised);
     font: 600 0.8rem/1.4 var(--erp-font);
     cursor: pointer;
   }
   .record-view-toggle[aria-pressed="true"] {
+    box-shadow: var(--erp-inset);
     background: var(--erp-primary-soft);
   }
   .record-sort-menu {
@@ -226,8 +235,9 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0;
-    border: 1px solid var(--erp-border) !important;
-    border-radius: 9px;
+    border: 0 !important;
+    border-radius: var(--erp-radius);
+    box-shadow: var(--erp-shadow);
     background: white;
     overflow: hidden;
   }
@@ -270,8 +280,8 @@
     > .record-key-cell {
     grid-column: 1 / -1;
     order: -1;
-    border-bottom: 1px solid var(--erp-border);
-    background: #f1f5fd !important;
+    border-bottom: 0;
+    background: var(--erp-subtle) !important;
     font-weight: 650;
   }
   .responsive-table-viewport:not(.show-table)
@@ -414,7 +424,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    border-bottom: 1px solid var(--erp-border);
+    border-bottom: 0;
   }
   .responsive-table-viewport:not(.show-table)
     > .record-table

@@ -1,11 +1,12 @@
 @import url("./design_tokens.css");
+@import url("./neutral_components.css");
 
 /* One workspace shell and one page header for every module. */
 .erp-app {
-    --bs-primary-rgb: 37, 99, 235;
-    --bs-success-rgb: 22, 112, 74;
-    --bs-danger-rgb: 187, 51, 69;
-    --bs-dark-rgb: 28, 48, 41;
+    --bs-primary-rgb: 38, 38, 38;
+    --bs-success-rgb: 38, 38, 38;
+    --bs-danger-rgb: 38, 38, 38;
+    --bs-dark-rgb: 38, 38, 38;
     background: var(--erp-bg);
     color: var(--erp-text);
     font-family: var(--erp-font);
@@ -51,8 +52,8 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    border-right: 1px solid var(--erp-border);
-    background: white;
+    border-right: 0;
+    background: var(--erp-sidebar);
     z-index: 1030;
 }
 .sidebar-brand {
@@ -74,7 +75,8 @@
     height: 42px;
     color: white;
     background: var(--erp-primary);
-    border-radius: 9px 9px 9px 2px;
+    border-radius: 12px;
+    box-shadow: var(--erp-raised);
     font-size: 1.55rem;
 }
 .brand-caption {
@@ -90,7 +92,7 @@
 }
 .nav-caption {
     padding: 0 12px 9px;
-    color: #898f97;
+    color: var(--erp-muted);
     font-size: 0.61rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -104,8 +106,8 @@
     min-height: 41px;
     margin: 2px 0;
     padding: 9px 12px;
-    border-radius: 6px;
-    color: #606771;
+    border-radius: var(--erp-control-radius);
+    color: var(--erp-sidebar-text);
     font-size: 0.83rem;
     text-decoration: none;
     font-weight: 500;
@@ -117,15 +119,15 @@
 }
 .sidebar-nav .nav-item:hover,
 .mobile-menu .nav-item:hover {
-    background: #f4f5f7;
+    background: #f5f5f5;
     color: var(--erp-primary);
 }
 .sidebar-nav .nav-item.active,
 .mobile-menu .nav-item.active {
-    background: #e9edf3;
-    color: #1e40af;
+    background: #e9e9e9;
+    color: var(--erp-text);
     font-weight: 650;
-    box-shadow: inset 3px 0 #2563eb;
+    box-shadow: var(--erp-inset);
 }
 .sidebar-footer {
     display: flex;
@@ -133,12 +135,12 @@
     gap: 11px;
     margin-top: auto;
     padding: 26px 10px 0;
-    color: #656b74;
+    color: #686868;
     font-size: 0.74rem;
 }
 .sidebar-footer small {
     display: block;
-    color: #92979e;
+    color: var(--erp-muted);
     font-size: 0.62rem;
 }
 .footer-mark {
@@ -157,20 +159,20 @@
     justify-content: space-between;
     gap: 16px;
     padding: 15px 36px;
-    border-bottom: 1px solid var(--erp-border);
-    background: white;
+    border-bottom: 0;
+    background: var(--erp-bg);
 }
 .workspace-name {
     display: flex;
     align-items: center;
     gap: 11px;
-    color: #656c76 !important;
+    color: #686868 !important;
     font-size: 0.8rem;
     text-decoration: none;
     white-space: nowrap;
 }
 .workspace-name i {
-    color: #9298a1;
+    color: var(--erp-muted);
     font-size: 1rem;
 }
 .workspace-tools {
@@ -179,7 +181,7 @@
     gap: 24px;
 }
 .workspace-date {
-    color: #787e87;
+    color: var(--erp-muted);
     font-size: 0.75rem;
 }
 .workspace-user {
@@ -205,8 +207,8 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    color: #425165;
-    background: #e7eaef;
+    color: #525252;
+    background: #ebebeb;
     font-size: 0.75rem;
     font-weight: 650;
 }
@@ -225,7 +227,7 @@
 }
 .page-eyebrow {
     margin-bottom: 7px;
-    color: #7d848d;
+    color: var(--erp-muted);
     font-size: 0.62rem;
     font-weight: 650;
     text-transform: uppercase;
@@ -233,7 +235,7 @@
 }
 .page-header h1 {
     margin: 0 0 7px;
-    color: #202935;
+    color: #262626;
     font-size: clamp(1.5rem, 2.3vw, 1.95rem);
     font-weight: 650;
     line-height: 1.2;
@@ -273,7 +275,7 @@
     margin-top: 36px;
     padding-top: 16px;
     border-top: 1px solid var(--erp-border);
-    color: #8a8f97;
+    color: var(--erp-muted);
     font-size: 0.65rem;
 }
 .mobile-menu {
@@ -305,10 +307,10 @@
 .erp-app .card,
 .erp-app .surface {
     min-width: 0;
-    border: 1px solid var(--erp-border) !important;
+    border: 0 !important;
     border-radius: var(--erp-radius) !important;
-    background: white;
-    box-shadow: 0 2px 3px rgba(29, 41, 64, 0.015) !important;
+    background: var(--erp-surface);
+    box-shadow: var(--erp-shadow) !important;
 }
 .data-panel {
     overflow: hidden;
@@ -319,8 +321,8 @@
     justify-content: space-between;
     gap: 16px;
     min-height: 77px;
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--erp-border);
+    padding: 22px;
+    border-bottom: 0;
 }
 .erp-app .panel-toolbar h2,
 .erp-app .panel-toolbar h5,
@@ -338,7 +340,7 @@
     font-size: 0.72rem;
 }
 .panel-toolbar > i {
-    color: #9199a5;
+    color: var(--erp-muted);
     font-size: 1.15rem;
 }
 .panel-toolbar > .d-flex {
@@ -352,10 +354,10 @@
     justify-content: center;
     min-width: 25px;
     padding: 1px 7px;
-    border: 1px solid #dce1e8;
-    border-radius: 5px;
-    color: #647081;
-    background: #f1f3f7;
+    border: 0;
+    border-radius: 8px;
+    color: #686868;
+    background: #f5f5f5;
     font-size: 0.67rem;
     font-weight: 600;
 }
@@ -364,28 +366,28 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    color: #797f88;
+    color: var(--erp-muted);
     font-size: 0.68rem;
     white-space: nowrap;
 }
 .status-label {
     padding: 5px 8px;
-    color: #4f637e;
+    color: #686868;
     border-radius: 5px;
-    background: #f0f3f7;
+    background: #f5f5f5;
 }
 .status-label > span {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #647fa5;
+    background: #767676;
 }
 .status-label.muted {
-    color: #8e7567;
-    background: #f8f3ef;
+    color: var(--erp-muted);
+    background: #f5f5f5;
 }
 .status-label.muted > span {
-    background: #bc9980;
+    background: #9e9e9e;
 }
 .erp-app .shadow-sm,
 .erp-app .shadow-lg {
@@ -399,18 +401,18 @@
     padding: 18px 22px;
     background: white !important;
     color: var(--erp-text) !important;
-    border-bottom: 1px solid var(--erp-border) !important;
+    border-bottom: 0 !important;
 }
 .erp-app .bg-light {
-    background: #f6f7f9 !important;
+    background: #f5f5f5 !important;
 }
 .table-help {
     padding: 11px 22px;
     margin: 0;
-    background: #fafbfc;
-    color: #7a8089;
+    background: #fafafa;
+    color: var(--erp-muted);
     font-size: 0.72rem;
-    border-bottom: 1px solid #edeff1;
+    border-bottom: 1px solid #eeeeee;
 }
 .erp-app .filter-drawer.filter-panel {
     padding: 20px 22px;
@@ -418,7 +420,7 @@
     border: 0;
     border-bottom: 1px solid var(--erp-border);
     border-radius: 0;
-    background: #fafbfc;
+    background: #fafafa;
 }
 .filter-grid {
     display: grid;
@@ -447,7 +449,7 @@
     gap: 13px;
     min-width: 170px;
     font-weight: 550;
-    color: #303c4c !important;
+    color: #303030 !important;
 }
 .period-icon {
     display: inline-flex;
@@ -455,9 +457,9 @@
     justify-content: center;
     width: 32px;
     height: 34px;
-    color: #7c8899;
-    background: #f2f4f7;
-    border: 1px solid #e5e8ed;
+    color: var(--erp-muted);
+    background: #f5f5f5;
+    border: 1px solid #ebebeb;
     border-radius: 6px;
 }
 .person-avatar {
@@ -467,13 +469,13 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #eaedf2;
-    color: #616f82;
+    background: #eeeeee;
+    color: #686868;
     font-size: 0.8rem;
 }
 .amount,
 .period-total {
-    color: #34455c;
+    color: #525252;
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     font-size: 0.84rem;
@@ -491,10 +493,11 @@
 }
 .metric-card {
     min-width: 0;
-    padding: 20px 22px;
-    border: 1px solid var(--erp-border);
+    padding: 24px;
+    border: 0;
     border-radius: var(--erp-radius);
-    background: white;
+    background: var(--erp-surface);
+    box-shadow: var(--erp-shadow);
 }
 .metric-top {
     display: flex;
@@ -502,7 +505,7 @@
     justify-content: space-between;
     gap: 10px;
     margin-bottom: 11px;
-    color: #737b86;
+    color: var(--erp-muted);
     font-size: 0.75rem;
 }
 .metric-top i {
@@ -511,9 +514,9 @@
     justify-content: center;
     width: 29px;
     height: 29px;
-    background: #edf0f5;
+    background: #eeeeee;
     border-radius: 7px;
-    color: #6b7b92;
+    color: var(--erp-muted);
 }
 .metric-card > strong {
     display: block;
@@ -527,7 +530,7 @@
 .metric-card small {
     display: block;
     margin-top: 9px;
-    color: #9197a0;
+    color: var(--erp-muted);
     font-size: 0.65rem;
 }
 .balance-banner {
@@ -536,10 +539,10 @@
     gap: 30px;
     margin-bottom: 22px;
     padding: 22px 26px;
-    border: 1px solid #e6e3db;
-    border-left: 3px solid #bea476;
-    border-radius: 9px;
-    background: #fffefa;
+    border: 0;
+    border-radius: var(--erp-radius);
+    background: var(--erp-surface);
+    box-shadow: var(--erp-shadow);
 }
 .page-stack > .balance-banner {
     margin-bottom: 0;
@@ -547,7 +550,7 @@
 .balance-banner strong {
     display: block;
     margin-top: 7px;
-    color: #79533e;
+    color: var(--erp-text);
     font-size: 1.85rem;
     font-weight: 600;
     letter-spacing: -0.025em;
@@ -555,27 +558,25 @@
 }
 .balance-banner p {
     margin: 0;
-    color: #8c8e81;
+    color: var(--erp-muted);
     font-size: 0.77rem;
 }
 .balance-icon {
     margin-left: auto;
     font-size: 2rem;
-    color: #c8bda3;
+    color: var(--erp-muted);
 }
 .sales-balance {
-    border-color: #dfe3e8;
-    border-left-color: #677992;
-    background: #f8fafc;
+    background: var(--erp-surface);
 }
 .sales-balance strong {
-    color: #31445f;
+    color: var(--erp-text);
 }
 .detail-label,
 .profile-grid dt,
 .detail-grid dt {
     display: block;
-    color: #818891;
+    color: var(--erp-muted);
     font-size: 0.65rem;
     font-weight: 550;
     text-transform: uppercase;
@@ -591,7 +592,7 @@
 .profile-grid dd,
 .detail-grid dd {
     margin: 8px 0 0;
-    color: #353f4e;
+    color: #303030;
     font-size: 0.85rem;
     overflow-wrap: anywhere;
 }
@@ -606,7 +607,7 @@
     font-size: 1.12rem;
 }
 .sold-to address {
-    color: #797f87;
+    color: var(--erp-muted);
     font-size: 0.84rem;
 }
 .detail-grid {
@@ -615,33 +616,12 @@
     gap: 22px;
     margin: 0;
 }
-.dashboard-charts {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr;
-    gap: 18px;
-    margin-bottom: 24px;
-}
-.dashboard-charts .panel-toolbar {
-    min-height: 70px;
-}
-.chart-body {
-    padding: 18px;
-}
-.erp-app .chart-container {
-    position: relative;
-    width: 100%;
-    height: 500px;
-}
-.page-home canvas {
-    width: 100% !important;
-    height: 220px !important;
-}
 
 /* Table containers own scrolling; table elements keep their native semantics. */
 .erp-app .table-responsive {
     max-width: 100%;
-    border: 1px solid var(--erp-border);
-    border-radius: 9px;
+    border: 0;
+    border-radius: var(--erp-radius);
     background: var(--erp-surface);
 }
 .erp-app .table-responsive .table-responsive {
@@ -649,8 +629,9 @@
     border-radius: 0;
 }
 .erp-app .table {
-    --bs-table-striped-bg: #fafbfc;
-    --bs-table-hover-bg: #f1f3f7;
+    --bs-table-striped-bg: #fafafa;
+    --bs-table-striped-color: var(--erp-text);
+    --bs-table-hover-bg: #f5f5f5;
     --bs-table-hover-color: var(--erp-text);
     width: 100%;
     margin-bottom: 0;
@@ -658,23 +639,25 @@
     border-color: var(--erp-border);
     font-size: 0.85rem;
     font-variant-numeric: tabular-nums;
+    border: 0 !important;
     box-shadow: none !important;
 }
 .erp-app .table > :not(caption) > * > * {
     padding: 12px 14px;
     vertical-align: middle;
+    border: 0;
 }
 .erp-app .table > :not(:first-child) {
     border-top: 0;
 }
 .erp-app .table thead th {
-    background: #f4f5f7 !important;
-    color: #68727f !important;
-    border-bottom: 1px solid var(--erp-border);
+    background: var(--erp-subtle) !important;
+    color: var(--erp-muted) !important;
+    border-bottom: 0;
     font-size: 0.72rem;
     font-weight: 650;
     letter-spacing: 0.035em;
-    text-transform: uppercase;
+    text-transform: none;
     white-space: nowrap;
     box-shadow: none;
 }
@@ -687,20 +670,20 @@
     text-decoration: underline;
 }
 .erp-app .table tbody td {
-    border-bottom-color: #eaecf0;
+    border: 0;
 }
 .erp-app .table tbody > tr:last-child > td {
     border-bottom-width: 0;
 }
 .erp-app .table-row-light {
-    background-color: var(--erp-subtle);
+    background-color: #fafafa;
 }
 .erp-app .table-row-dark {
     background-color: var(--erp-surface);
 }
 .erp-app .table-hover > tbody > tr:hover > *,
 .erp-app tr[data-href]:hover > * {
-    --bs-table-accent-bg: #f1f3f7;
+    --bs-table-accent-bg: #f5f5f5;
 }
 .erp-app tr[data-href] {
     cursor: pointer;
@@ -718,7 +701,8 @@
     background: var(--erp-subtle);
 }
 .erp-app .table tfoot td {
-    border-top: 1px solid var(--erp-border);
+    border: 0;
+    font-weight: 600;
 }
 .erp-app .table .table {
     font-size: 0.8rem;
@@ -734,8 +718,8 @@
     line-height: 1.2;
 }
 .erp-app .badge.bg-secondary {
-    background: #eff1f4 !important;
-    color: #647080 !important;
+    background: #eeeeee !important;
+    color: #686868 !important;
 }
 .erp-app .table tr.bg-secondary {
     background: var(--erp-sidebar) !important;
@@ -783,7 +767,7 @@
     font-size: 0.83rem;
     font-weight: 600;
     line-height: 1.5;
-    box-shadow: none !important;
+    box-shadow: var(--erp-raised) !important;
 }
 .erp-app .btn-sm {
     padding: 5px 9px;
@@ -800,7 +784,7 @@
 }
 .erp-app .btn-outline-primary {
     color: var(--erp-primary);
-    border-color: #c8cfd9;
+    border-color: #d6d6d6;
     background: white;
 }
 .erp-app .btn-outline-primary:hover {
@@ -810,14 +794,14 @@
 }
 .erp-app .btn-secondary,
 .erp-app .btn-outline-secondary {
-    color: #68727f;
-    border-color: #d7dbe1;
+    color: var(--erp-muted);
+    border-color: #d6d6d6;
     background: white;
 }
 .erp-app .btn-secondary:hover,
 .erp-app .btn-outline-secondary:hover {
     color: var(--erp-text);
-    background: #eff1f4;
+    background: #eeeeee;
 }
 .erp-app .btn-success {
     background: var(--erp-success);
@@ -825,8 +809,8 @@
     color: white;
 }
 .erp-app .btn-success:hover {
-    background: #10305c;
-    border-color: #10305c;
+    background: #303030;
+    border-color: #303030;
 }
 .erp-app .btn-link {
     color: var(--erp-primary);
@@ -834,7 +818,7 @@
 .erp-app .form-label,
 .erp-app label {
     margin-bottom: 6px;
-    color: #68727f;
+    color: var(--erp-muted);
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -847,9 +831,10 @@
     width: 100%;
     min-height: 39px;
     padding: 8px 11px;
-    border: 1px solid #d7dbe1;
+    border: 1px solid var(--erp-control-border);
     border-radius: var(--erp-control-radius);
-    background-color: white;
+    box-shadow: var(--erp-inset);
+    background-color: var(--erp-surface);
     color: var(--erp-text);
     font-family: inherit;
     font-size: 0.85rem;
@@ -874,6 +859,7 @@
     border-radius: 5px;
 }
 .erp-app .page-item.active .page-link {
+    color: white;
     background: var(--erp-primary);
     border-color: var(--erp-primary);
 }
@@ -908,6 +894,16 @@
     flex: 0 0 auto;
 }
 
+/* Group labels and totals remain visible without heavy row outlines. */
+.erp-app .table tbody > tr:is(.border-start, .border-end, .border-top, .border-bottom) {
+    border: 0 !important;
+}
+.erp-app .table tbody > tr.border-top > td {
+    border-top: 1px solid var(--erp-border);
+}
+.erp-app .table tr.bg-secondary :is(td, th) {
+    color: var(--erp-text) !important;
+}
 /* Keep the payment report's sorting affordances and group metadata intact. */
 #monthly-payment-table .payment-sort-button {
     display: inline-flex;
@@ -915,10 +911,10 @@
     gap: 8px;
     min-height: 36px;
     padding: 7px 10px;
-    border: 1px solid #d7dbe1;
+    border: 1px solid transparent;
     border-radius: var(--erp-control-radius);
-    background: white;
-    color: #68727f;
+    background: transparent;
+    color: var(--erp-muted);
     font: 600 0.78rem/1.3 var(--erp-font);
     white-space: nowrap;
     cursor: pointer;
@@ -931,7 +927,7 @@
 #monthly-payment-table th[aria-sort="descending"] .payment-sort-button {
     background: var(--erp-primary-soft);
     color: var(--erp-primary);
-    border-color: #a6b4c7;
+    border-color: #b8b8b8;
 }
 #monthly-payment-table .sort-indicator {
     width: 16px;
@@ -941,10 +937,6 @@
 #monthly-payment-table th[aria-sort="ascending"] .sort-down,
 #monthly-payment-table th[aria-sort="descending"] .sort-up {
     opacity: 0.2;
-}
-.page-home canvas {
-    width: 100% !important;
-    height: 250px !important;
 }
 .erp-app .chart-container {
     position: relative;
@@ -968,16 +960,16 @@
     padding: 14px 22px;
 }
 .erp-app .table thead th {
-    font-size: 0.65rem;
-    letter-spacing: 0.06em;
-    font-weight: 550;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    font-weight: 600;
 }
 .erp-app .table td.column-customer {
     min-width: 220px;
 }
 .erp-app .table tr.bg-secondary {
-    background: #28374b !important;
-    color: white;
+    background: var(--erp-primary-soft) !important;
+    color: var(--erp-text);
 }
 .erp-app .table .fw-bold {
     font-weight: 600 !important;
@@ -999,7 +991,7 @@
     min-height: 38px;
     font-size: 0.74rem;
     font-weight: 550;
-    border-radius: 6px;
+    border-radius: var(--erp-control-radius);
     white-space: normal;
 }
 .erp-app .btn .me-2 {
@@ -1030,8 +1022,8 @@
     font-size: 1.8rem;
 }
 .erp-app .panel-toolbar .badge {
-    background: #edf0f5 !important;
-    color: #606d80 !important;
+    background: #eeeeee !important;
+    color: #686868 !important;
     font-size: 0.7rem !important;
     padding: 6px 9px !important;
 }
@@ -1042,12 +1034,6 @@
     }
     .workspace-header {
         padding-inline: 24px;
-    }
-    .dashboard-charts {
-        grid-template-columns: 1fr 1fr;
-    }
-    .trend-panel {
-        grid-column: 1 / -1;
     }
     .filter-grid {
         grid-template-columns: 1fr 1fr;
@@ -1087,7 +1073,7 @@
         font-size: 1.3rem;
     }
     .mobile-menu[open] summary {
-        background: #edf0f5;
+        background: #eeeeee;
         border-radius: 5px;
     }
     .mobile-menu nav {
@@ -1102,7 +1088,7 @@
         border: 1px solid var(--erp-border);
         border-radius: 10px;
         background: white;
-        box-shadow: 0 14px 40px rgba(30, 44, 65, 0.15);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.15);
         z-index: 1040;
     }
     .workspace-name {
@@ -1155,9 +1141,6 @@
     }
     .metric-card > strong {
         font-size: 1.55rem;
-    }
-    .dashboard-charts {
-        grid-template-columns: 1fr;
     }
     .panel-toolbar {
         padding: 16px;
