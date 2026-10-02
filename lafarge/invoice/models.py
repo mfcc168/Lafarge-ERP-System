@@ -13,10 +13,15 @@ from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Forbidden_Word(models.Model):
     word = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        verbose_name = _("blocked word")
+        verbose_name_plural = _("blocked words")
 
     def __str__(self):
         return self.word
