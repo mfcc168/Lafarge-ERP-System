@@ -107,10 +107,12 @@
     margin: 2px 0;
     padding: 9px 12px;
     border-radius: var(--erp-control-radius);
+    background: var(--erp-sidebar);
     color: var(--erp-sidebar-text);
     font-size: 0.83rem;
     text-decoration: none;
     font-weight: 500;
+    transition: box-shadow 140ms ease;
 }
 .nav-item i {
     width: 19px;
@@ -119,24 +121,24 @@
 }
 .sidebar-nav .nav-item:hover,
 .mobile-menu .nav-item:hover {
-    background: var(--erp-subtle);
-    color: var(--erp-primary);
+    color: var(--erp-sidebar-text);
+    box-shadow: var(--erp-raised);
 }
 .sidebar-nav .nav-item.active,
-.mobile-menu .nav-item.active {
-    background: var(--erp-nav-selected);
-    color: var(--erp-primary);
-    font-weight: 650;
-    box-shadow: var(--erp-inset);
+.mobile-menu .nav-item.active,
+.sidebar-nav .nav-item:active,
+.mobile-menu .nav-item:active {
+    color: var(--erp-sidebar-text);
+    box-shadow: var(--erp-nav-inset);
 }
 .sidebar-nav .nav-area-switch,
 .mobile-menu .nav-area-switch {
     background: var(--erp-surface);
-    color: var(--erp-primary);
     box-shadow: var(--erp-raised);
 }
-.nav-area-switch:active {
-    box-shadow: var(--erp-inset);
+.sidebar-nav .nav-area-switch:active,
+.mobile-menu .nav-area-switch:active {
+    box-shadow: var(--erp-nav-inset);
 }
 .sidebar-footer {
     display: flex;
@@ -1062,6 +1064,8 @@
         align-items: center;
         gap: 6px;
         padding: 5px;
+        background: var(--erp-sidebar);
+        border-radius: var(--erp-control-radius);
         color: var(--erp-primary);
         font-size: 0.75rem;
         cursor: pointer;
@@ -1074,8 +1078,7 @@
         font-size: 1.3rem;
     }
     .mobile-menu[open] summary {
-        background: var(--erp-primary-soft);
-        border-radius: 5px;
+        box-shadow: var(--erp-nav-inset);
     }
     .mobile-menu nav {
         position: absolute;
