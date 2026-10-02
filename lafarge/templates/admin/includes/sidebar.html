@@ -1,0 +1,68 @@
+{% load i18n static jazzmin %}
+{% get_side_menu as side_menu_list %}
+<aside class="main-sidebar elevation-4 {{ jazzmin_ui.sidebar_classes }}" id="jazzy-sidebar" aria-label="{% trans 'Admin sidebar' %}">
+    <a href="{% url 'admin:index' %}" class="brand-link {{ jazzmin_ui.brand_classes }}" id="jazzy-logo" aria-label="{{ jazzmin_settings.site_brand }} {% trans 'Admin console' %}">
+        <img src="{% static jazzmin_settings.site_logo %}" alt="" class="{{ jazzmin_settings.site_logo_classes }} brand-image">
+        <span class="admin-brand-copy">
+            <span class="brand-text font-weight-light">{{ jazzmin_settings.site_brand }}</span>
+            <span class="admin-brand-caption"><i class="fas fa-shield-alt" aria-hidden="true"></i> {% trans "Admin console" %}</span>
+        </span>
+    </a>
+    <div class="sidebar">
+        <a class="admin-workspace-return" href="{% url 'home' %}" aria-label="{% trans 'Back to workspace' %}" title="{% trans 'Back to workspace' %}"><i class="fas fa-arrow-left" aria-hidden="true"></i><span>{% trans "Back to workspace" %}</span></a>
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                {% if jazzmin_settings|has_jazzmin_setting:"user_avatar" %}
+                    <img src="{% get_user_avatar request.user %}" width="160px" class="img-circle elevation-2" alt="{% trans 'User image' %}">
+                {% else %}
+                    <i class="fas user-profile fa-user-circle" aria-hidden="true"></i>
+                {% endif %}
+            </div>
+            <div class="info">
+                {% if perms|can_view_self %}
+                    <a href="{% jazzy_admin_url request.user request.current_app|default:'admin' %}" class="d-block">{{ request.user }}</a>
+                {% else %}
+                    <span class="d-block">{{ request.user }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="mt-2" aria-label="{% trans 'Admin navigation' %}">
+            <ul class="nav nav-pills nav-sidebar flex-column {{ jazzmin_ui.sidebar_list_classes }}" data-widget="treeview" role="menu" data-collapsible="false">
+                <li class="nav-item">
+                    <a href="{% url 'admin:index' %}" class="nav-link">
+                        <i class="nav-icon fas fa-th-large" aria-hidden="true"></i><p>{% trans "Admin overview" %}</p>
+                    </a>
+                </li>
+                {% for app in side_menu_list %}
+                    {% if jazzmin_settings.navigation_expanded %}
+                        <li class="nav-header">{% include "admin/includes/navigation_group.html" %}</li>
+                        {% for model in app.models %}
+                            <li class="nav-item">
+                                {% if model.url %}
+                                    <a href="{{ model.url }}" class="nav-link"><i class="nav-icon {{ model.icon }}" aria-hidden="true"></i><p>{{ model.name }}</p></a>
+                                {% else %}
+                                    <span class="nav-link disabled"><i class="nav-icon {{ model.icon }}" aria-hidden="true"></i><p>{{ model.name }}</p></span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link"><i class="nav-icon {{ app.icon }}" aria-hidden="true"></i><p>{% include "admin/includes/navigation_group.html" %} <i class="fas fa-angle-left right" aria-hidden="true"></i></p></a>
+                            <ul class="nav nav-treeview" style="display: none;">
+                                {% for model in app.models %}
+                                    <li class="nav-item">
+                                        {% if model.url %}
+                                            <a href="{{ model.url }}" class="nav-link"><i class="nav-icon {{ model.icon }}" aria-hidden="true"></i><p>{{ model.name }}</p></a>
+                                        {% else %}
+                                            <span class="nav-link disabled"><i class="nav-icon {{ model.icon }}" aria-hidden="true"></i><p>{{ model.name }}</p></span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</aside>

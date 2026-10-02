@@ -98,7 +98,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
-    "topmenu_links": [{"name": "Business workspace", "url": "/", "new_window": False}],
+    # Order matches the Admin identity and workspace-return styles in admin_overrides.css.
+    "topmenu_links": [
+        {"name": "Admin console", "url": "admin:index", "new_window": False},
+        {"name": "Back to workspace", "url": "home", "new_window": False},
+    ],
     "site_brand": "Lafarge",
     "site_logo": "images/lafarge-mark.svg",
     "site_logo_classes": "",

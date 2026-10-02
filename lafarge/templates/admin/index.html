@@ -1,21 +1,20 @@
 {% extends "admin/base_site.html" %}
 {% load i18n log %}
 {% block bodyclass %}{{ block.super }} dashboard erp-admin-dashboard{% endblock %}
-{% block content_title %}{% trans "Administration" %}{% endblock %}
+{% block content_title %}{% trans "Admin overview" %}{% endblock %}
 {% block breadcrumbs %}
-<ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">{% trans "Business workspace" %}</a></li><li class="breadcrumb-item active">{% trans "Administration" %}</li></ol>
+<ol class="breadcrumb"><li class="breadcrumb-item active">{% trans "Admin console" %}</li></ol>
 {% endblock %}
 {% block content %}
 <div class="admin-overview">
     <div class="admin-overview-intro">
-        <div><span class="admin-eyebrow">{% trans "Manage your workspace" %}</span><h2>{% trans "Records & access" %}</h2><p>{% trans "Manage business records, team access and recent changes in one place." %}</p></div>
-        <a class="btn btn-primary" href="/">{% trans "Open workspace" %} <span aria-hidden="true">↗</span></a>
+        <div><span class="admin-eyebrow">{% trans "Administration" %}</span><h2>{% trans "Records & access" %}</h2><p>{% trans "Manage business records, team access and recent changes in one place." %}</p></div>
     </div>
     <div class="admin-overview-grid">
         <div class="admin-modules">
             {% for app in app_list %}
             <section class="admin-module" aria-labelledby="module-{{ app.app_label }}">
-                <header class="admin-panel-heading"><div><h2 id="module-{{ app.app_label }}">{{ app.name }}</h2><p>{% trans "Browse records or add a new entry." %}</p></div><span class="admin-count">{{ app.models|length }}</span></header>
+                <header class="admin-panel-heading"><div><h2 id="module-{{ app.app_label }}">{% include "admin/includes/navigation_group.html" %}</h2><p>{% trans "Browse records or add a new entry." %}</p></div><span class="admin-count">{{ app.models|length }}</span></header>
                 <div class="admin-models">
                     {% for model in app.models %}
                     <div class="admin-model-row">

@@ -1,6 +1,12 @@
 @import url("./design_tokens.css");
 @import url("./neutral_components.css");
 
+:root {
+    --erp-admin-accent: #6b6258;
+    --erp-admin-sidebar: #e8e8e8;
+    --erp-admin-selected: #e0e0e0;
+}
+
 /* Visual theme only: retain Jazzmin's form, inline and modal behavior below. */
 body {
     font-family: var(--erp-font);
@@ -12,11 +18,11 @@ body {
 }
 :is(.main-sidebar, .app-sidebar),
 :is(.main-sidebar, .app-sidebar) .brand-link {
-    background: var(--erp-sidebar) !important;
+    background: var(--erp-admin-sidebar) !important;
 }
 :is(.main-sidebar, .app-sidebar) .brand-link {
-    color: white;
-    border-color: #303030;
+    color: var(--erp-text);
+    border-bottom: 0;
 }
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link {
     border-radius: var(--erp-control-radius);
@@ -24,8 +30,8 @@ body {
 :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
     .nav-link.active {
-    background: var(--erp-primary) !important;
-    color: white !important;
+    background: var(--erp-admin-selected) !important;
+    color: var(--erp-admin-accent) !important;
 }
 :is(.main-header, .app-header) {
     border-bottom: 0;
@@ -211,7 +217,7 @@ body {
     display: inline-block !important;
 }
 
-/* The admin uses the same neutral light navigation and action hierarchy. */
+/* Shared navigation geometry, with one muted accent to identify the Admin area. */
 :is(.main-sidebar, .app-sidebar) {
     border-right: 0;
     box-shadow: none !important;
@@ -222,13 +228,16 @@ body {
     font-weight: 650;
 }
 :is(.main-sidebar, .app-sidebar) :is(.nav-link, .nav-header, .user-panel a) {
-    color: #686868 !important;
+    color: var(--erp-primary) !important;
+}
+:root :is(.main-sidebar, .app-sidebar) .nav-header {
+    color: var(--erp-admin-accent) !important;
 }
 :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
     .nav-link.active {
-    background: #eeeeee !important;
-    color: #303030 !important;
+    background: var(--erp-admin-selected) !important;
+    color: var(--erp-admin-accent) !important;
     box-shadow: var(--erp-inset);
 }
 :is(.content-header, .app-content-header) h1 {
@@ -270,7 +279,7 @@ body { font-size: 0.9rem; }
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 76px;
+    min-height: 94px;
     padding: 18px 24px;
     text-decoration: none;
 }
@@ -288,6 +297,117 @@ body { font-size: 0.9rem; }
     font-size: 1.5rem;
     font-weight: 750 !important;
     letter-spacing: -0.04em;
+}
+.admin-brand-copy { display: flex; flex-direction: column; gap: 4px; }
+:is(.main-sidebar, .app-sidebar) .admin-brand-caption {
+    color: var(--erp-admin-accent);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+.admin-brand-caption i { margin-right: 4px; }
+#jazzy-sidebar > .sidebar { height: calc(100% - 94px); }
+.admin-workspace-return {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin: 16px 8px 4px;
+    padding: 10px 12px;
+    background: var(--erp-surface);
+    color: var(--erp-primary) !important;
+    box-shadow: var(--erp-raised);
+    border-radius: var(--erp-control-radius);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.admin-workspace-return:hover { background: var(--erp-subtle); }
+.admin-workspace-return:active { box-shadow: var(--erp-inset); }
+:is(.main-sidebar, .app-sidebar) .user-panel { color: var(--erp-primary); }
+:is(.main-sidebar, .app-sidebar) a:focus-visible,
+#jazzy-navbar a:focus-visible {
+    outline: 2px solid var(--erp-primary);
+    outline-offset: 2px;
+}
+/* Jazzmin renders the configured Admin console and Back to workspace links
+   immediately after the sidebar toggle. Keep the area label visible on phones. */
+#jazzy-navbar > .navbar-nav:first-child { align-items: center; gap: 8px; }
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(2) {
+    display: block !important;
+}
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(2) > .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    color: var(--erp-admin-accent) !important;
+    font-size: 0.82rem;
+    font-weight: 650;
+    white-space: nowrap;
+}
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(2) > .nav-link::before {
+    content: "\f3ed";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) > .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: var(--erp-control-radius);
+    background: var(--erp-surface);
+    color: var(--erp-primary);
+    box-shadow: var(--erp-raised);
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) > .nav-link::before {
+    content: "\f060";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) > .nav-link:hover { background: var(--erp-subtle); }
+#jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) > .nav-link:active { box-shadow: var(--erp-inset); }
+@media (min-width: 992px) {
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-brand-copy,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return span {
+        display: none;
+    }
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .brand-link {
+        justify-content: center;
+        gap: 0;
+        padding-inline: 10px;
+    }
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return {
+        justify-content: center;
+        gap: 0;
+        padding-inline: 0;
+    }
+}
+@media (max-width: 575.98px) {
+    #jazzy-navbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        padding: 12px 8px;
+        gap: 8px;
+    }
+    #jazzy-navbar > .navbar-nav:first-child {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 6px 4px;
+        min-width: 0;
+    }
+    #jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(2) > .nav-link { padding-inline: 4px; }
+    #jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) {
+        display: block !important;
+        grid-column: 2;
+    }
+    #jazzy-navbar > .navbar-nav:last-child { margin-left: 0 !important; }
 }
 .sidebar-brand { height: auto; padding: 0; border-bottom: 0; }
 :is(.main-sidebar, .app-sidebar) .user-panel {
@@ -309,7 +429,7 @@ body { font-size: 0.9rem; }
     margin-bottom: 3px;
     font-size: 0.875rem;
 }
-:is(.main-sidebar, .app-sidebar) .nav-link:hover { background: var(--erp-subtle); }
+:is(.main-sidebar, .app-sidebar) .nav-link:hover { background: #f2f2f2; }
 :is(.content-header, .app-content-header) { padding: 30px 24px 22px; }
 :is(.content-header, .app-content-header) :is(h1, h3) {
     font-size: 2rem;
