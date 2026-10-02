@@ -5,7 +5,9 @@
     --erp-admin-accent: #6b6258;
     --erp-admin-icon: #b43b3b;
     --erp-admin-sidebar: #e8e8e8;
-    --erp-admin-selected: #e0e0e0;
+    --erp-admin-selected: #e4e4e4;
+    --erp-admin-raised: 3px 3px 8px rgba(0, 0, 0, 0.06), -3px -3px 8px rgba(255, 255, 255, 0.65);
+    --erp-admin-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.07), inset -2px -2px 5px rgba(255, 255, 255, 0.65);
 }
 
 /* Visual theme only: retain Jazzmin's form, inline and modal behavior below. */
@@ -218,8 +220,12 @@ body {
     display: inline-block !important;
 }
 
-/* Shared navigation geometry, with one muted accent to identify the Admin area. */
+/* Admin navigation shares the workspace's spacing, with distinct labels and icons. */
 :is(.main-sidebar, .app-sidebar) {
+    display: flex;
+    flex-direction: column;
+    height: 100vh !important;
+    height: 100dvh !important;
     border-right: 0;
     box-shadow: none !important;
 }
@@ -237,12 +243,12 @@ body {
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-icon {
     color: var(--erp-admin-icon);
 }
-:is(.main-sidebar, .app-sidebar)
+:root :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
     .nav-link.active {
     background: var(--erp-admin-selected) !important;
     color: var(--erp-admin-accent) !important;
-    box-shadow: var(--erp-inset);
+    box-shadow: var(--erp-admin-inset);
 }
 :is(.content-header, .app-content-header) h1 {
     font-size: 1.8rem;
@@ -281,6 +287,7 @@ body { font-size: 0.9rem; }
 :is(.main-header, .app-header) .nav-link { color: var(--erp-muted); }
 :is(.main-sidebar, .app-sidebar) .brand-link {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 12px;
     min-height: 94px;
@@ -298,35 +305,80 @@ body { font-size: 0.9rem; }
 }
 :is(.main-sidebar, .app-sidebar) .brand-text {
     color: var(--erp-text);
-    font-size: 1.5rem;
-    font-weight: 750 !important;
+    font-size: 1.4rem;
+    line-height: 1.2;
+    font-weight: 700 !important;
     letter-spacing: -0.04em;
 }
 .admin-brand-copy { display: flex; flex-direction: column; gap: 4px; }
 :is(.main-sidebar, .app-sidebar) .admin-brand-caption {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     color: var(--erp-admin-accent);
     font-size: 0.65rem;
-    font-weight: 600;
+    line-height: 1.4;
+    font-weight: 500;
     letter-spacing: 0;
 }
-.admin-brand-caption i { margin-right: 4px; }
-#jazzy-sidebar > .sidebar { height: calc(100% - 94px); }
+.admin-brand-caption .nav-icon { width: 13px; height: 13px; flex: 0 0 13px; }
+#jazzy-sidebar > .sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: auto !important;
+    padding: 12px 18px 18px;
+    overflow-x: hidden;
+}
+.admin-navigation { flex-shrink: 0; }
+.admin-sidebar-footer { margin-top: auto; padding-top: 24px; flex-shrink: 0; }
 .admin-workspace-return {
     display: flex;
     align-items: center;
     gap: 10px;
     min-height: 44px;
-    margin: 16px 8px 4px;
+    margin: 0;
     padding: 10px 12px;
-    background: var(--erp-surface);
+    background: var(--erp-admin-sidebar);
     color: var(--erp-primary) !important;
-    box-shadow: var(--erp-raised);
+    box-shadow: var(--erp-admin-raised);
     border-radius: var(--erp-control-radius);
     font-size: 0.72rem;
     font-weight: 600;
+    transition: background-color 140ms ease, box-shadow 140ms ease;
 }
+.admin-workspace-return .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; }
 .admin-workspace-return:hover { background: var(--erp-subtle); }
-.admin-workspace-return:active { box-shadow: var(--erp-inset); }
+.admin-workspace-return:active { box-shadow: var(--erp-admin-inset); }
+.admin-user-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin-top: 16px;
+    padding: 6px 4px;
+    border-radius: var(--erp-control-radius);
+    color: var(--erp-primary) !important;
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
+.admin-user-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    background: var(--erp-admin-sidebar);
+    box-shadow: var(--erp-admin-inset);
+    border-radius: 50%;
+    overflow: hidden;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.admin-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.admin-user-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 :is(.main-sidebar, .app-sidebar) .user-panel { color: var(--erp-primary); }
 :is(.main-sidebar, .app-sidebar) a:focus-visible,
 #jazzy-navbar a:focus-visible {
@@ -378,7 +430,10 @@ body { font-size: 0.9rem; }
 #jazzy-navbar > .navbar-nav:first-child > .nav-item:nth-child(3) > .nav-link:active { box-shadow: var(--erp-inset); }
 @media (min-width: 992px) {
     .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-brand-copy,
-    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return span {
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return span,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-user-name,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-header,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-link p {
         display: none;
     }
     .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .brand-link {
@@ -386,10 +441,16 @@ body { font-size: 0.9rem; }
         gap: 0;
         padding-inline: 10px;
     }
-    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return {
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-workspace-return,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .admin-user-link,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar .nav-link {
         justify-content: center;
         gap: 0;
         padding-inline: 0;
+        width: 100%;
+    }
+    .sidebar-mini.sidebar-collapse #jazzy-sidebar:not(:hover) > .sidebar {
+        padding-inline: 12px;
     }
 }
 @media (max-width: 575.98px) {
@@ -414,26 +475,61 @@ body { font-size: 0.9rem; }
     #jazzy-navbar > .navbar-nav:last-child { margin-left: 0 !important; }
 }
 .sidebar-brand { height: auto; padding: 0; border-bottom: 0; }
-:is(.main-sidebar, .app-sidebar) .user-panel {
-    border-bottom: 0;
-    padding-block: 16px;
-    margin-bottom: 12px;
-}
 :is(.main-sidebar, .app-sidebar) .nav-header {
     white-space: normal;
-    font-size: 0.66rem;
+    font-size: 0.61rem;
     line-height: 1.6;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    padding: 22px 16px 8px;
+    padding: 22px 12px 8px;
 }
-:is(.main-sidebar, .app-sidebar) .nav-link {
-    padding: 12px 14px;
-    margin-bottom: 3px;
-    font-size: 0.875rem;
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) { width: 100%; margin: 0; }
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 12px;
+    margin-bottom: 2px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: background-color 140ms ease, box-shadow 140ms ease;
 }
-:is(.main-sidebar, .app-sidebar) .nav-link:hover { background: #f2f2f2; }
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link.active { font-weight: 650; }
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin: 0;
+}
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link p {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+:is(.main-sidebar, .app-sidebar) .nav-link p > .right {
+    position: static;
+    margin-left: auto;
+    font-size: 0.6rem;
+}
+:is(.main-sidebar, .app-sidebar) .nav-link:not(.active):hover {
+    background: #eeeeee;
+    box-shadow: var(--erp-admin-raised);
+}
+:is(.main-sidebar, .app-sidebar) .nav-link:not(.active):active {
+    background: var(--erp-admin-selected);
+    box-shadow: var(--erp-admin-inset);
+}
+@media (prefers-reduced-motion: reduce) {
+    #jazzy-sidebar :is(.nav-link, .admin-workspace-return) { transition: none; }
+}
 :is(.content-header, .app-content-header) { padding: 30px 24px 22px; }
 :is(.content-header, .app-content-header) :is(h1, h3) {
     font-size: 2rem;
