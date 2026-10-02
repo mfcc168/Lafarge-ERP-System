@@ -3,6 +3,7 @@
 
 :root {
     --erp-admin-accent: #6b6258;
+    --erp-admin-icon: #b43b3b;
     --erp-admin-sidebar: #e8e8e8;
     --erp-admin-selected: #e0e0e0;
 }
@@ -232,6 +233,9 @@ body {
 }
 :root :is(.main-sidebar, .app-sidebar) .nav-header {
     color: var(--erp-admin-accent) !important;
+}
+:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-icon {
+    color: var(--erp-admin-icon);
 }
 :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
