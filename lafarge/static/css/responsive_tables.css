@@ -17,8 +17,8 @@
     background:
       linear-gradient(to right, #ffffff 30%, transparent),
       linear-gradient(to left, #ffffff 30%, transparent),
-      linear-gradient(to right, #d6d6d6, transparent),
-      linear-gradient(to left, #d6d6d6, transparent);
+      linear-gradient(to right, var(--erp-control-border), transparent),
+      linear-gradient(to left, var(--erp-control-border), transparent);
     background-size:
       32px 100%,
       32px 100%,
@@ -43,7 +43,7 @@
   }
   .responsive-table-viewport.is-overflowing .table-row-light > .erp-sticky-key,
   .responsive-table-viewport.is-overflowing .table-striped > tbody > tr:nth-of-type(odd) > .erp-sticky-key {
-    background: #fafafa !important;
+    background: var(--erp-subtle) !important;
   }
   .responsive-table-viewport.is-overflowing .table-hover > tbody > tr:hover > .erp-sticky-key {
     background: var(--erp-subtle) !important;

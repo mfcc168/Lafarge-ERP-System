@@ -2,12 +2,12 @@
 @import url("./neutral_components.css");
 
 :root {
-    --erp-admin-accent: #6b6258;
+    --erp-admin-accent: #404252;
     --erp-admin-icon: #b43b3b;
-    --erp-admin-sidebar: #e8e8e8;
-    --erp-admin-selected: #e4e4e4;
-    --erp-admin-raised: 3px 3px 8px rgba(0, 0, 0, 0.06), -3px -3px 8px rgba(255, 255, 255, 0.65);
-    --erp-admin-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.07), inset -2px -2px 5px rgba(255, 255, 255, 0.65);
+    --erp-admin-sidebar: var(--erp-surface);
+    --erp-admin-selected: var(--erp-nav-selected);
+    --erp-admin-raised: var(--erp-raised);
+    --erp-admin-inset: var(--erp-inset);
 }
 
 /* Visual theme only: retain Jazzmin's form, inline and modal behavior below. */
@@ -79,7 +79,7 @@ body {
 }
 :is(.content-wrapper, .app-main) .form-control,
 .login-box .form-control {
-    border-color: #d6d6d6;
+    border-color: var(--erp-control-border);
     border-radius: var(--erp-control-radius);
 }
 :is(.content-wrapper, .app-main) .form-control:focus,
@@ -92,16 +92,16 @@ body {
     font-variant-numeric: tabular-nums;
 }
 :is(.content-wrapper, .app-main) .table thead th {
-    background: #f5f5f5;
-    color: #686868;
+    background: var(--erp-subtle);
+    color: var(--erp-muted);
     font-weight: 600;
     border-color: var(--erp-border);
 }
 :is(.content-wrapper, .app-main) .table td {
-    border-color: #eeeeee;
+    border-color: var(--erp-primary-soft);
 }
 :is(.content-wrapper, .app-main) .table-hover tbody tr:hover {
-    background: #f5f5f5;
+    background: var(--erp-subtle);
 }
 :is(.content-wrapper, .app-main) a:focus-visible,
 :is(.content-wrapper, .app-main) button:focus-visible {
@@ -209,8 +209,8 @@ body {
 /* Left align the "Add other Invoice item" button */
 .inline-related .add-row a {
     float: left !important;
-    background-color: #525252 !important;
-    border-color: #525252 !important;
+    background-color: var(--erp-info) !important;
+    border-color: var(--erp-info) !important;
     color: #ffffff !important;
     padding: 0.375rem 0.75rem !important;
     font-size: 1rem !important;
@@ -260,7 +260,7 @@ body {
     padding: 18px 22px;
 }
 :is(.content-wrapper, .app-main) .table thead th {
-    background: #f5f5f5;
+    background: var(--erp-subtle);
     color: var(--erp-muted);
     font-size: 0.72rem;
 }
@@ -272,9 +272,9 @@ body {
     border-color: var(--erp-primary);
 }
 :is(.content-wrapper, .app-main) .btn-info {
-    background: #eeeeee;
-    border-color: #d6d6d6;
-    color: #525252;
+    background: var(--erp-primary-soft);
+    border-color: var(--erp-control-border);
+    color: var(--erp-info);
 }
 
 /* Workspace layout, shared across Jazzmin's AdminLTE 3 and 4 templates. */
@@ -301,7 +301,8 @@ body { font-size: 0.9rem; }
     max-height: 38px !important;
     margin: 0 !important;
     opacity: 1 !important;
-    box-shadow: none !important;
+    border-radius: 12px;
+    box-shadow: var(--erp-raised) !important;
 }
 :is(.main-sidebar, .app-sidebar) .brand-text {
     color: var(--erp-text);
@@ -363,7 +364,7 @@ body { font-size: 0.9rem; }
     font-size: 0.72rem;
     font-weight: 500;
 }
-a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
+a.admin-user-link:hover { background: var(--erp-subtle); }
 .admin-user-avatar {
     display: grid;
     place-items: center;
@@ -520,7 +521,7 @@ a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
     font-size: 0.6rem;
 }
 :is(.main-sidebar, .app-sidebar) .nav-link:not(.active):hover {
-    background: #eeeeee;
+    background: var(--erp-primary-soft);
     box-shadow: var(--erp-admin-raised);
 }
 :is(.main-sidebar, .app-sidebar) .nav-link:not(.active):active {
@@ -631,7 +632,7 @@ a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
 #jazzy-actions .object-tools { margin-top: 10px; }
 :is(.content-wrapper, .app-main) .btn { padding: 9px 14px; font-size: 0.82rem; }
 :is(.content-wrapper, .app-main) .btn-success:hover { background: var(--erp-primary-hover); border-color: var(--erp-primary-hover); }
-:is(.content-wrapper, .app-main) .btn-danger { background: #f5f5f5; color: var(--erp-danger); border-color: #d6d6d6; }
+:is(.content-wrapper, .app-main) .btn-danger { background: var(--erp-subtle); color: var(--erp-danger); border-color: var(--erp-control-border); }
 :is(.content-wrapper, .app-main) .btn-danger:hover { background: var(--erp-danger); color: white; }
 .inline-related .add-row a { background: var(--erp-primary) !important; border-color: var(--erp-primary) !important; border-radius: var(--erp-control-radius) !important; }
 .inline-related .table :is(td, th) { padding: 10px; }
@@ -676,7 +677,7 @@ a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
 .admin-panel-heading h2 { font-size: 1rem; font-weight: 700; margin: 0 0 6px; }
 .admin-count { background: var(--erp-primary-soft); color: var(--erp-primary); border-radius: 6px; font-size: 0.75rem; font-weight: 700; padding: 4px 9px; }
 .admin-model-row { display: flex; align-items: center; gap: 14px; padding: 17px 22px; border-bottom: 0; }
-.admin-model-row:nth-child(even) { background: #fafafa; }
+.admin-model-row:nth-child(even) { background: var(--erp-subtle); }
 .admin-model-row:last-child { border-bottom: 0; }
 .admin-model-row:hover { background: var(--erp-subtle); }
 .admin-model-icon { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 7px; background: var(--erp-primary-soft); color: var(--erp-primary); font-size: 0.8rem; font-weight: 700; }
@@ -692,7 +693,7 @@ a.admin-user-link:hover { background: rgba(255, 255, 255, 0.3); }
 .admin-activity-list li:last-child { border-bottom: 0; }
 .admin-activity-meta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .admin-event { font-size: 0.65rem; font-weight: 700; color: var(--erp-primary); background: var(--erp-primary-soft); padding: 3px 7px; border-radius: 4px; }
-.admin-event-delete { color: var(--erp-danger); background: #f5f5f5; }
+.admin-event-delete { color: var(--erp-danger); background: var(--erp-subtle); }
 .admin-activity-meta time { color: var(--erp-muted); font-size: 0.68rem; }
 .admin-activity-object { font-size: 0.85rem; font-weight: 600; overflow-wrap: anywhere; }
 .admin-activity-type { font-size: 0.7rem; color: var(--erp-muted); }
@@ -755,7 +756,7 @@ body .selector :is(.selector-available h2, .selector-chosen h2) { background: va
 body .selector :is(select, .selector-filter) { border-color: var(--erp-control-border); }
 :is(.content-wrapper, .app-main) .table :is(td, th) { border: 0; }
 #result_list.table-bordered, #result_list.table-bordered :is(td, th) { border: 0; }
-#result_list tbody tr:nth-child(even) { background: #fafafa; }
+#result_list tbody tr:nth-child(even) { background: var(--erp-subtle); }
 body .content-wrapper > .content.border-bottom { border-bottom: 0 !important; }
 body .content-wrapper h1.border-right { border-right: 0 !important; }
 body .main-footer { border: 0; }
