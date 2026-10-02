@@ -95,7 +95,7 @@ body {
     border-color: var(--erp-primary-soft);
 }
 :is(.content-wrapper, .app-main) .table-hover tbody tr:hover {
-    background: var(--erp-subtle);
+    background: var(--erp-surface);
 }
 :is(.content-wrapper, .app-main) a:focus-visible,
 :is(.content-wrapper, .app-main) button:focus-visible {
@@ -575,8 +575,6 @@ a.admin-user-link:active { box-shadow: var(--erp-nav-inset); }
     border-bottom: 0;
     font-size: 0.85rem;
 }
-#result_list tbody tr:nth-child(even) { background: var(--erp-subtle); }
-#result_list tbody tr:hover { background: var(--erp-primary-soft); }
 :is(.content-wrapper, .app-main) :is(.form-control, .form-select, select:not([multiple]), input.vTextField, input.vDateField, input.vTimeField, input.vIntegerField, input.vDecimalField, textarea) {
     border: 1px solid var(--erp-control-border);
     box-shadow: var(--erp-inset);
@@ -666,10 +664,8 @@ a.admin-user-link:active { box-shadow: var(--erp-nav-inset); }
 .admin-panel-heading { padding: 22px; border-bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .admin-panel-heading h2 { font-size: 1rem; font-weight: 500; margin: 0 0 6px; }
 .admin-count { background: var(--erp-primary-soft); color: var(--erp-primary); border-radius: 6px; font-size: 0.75rem; font-weight: 400; padding: 4px 9px; }
-.admin-model-row { display: flex; align-items: center; gap: 14px; padding: 17px 22px; border-bottom: 0; }
-.admin-model-row:nth-child(even) { background: var(--erp-subtle); }
+.admin-model-row { display: flex; align-items: center; gap: 14px; padding: 17px 22px; border-bottom: 0; background: var(--erp-surface); }
 .admin-model-row:last-child { border-bottom: 0; }
-.admin-model-row:hover { background: var(--erp-subtle); }
 .admin-model-icon { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 7px; background: var(--erp-primary-soft); color: var(--erp-primary); font-size: 0.8rem; font-weight: 500; }
 .admin-model-name { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 0.875rem; font-weight: 400; }
 .admin-model-name a { color: var(--erp-text) !important; }
@@ -746,7 +742,6 @@ body .selector :is(.selector-available h2, .selector-chosen h2) { background: va
 body .selector :is(select, .selector-filter) { border-color: var(--erp-control-border); }
 :is(.content-wrapper, .app-main) .table :is(td, th) { border: 0; }
 #result_list.table-bordered, #result_list.table-bordered :is(td, th) { border: 0; }
-#result_list tbody tr:nth-child(even) { background: var(--erp-subtle); }
 body .content-wrapper > .content.border-bottom { border-bottom: 0 !important; }
 body .content-wrapper h1.border-right { border-right: 0 !important; }
 body .main-footer { border: 0; }
