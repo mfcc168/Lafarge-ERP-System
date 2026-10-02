@@ -1,1 +1,1 @@
-{% load i18n %}{% if model.model_str == 'invoice.forbidden_word' %}{% trans "Blocked words" %}{% elif model.model_str == 'invoice.deliveryman' %}{% trans "Deliverymen" %}{% elif model.model_str == 'invoice.salesman' %}{% trans "Salesmen" %}{% elif model.model_str == 'invoice.producttransaction' %}{% trans "Stock movements" %}{% else %}{{ model.name }}{% endif %}
+{% load i18n %}{% if model.model_str == 'invoice.deliveryman' %}{% trans "Deliverymen" %}{% elif model.model_str == 'invoice.salesman' %}{% trans "Salesmen" %}{% else %}{{ model.name }}{% endif %}
