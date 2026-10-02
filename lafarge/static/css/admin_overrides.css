@@ -3,9 +3,8 @@
 
 :root {
     --erp-admin-accent: #404252;
-    --erp-admin-icon: #b43b3b;
+    --erp-admin-nav: #2563eb;
     --erp-admin-sidebar: var(--erp-surface);
-    --erp-admin-selected: var(--erp-nav-selected);
     --erp-admin-raised: var(--erp-raised);
     --erp-admin-inset: var(--erp-inset);
 }
@@ -30,12 +29,6 @@ body {
 }
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link {
     border-radius: var(--erp-control-radius);
-}
-:is(.main-sidebar, .app-sidebar)
-    :is(.nav-sidebar, .sidebar-menu)
-    .nav-link.active {
-    background: var(--erp-admin-selected) !important;
-    color: var(--erp-admin-accent) !important;
 }
 :is(.main-header, .app-header) {
     border-bottom: 0;
@@ -241,15 +234,21 @@ body {
 :root :is(.main-sidebar, .app-sidebar) .nav-header {
     color: var(--erp-admin-accent) !important;
 }
-:is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-icon {
-    color: var(--erp-admin-icon);
+:root :is(.main-sidebar, .app-sidebar)
+    :is(.nav-sidebar, .sidebar-menu)
+    :is(.nav-link, .nav-link:hover, .nav-link:focus, .nav-link:active, .nav-link.active) {
+    background: var(--erp-admin-sidebar) !important;
+    color: var(--erp-admin-nav) !important;
 }
 :root :is(.main-sidebar, .app-sidebar)
     :is(.nav-sidebar, .sidebar-menu)
-    .nav-link.active {
-    background: var(--erp-admin-selected) !important;
-    color: var(--erp-admin-accent) !important;
-    box-shadow: var(--erp-admin-inset);
+    .nav-link :is(.nav-icon, p, .right) {
+    color: inherit !important;
+}
+:root :is(.main-sidebar, .app-sidebar)
+    :is(.nav-sidebar, .sidebar-menu)
+    :is(.nav-link.active, .nav-link:active) {
+    box-shadow: var(--erp-nav-inset) !important;
 }
 :is(.content-header, .app-content-header) h1 {
     font-size: 1.8rem;
@@ -340,16 +339,16 @@ body { font-size: 0.9rem; }
     margin: 0;
     padding: 10px 12px;
     background: var(--erp-admin-sidebar);
-    color: var(--erp-primary) !important;
+    color: var(--erp-admin-nav) !important;
     box-shadow: var(--erp-admin-raised);
     border-radius: var(--erp-control-radius);
     font-size: 0.72rem;
     font-weight: 500;
-    transition: background-color 140ms ease, box-shadow 140ms ease;
+    transition: box-shadow 140ms ease;
 }
 .admin-workspace-return .nav-icon { width: 18px; height: 18px; flex: 0 0 18px; }
-.admin-workspace-return:hover { background: var(--erp-subtle); }
-.admin-workspace-return:active { box-shadow: var(--erp-admin-inset); }
+.admin-workspace-return:hover { background: var(--erp-admin-sidebar); }
+.admin-workspace-return:active { box-shadow: var(--erp-nav-inset); }
 .admin-user-link {
     display: flex;
     align-items: center;
@@ -358,11 +357,12 @@ body { font-size: 0.9rem; }
     margin-top: 16px;
     padding: 6px 4px;
     border-radius: var(--erp-control-radius);
-    color: var(--erp-primary) !important;
+    color: var(--erp-admin-nav) !important;
     font-size: 0.72rem;
     font-weight: 500;
 }
-a.admin-user-link:hover { background: var(--erp-subtle); }
+a.admin-user-link:hover { background: var(--erp-admin-sidebar); box-shadow: var(--erp-admin-raised); }
+a.admin-user-link:active { box-shadow: var(--erp-nav-inset); }
 .admin-user-avatar {
     display: grid;
     place-items: center;
@@ -490,7 +490,7 @@ a.admin-user-link:hover { background: var(--erp-subtle); }
     font-size: 0.83rem;
     font-weight: 500;
     line-height: 1.4;
-    transition: background-color 140ms ease, box-shadow 140ms ease;
+    transition: box-shadow 140ms ease;
 }
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-link.active { font-weight: 500; }
 :is(.main-sidebar, .app-sidebar) :is(.nav-sidebar, .sidebar-menu) .nav-icon {
@@ -514,12 +514,7 @@ a.admin-user-link:hover { background: var(--erp-subtle); }
     font-size: 0.6rem;
 }
 :is(.main-sidebar, .app-sidebar) .nav-link:not(.active):hover {
-    background: var(--erp-primary-soft);
     box-shadow: var(--erp-admin-raised);
-}
-:is(.main-sidebar, .app-sidebar) .nav-link:not(.active):active {
-    background: var(--erp-admin-selected);
-    box-shadow: var(--erp-admin-inset);
 }
 @media (prefers-reduced-motion: reduce) {
     #jazzy-sidebar :is(.nav-link, .admin-workspace-return) { transition: none; }

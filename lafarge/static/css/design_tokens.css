@@ -23,11 +23,11 @@
     --erp-info: #404252;
     --erp-sidebar: #ffffff;
     --erp-sidebar-text: #5b5d6b;
-    --erp-nav-selected: #ffffff;
     --erp-radius: 18px;
     --erp-control-radius: 11px;
     --erp-shadow: 6px 6px 18px rgba(210, 212, 218, 0.32), -6px -6px 18px #ffffff;
     --erp-raised: 3px 3px 9px rgba(210, 212, 218, 0.48), -3px -3px 9px #ffffff;
     --erp-inset: inset 2px 2px 5px rgba(210, 212, 218, 0.55), inset -2px -2px 5px #ffffff;
+    --erp-nav-inset: inset 4px 4px 8px rgba(184, 190, 202, 0.42), inset -4px -4px 8px #ffffff, inset 1px 1px 2px rgba(184, 190, 202, 0.2);
     --erp-focus: 0 0 0 3px rgba(64, 66, 82, 0.16);
 }
