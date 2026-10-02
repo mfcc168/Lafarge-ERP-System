@@ -6,7 +6,7 @@
 {% block page_actions %}<a href="{% url 'monthly_payment_preview' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i> All months</a>{% endblock %}
 
 {% block content %}
-<section class="data-panel"><div class="panel-toolbar"><div><h2>Payment register</h2><p>Sort by any column to review payments and grouped totals.</p></div><span class="panel-label"><i class="bi bi-arrow-down-up" aria-hidden="true"></i> Sortable columns</span></div><p id="payment-sort-help" class="table-help">Grouped prices are totals for matching payment details.</p><div class="table-responsive" tabindex="0" role="region" aria-label="Payment register"><table id="monthly-payment-table" class="table align-middle border-0" aria-describedby="payment-sort-help">
+<section class="data-panel"><div class="panel-toolbar"><h2>Payment register</h2></div><div class="table-responsive" tabindex="0" role="region" aria-label="Payment register"><table id="monthly-payment-table" class="table align-middle border-0">
                     <thead class="bg-light text-dark">
                     <tr>
                         <th scope="col" data-sort-type="date" aria-sort="none">

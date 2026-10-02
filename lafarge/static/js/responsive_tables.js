@@ -106,13 +106,6 @@
           row.cells[keyColumn]?.classList.add("erp-sticky-key");
       });
     }
-    const hint = document.createElement("p");
-    hint.className = "table-scroll-hint";
-    hint.id = `${viewport.id}-hint`;
-    hint.textContent = "Swipe left or right to see all columns.";
-    viewport.before(hint);
-    viewport.setAttribute("aria-describedby", hint.id);
-
     if (stackable && !nested) {
       const controls = document.createElement("div");
       controls.className = "record-table-controls";
@@ -192,14 +185,12 @@
         portrait.matches &&
         !viewport.classList.contains("show-table");
       viewport.classList.toggle("is-overflowing", overflow);
-      hint.hidden = !overflow;
       viewport.tabIndex = overflow ? 0 : -1;
       headerControls.forEach(({ control, tabindex }) => {
         if (cards) control.tabIndex = -1;
         else if (tabindex === null) control.removeAttribute("tabindex");
         else control.setAttribute("tabindex", tabindex);
       });
-      // A nested record view does not need its own scroll instructions.
       if (cards) viewport.scrollLeft = 0;
     }
     new ResizeObserver(updateOverflow).observe(viewport);

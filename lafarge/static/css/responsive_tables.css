@@ -48,15 +48,6 @@
   .responsive-table-viewport.is-overflowing .table-hover > tbody > tr:hover > .erp-sticky-key {
     background: var(--erp-subtle) !important;
   }
-  .table-scroll-hint {
-    margin: 0;
-    padding: 10px 16px;
-    color: var(--erp-muted);
-    background: var(--erp-subtle);
-    border-bottom: 0;
-    font-size: 0.75rem;
-  }
-  .table-scroll-hint[hidden],
   .record-table-controls {
     display: none;
   }
@@ -406,8 +397,7 @@
   }
 }
 @media print {
-  .record-table-controls,
-  .table-scroll-hint {
+  .record-table-controls {
     display: none !important;
   }
   .responsive-table-viewport {

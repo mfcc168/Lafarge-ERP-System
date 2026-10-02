@@ -415,14 +415,6 @@
 .erp-app .bg-light {
     background: #f5f5f5 !important;
 }
-.table-help {
-    padding: 11px 22px;
-    margin: 0;
-    background: #fafafa;
-    color: var(--erp-muted);
-    font-size: 0.72rem;
-    border-bottom: 1px solid #eeeeee;
-}
 .erp-app .filter-drawer.filter-panel {
     padding: 20px 22px;
     margin: 0;
