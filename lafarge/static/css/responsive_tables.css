@@ -17,8 +17,8 @@
     background:
       linear-gradient(to right, #ffffff 30%, transparent),
       linear-gradient(to left, #ffffff 30%, transparent),
-      linear-gradient(to right, #d6d6d6, transparent),
-      linear-gradient(to left, #d6d6d6, transparent);
+      linear-gradient(to right, var(--erp-control-border), transparent),
+      linear-gradient(to left, var(--erp-control-border), transparent);
     background-size:
       32px 100%,
       32px 100%,
@@ -43,20 +43,11 @@
   }
   .responsive-table-viewport.is-overflowing .table-row-light > .erp-sticky-key,
   .responsive-table-viewport.is-overflowing .table-striped > tbody > tr:nth-of-type(odd) > .erp-sticky-key {
-    background: #fafafa !important;
+    background: var(--erp-subtle) !important;
   }
   .responsive-table-viewport.is-overflowing .table-hover > tbody > tr:hover > .erp-sticky-key {
     background: var(--erp-subtle) !important;
   }
-  .table-scroll-hint {
-    margin: 0;
-    padding: 10px 16px;
-    color: var(--erp-muted);
-    background: var(--erp-subtle);
-    border-bottom: 0;
-    font-size: 0.75rem;
-  }
-  .table-scroll-hint[hidden],
   .record-table-controls {
     display: none;
   }
@@ -406,8 +397,7 @@
   }
 }
 @media print {
-  .record-table-controls,
-  .table-scroll-hint {
+  .record-table-controls {
     display: none !important;
   }
   .responsive-table-viewport {

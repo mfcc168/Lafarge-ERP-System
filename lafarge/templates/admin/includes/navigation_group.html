@@ -1,0 +1,1 @@
+{% load i18n %}{% if app.app_label == 'auth' %}{% trans "Users & permissions" %}{% elif app.app_label == 'invoice' %}{% trans "Manage records" %}{% else %}{{ app.name }}{% endif %}
