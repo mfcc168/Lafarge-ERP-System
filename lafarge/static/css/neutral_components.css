@@ -21,6 +21,12 @@
 :root :is(.border-primary, .border-success, .border-info, .border-warning, .border-danger, .border-secondary) {
     border-color: var(--erp-border) !important;
 }
+/* White data rows in Bootstrap 4/5, including striped, hovered and total rows. */
+:root body .table > :is(tbody, tfoot) > tr,
+:root body .table > :is(tbody, tfoot) > tr > :is(td, th) {
+    background-color: var(--erp-surface) !important;
+    --bs-table-accent-bg: transparent !important;
+}
 /* A solid primary action, softly raised secondary actions, and a clear pressed state. */
 :root .btn {
     border-radius: var(--erp-control-radius);

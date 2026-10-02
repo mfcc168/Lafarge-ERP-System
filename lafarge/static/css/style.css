@@ -632,9 +632,9 @@
     border-radius: 0;
 }
 .erp-app .table {
-    --bs-table-striped-bg: var(--erp-subtle);
+    --bs-table-striped-bg: var(--erp-surface);
     --bs-table-striped-color: var(--erp-text);
-    --bs-table-hover-bg: var(--erp-subtle);
+    --bs-table-hover-bg: var(--erp-surface);
     --bs-table-hover-color: var(--erp-text);
     width: 100%;
     margin-bottom: 0;
@@ -678,15 +678,13 @@
 .erp-app .table tbody > tr:last-child > td {
     border-bottom-width: 0;
 }
-.erp-app .table-row-light {
-    background-color: var(--erp-subtle);
-}
+.erp-app .table-row-light,
 .erp-app .table-row-dark {
     background-color: var(--erp-surface);
 }
 .erp-app .table-hover > tbody > tr:hover > *,
 .erp-app tr[data-href]:hover > * {
-    --bs-table-accent-bg: var(--erp-subtle);
+    --bs-table-accent-bg: transparent;
 }
 .erp-app tr[data-href] {
     cursor: pointer;
@@ -701,7 +699,7 @@
     white-space: nowrap;
 }
 .erp-app .table tfoot {
-    background: var(--erp-subtle);
+    background: var(--erp-surface);
 }
 .erp-app .table tfoot td {
     border: 0;
@@ -971,7 +969,7 @@
     min-width: 220px;
 }
 .erp-app .table tr.bg-secondary {
-    background: var(--erp-primary-soft) !important;
+    background: var(--erp-surface) !important;
     color: var(--erp-text);
 }
 .erp-app .table .fw-bold {
