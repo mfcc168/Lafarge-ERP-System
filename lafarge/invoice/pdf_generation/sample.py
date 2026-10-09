@@ -63,20 +63,21 @@ def draw_sample_page(pdf, invoice):
                 text_object.textLine(line)
             pdf.drawText(text_object)
 
-    # Aggregate quantities for products with the same name
+    # Aggregate quantities for products with the same name and unit
     product_quantities = {}
     for item in invoice.invoiceitem_set.all():
         product_name = item.product.name
-        if product_name in product_quantities:
-            product_quantities[product_name] += item.quantity
+        key = (product_name, item.product.unit)
+        if key in product_quantities:
+            product_quantities[key] += item.quantity
         else:
-            product_quantities[product_name] = item.quantity
+            product_quantities[key] = item.quantity
 
     data = [["Product", "Quantity"]]
-    for product_name, total_quantity in product_quantities.items():
+    for (product_name, unit), total_quantity in product_quantities.items():
         data.append([
             product_name,
-            f"{float(total_quantity):,g} {item.product.unit}",  # Use the unit from the last item processed
+            f"{float(total_quantity):,g} {unit}",
         ])
 
     table = Table(data, colWidths=[200, 50])
