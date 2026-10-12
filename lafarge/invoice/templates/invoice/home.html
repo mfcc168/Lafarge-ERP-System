@@ -6,21 +6,21 @@
 {% block page_actions %}<a href="{% url 'invoice_list' %}" class="btn btn-outline-primary">View invoices <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>{% endblock %}
 
 {% block content %}
-<div class="metrics-grid"><div class="metric-card"><div class="metric-top"><span>Deliveries today</span><i class="bi bi-truck" aria-hidden="true"></i></div><strong>{{ invoices_today|length }}</strong><small>Invoices delivered today</small></div><div class="metric-card"><div class="metric-top"><span>Pending deposit records</span><i class="bi bi-receipt" aria-hidden="true"></i></div><strong>{{ pending_deposits|length }}</strong><small>Includes scheduled payments</small></div><div class="metric-card"><div class="metric-top"><span>Awaiting deposit</span><i class="bi bi-wallet2" aria-hidden="true"></i></div><strong>${{ total_pending_deposit|currency }}</strong><small>Excludes post-dated payments</small></div></div>
+<div class="metrics-grid"><div class="metric-card"><div class="metric-top"><span>Deliveries today</span><i class="bi bi-truck" aria-hidden="true"></i></div><strong>{{ delivered_today_count }}</strong><small>Invoices delivered today</small></div><div class="metric-card"><div class="metric-top"><span>Pending deposit records</span><i class="bi bi-receipt" aria-hidden="true"></i></div><strong>{{ pending_deposits|length }}</strong><small>Includes scheduled payments</small></div><div class="metric-card"><div class="metric-top"><span>Awaiting deposit</span><i class="bi bi-wallet2" aria-hidden="true"></i></div><strong>${{ total_pending_deposit|currency }}</strong><small>Excludes post-dated payments</small></div></div>
 <div class="page-stack">
     <form id="delivery-export-form" action="{% url 'export_today_deliveries' %}" method="get">
         <section class="data-panel">
             <div class="panel-toolbar">
-                <div><h2>Today's deliveries</h2><p>Delivered invoices and their items.</p></div>
+                <div><h2>Today's deliveries</h2><p>Delivered today and awaiting delivery.</p></div>
                 <div class="delivery-export-actions">
                     <label class="delivery-select-all" for="select-all-deliveries">
                         <input id="select-all-deliveries" type="checkbox" class="form-check-input"
-                               {% if invoices_today %}checked{% else %}disabled{% endif %}>
+                               {% if delivery_invoices %}checked{% else %}disabled{% endif %}>
                         <span>Select all</span>
                     </label>
-                    <span id="delivery-selection-count" class="panel-label" aria-live="polite">{{ invoices_today|length }} selected</span>
+                    <span id="delivery-selection-count" class="panel-label" aria-live="polite">{{ delivery_invoices|length }} selected</span>
                     <button id="export-deliveries" type="submit" class="btn btn-outline-primary"
-                            {% if not invoices_today %}disabled{% endif %}>
+                            {% if not delivery_invoices %}disabled{% endif %}>
                         <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Export to Excel
                     </button>
                 </div>
@@ -40,7 +40,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for invoice in invoices_today %}
+                    {% for invoice in delivery_invoices %}
                     <tr class="{% cycle 'table-row-light' 'table-row-dark' %}"
                         data-href="{% url 'invoice_detail' invoice.number %}"
                         style="cursor: pointer;">
@@ -51,7 +51,7 @@
                                        aria-label="Select invoice #{{ invoice.number }} for export">
                             </label>
                         </td>
-                        <td class="text-nowrap">{{ invoice.delivery_date }}</td>
+                        <td class="text-nowrap">{% if invoice.delivery_date %}{{ invoice.delivery_date }}{% else %}<span class="text-muted">Not delivered</span>{% endif %}</td>
                         <td>
                             <a href="{% url 'invoice_detail' invoice.number %}"
                                class="text-decoration-none fw-bold text-primary">
@@ -72,7 +72,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="text-center text-muted">No invoices delivered today.</td>
+                        <td colspan="8" class="text-center text-muted">No invoices delivered today or awaiting delivery.</td>
                     </tr>
                     {% endfor %}
                     </tbody>

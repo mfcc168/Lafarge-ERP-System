@@ -43,6 +43,12 @@ class DeliveryExportTest(TestCase):
         self.yesterday_invoice = Invoice.objects.create(
             number='10003', customer=self.customer, delivery_date=self.today - timedelta(days=1),
         )
+        self.undelivered_invoice = Invoice.objects.create(
+            number='10005', customer=self.other_customer,
+        )
+        self.future_invoice = Invoice.objects.create(
+            number='10006', customer=self.customer, delivery_date=self.today + timedelta(days=1),
+        )
         tablets = self.create_product('Tablets (Lot no. ABC-1)')
         other_lot = self.create_product('Tablets (Lot no. ABC-2)')
         syrup = self.create_product('Syrup')
@@ -51,6 +57,7 @@ class DeliveryExportTest(TestCase):
         self.add_item(self.invoice, syrup, '1.0')
         self.add_item(self.other_invoice, syrup, '4.0')
         self.add_item(self.yesterday_invoice, syrup, '5.0')
+        self.add_item(self.undelivered_invoice, syrup, '6.0')
 
     def create_product(self, name):
         return Product.objects.create(name=name, quantity=Decimal('100.0'), price=Decimal('5.00'))
@@ -78,7 +85,29 @@ class DeliveryExportTest(TestCase):
         self.assertEqual(parser.deliveries, {
             str(self.invoice.pk): True,
             str(self.other_invoice.pk): True,
+            str(self.undelivered_invoice.pk): True,
         })
+        self.assertContains(response, 'Not delivered')
+        self.assertEqual(response.context['delivered_today_count'], 2)
+
+    def test_selected_undelivered_invoice_can_be_exported(self):
+        sheet = self.export_sheet([self.undelivered_invoice.pk])
+        self.assertEqual(list(sheet.values), [
+            ('Customer', 'Address', 'Items'),
+            ('Customer Two', '456 Test Road', 'Syrup 6.0'),
+        ])
+
+    def test_pending_delivery_is_shown_and_exportable_when_nothing_was_delivered_today(self):
+        Invoice.objects.filter(delivery_date=self.today).update(delivery_date=self.today - timedelta(days=1))
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        parser = DeliveryCheckboxParser()
+        parser.feed(response.content.decode())
+        self.assertEqual(parser.deliveries, {str(self.undelivered_invoice.pk): True})
+        self.assertEqual(response.context['delivered_today_count'], 0)
+        self.assertEqual(list(self.export_sheet([self.undelivered_invoice.pk]).values)[1], (
+            'Customer Two', '456 Test Road', 'Syrup 6.0',
+        ))
 
     def test_export_has_only_requested_columns_and_one_row_per_displayed_item(self):
         sheet = self.export_sheet([self.invoice.pk, self.other_invoice.pk])
@@ -109,7 +138,7 @@ class DeliveryExportTest(TestCase):
 
     def test_duplicate_selection_does_not_repeat_rows_or_include_other_dates(self):
         sheet = self.export_sheet([
-            self.other_invoice.pk, self.other_invoice.pk, self.yesterday_invoice.pk,
+            self.other_invoice.pk, self.other_invoice.pk, self.yesterday_invoice.pk, self.future_invoice.pk,
         ])
         self.assertEqual(list(sheet.values), [
             ('Customer', 'Address', 'Items'),
@@ -117,7 +146,7 @@ class DeliveryExportTest(TestCase):
         ])
 
     def test_empty_invalid_and_outdated_selections_do_not_export_all_deliveries(self):
-        for invoice_ids in ([], ['invalid'], ['-1'], ['9' * 30], [self.yesterday_invoice.pk], [999999]):
+        for invoice_ids in ([], ['invalid'], ['-1'], ['9' * 30], [self.yesterday_invoice.pk], [self.future_invoice.pk], [999999]):
             with self.subTest(invoice_ids=invoice_ids):
                 response = self.client.get(self.url, {'invoice_ids': invoice_ids})
                 self.assertEqual(response.status_code, 400)

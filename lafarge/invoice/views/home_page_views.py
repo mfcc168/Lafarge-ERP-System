@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 def _delivery_invoices(delivery_date):
-    return Invoice.objects.filter(delivery_date=delivery_date).select_related(
+    """Include deliveries on the given date and invoices awaiting delivery."""
+    return Invoice.objects.filter(
+        Q(delivery_date=delivery_date) | Q(delivery_date__isnull=True),
+    ).select_related(
         'customer', 'salesman', 'deliveryman',
     ).prefetch_related('invoiceitem_set__product').order_by('pk')
 
@@ -57,7 +60,7 @@ def export_today_deliveries(request):
     today = localdate()
     invoices = list(_delivery_invoices(today).filter(pk__in=invoice_ids))
     if not invoices:
-        return HttpResponseBadRequest('No selected deliveries are scheduled for today.')
+        return HttpResponseBadRequest('No selected invoices are delivered today or awaiting delivery.')
 
     workbook = Workbook()
     sheet = workbook.active
@@ -92,10 +95,10 @@ def export_today_deliveries(request):
 
 @staff_member_required
 def home(request):
-    """Dashboard view displaying today's invoices and pending deposits."""
+    """Display today's deliveries, undelivered invoices, and pending deposits."""
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
-    invoices_today = _delivery_invoices(today)
+    delivery_invoices = _delivery_invoices(today)
 
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date).select_related('customer')
@@ -134,7 +137,7 @@ def home(request):
             future_payment_counts_dict[payment_method] = future_invoices.count()
 
     modified_invoices = []
-    for invoice in invoices_today:
+    for invoice in delivery_invoices:
         modified_invoices.append({
             'id': invoice.pk,
             'delivery_date': invoice.delivery_date,
@@ -147,7 +150,8 @@ def home(request):
         })
 
     return render(request, 'invoice/home.html', {
-        'invoices_today': modified_invoices,
+        'delivery_invoices': modified_invoices,
+        'delivered_today_count': sum(invoice['delivery_date'] == today for invoice in modified_invoices),
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,
         'payment_totals_dict': payment_totals_dict,
