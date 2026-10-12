@@ -150,6 +150,30 @@ class DeliveryExportTest(TestCase):
             ('Customer Two', '456 Test Road', 'Syrup 4.0'),
         ])
 
+    def test_export_uses_the_second_last_address_part_for_each_item_row(self):
+        address = '1/F., Shop 109-110, Shopping Arcade,\nFortune Plaza, Taipo, N.T.'
+        self.customer.address = address
+        self.customer.save()
+        sheet = self.export_sheet([self.invoice.pk])
+        self.assertEqual([row[1] for row in list(sheet.values)[1:]], ['Taipo', 'Taipo'])
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.address, address)
+
+    def test_export_handles_address_spacing_empty_parts_and_short_addresses(self):
+        for address, expected in (
+            ('1/F.,, Fortune Plaza, \tTaipo \n, N.T., \n, ', 'Taipo'),
+            ('Shop 109，Fortune Plaza，大埔，新界', '大埔'),
+            ('Taipo, N.T.', 'Taipo'),
+            (' \tTaipo \n', 'Taipo'),
+            ('', None),
+            (' , \n, \t', None),
+        ):
+            with self.subTest(address=address):
+                self.customer.address = address
+                self.customer.save()
+                sheet = self.export_sheet([self.invoice.pk])
+                self.assertEqual([row[1] for row in list(sheet.values)[1:]], [expected, expected])
+
     def test_export_sums_lot_quantities_without_changing_the_product_name(self):
         for lot, quantity in (('ABC-1', '30.0'), ('ABC-2', '15.0')):
             self.add_item(

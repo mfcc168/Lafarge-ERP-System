@@ -43,6 +43,12 @@ def _delivery_items(invoice, total_quantities=False):
             for name, quantities in grouped_items.items()]
 
 
+def _delivery_export_address(address):
+    """Use the second-last nonempty comma-separated part of the address."""
+    parts = [part.strip() for part in re.split('[,，]', address or '') if part.strip()]
+    return parts[-2] if len(parts) > 1 else (parts[0] if parts else '')
+
+
 @staff_member_required
 @require_GET
 def export_today_deliveries(request):
@@ -71,9 +77,10 @@ def export_today_deliveries(request):
         cell.fill = PatternFill(fill_type='solid', fgColor='F2F4F7')
 
     for invoice in invoices:
+        export_address = _delivery_export_address(invoice.customer.address)
         # Keep a selected delivery even if it does not have any items yet.
         for item in _delivery_items(invoice, total_quantities=True) or ['']:
-            sheet.append([str(invoice.customer), invoice.customer.address or '', item])
+            sheet.append([str(invoice.customer), export_address, item])
             for cell in sheet[sheet.max_row]:
                 # Customer and product text must never become Excel formulas.
                 cell.data_type = 's'
