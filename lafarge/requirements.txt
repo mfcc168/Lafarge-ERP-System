@@ -5,6 +5,7 @@ django-filter
 reportlab
 tablib
 tablib[xlsx]
+openpyxl
 djangorestframework
 django-cors-headers
 Fernet

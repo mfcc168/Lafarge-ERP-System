@@ -9,7 +9,7 @@ from .views.customer_page_views import (
     CustomerListView, customer_detail,
     customers_with_unpaid_invoices, unpaid_invoices_by_customer, unpaid_invoices_by_month_detail, copy_previous_order
 )
-from .views.home_page_views import home, sales_data, product_insights_data
+from .views.home_page_views import home, sales_data, product_insights_data, export_today_deliveries
 from .views.invoice_page_views import InvoiceListView, invoice_detail, monthly_preview, monthly_report
 from .views.pdf_download_views import (
     download_delivery_note_pdf, download_invoice_legacy_pdf,
@@ -92,6 +92,7 @@ urlpatterns = [
 
     # Home
     path('', home, name='home'),
+    path('deliveries/today/export/', export_today_deliveries, name='export_today_deliveries'),
     path('sales-data/', sales_data, name='sales_data'),
     path('product_insights/', product_insights_data, name='product_insights'),
 ]
