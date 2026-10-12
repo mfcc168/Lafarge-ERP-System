@@ -84,10 +84,22 @@ class DeliveryExportTest(TestCase):
         sheet = self.export_sheet([self.invoice.pk, self.other_invoice.pk])
         self.assertEqual(list(sheet.values), [
             ('Customer', 'Address', 'Items'),
-            ('Customer One (Central)', 'Flat A\n123 Test Road', 'Tablets (2.0 + 3.0)'),
-            ('Customer One (Central)', 'Flat A\n123 Test Road', 'Syrup (1.0)'),
-            ('Customer Two', '456 Test Road', 'Syrup (4.0)'),
+            ('Customer One (Central)', 'Flat A\n123 Test Road', 'Tablets 5.0'),
+            ('Customer One (Central)', 'Flat A\n123 Test Road', 'Syrup 1.0'),
+            ('Customer Two', '456 Test Road', 'Syrup 4.0'),
         ])
+
+    def test_export_sums_lot_quantities_without_changing_the_product_name(self):
+        for lot, quantity in (('ABC-1', '30.0'), ('ABC-2', '15.0')):
+            self.add_item(
+                self.invoice,
+                self.create_product(f'Procough Tab. 60mg (Lot no. {lot})'),
+                quantity,
+            )
+        sheet = self.export_sheet([self.invoice.pk])
+        self.assertEqual(list(sheet.values)[-1], (
+            'Customer One (Central)', 'Flat A\n123 Test Road', 'Procough Tab. 60mg 45.0',
+        ))
 
     def test_export_includes_only_selected_deliveries_even_for_the_same_customer(self):
         Invoice.objects.create(number='10004', customer=self.customer, delivery_date=self.today)
@@ -101,7 +113,7 @@ class DeliveryExportTest(TestCase):
         ])
         self.assertEqual(list(sheet.values), [
             ('Customer', 'Address', 'Items'),
-            ('Customer Two', '456 Test Road', 'Syrup (4.0)'),
+            ('Customer Two', '456 Test Road', 'Syrup 4.0'),
         ])
 
     def test_empty_invalid_and_outdated_selections_do_not_export_all_deliveries(self):
@@ -119,7 +131,7 @@ class DeliveryExportTest(TestCase):
         self.invoice.invoiceitem_set.all().delete()
         self.add_item(self.invoice, self.create_product('=1+1'), '2.0')
         sheet = self.export_sheet([self.invoice.pk])
-        self.assertEqual(list(sheet.values)[1], ('=SUM(1,2)', '=1+1\n中文地址', '=1+1 (2.0)'))
+        self.assertEqual(list(sheet.values)[1], ('=SUM(1,2)', '=1+1\n中文地址', '=1+1 2.0'))
         self.assertTrue(all(cell.data_type == 's' for cell in sheet[2]))
 
     def test_selected_delivery_without_items_is_retained(self):

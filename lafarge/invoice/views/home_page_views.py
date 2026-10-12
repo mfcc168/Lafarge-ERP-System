@@ -27,20 +27,23 @@ def _delivery_invoices(delivery_date):
     ).prefetch_related('invoiceitem_set__product').order_by('pk')
 
 
-def _delivery_items(invoice):
-    """Use the same product names and quantities in the table and export."""
+def _delivery_items(invoice, total_quantities=False):
+    """Group product lots, optionally totaling quantities for the Excel export."""
     grouped_items = defaultdict(list)
     for item in invoice.invoiceitem_set.all():
         if item.product:
             clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
-            grouped_items[clean_name].append(str(item.quantity))
-    return [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+            grouped_items[clean_name].append(item.quantity)
+    if total_quantities:
+        return [f"{name} {sum(quantities):.1f}" for name, quantities in grouped_items.items()]
+    return [f"{name} ({' + '.join(str(quantity) for quantity in quantities)})"
+            for name, quantities in grouped_items.items()]
 
 
 @staff_member_required
 @require_GET
 def export_today_deliveries(request):
-    """Export selected deliveries with one row per displayed item."""
+    """Export selected deliveries with one row per product and summed quantities."""
     raw_ids = request.GET.getlist('invoice_ids')
     if not raw_ids:
         return HttpResponseBadRequest('Select at least one delivery to export.')
@@ -66,7 +69,7 @@ def export_today_deliveries(request):
 
     for invoice in invoices:
         # Keep a selected delivery even if it does not have any items yet.
-        for item in _delivery_items(invoice) or ['']:
+        for item in _delivery_items(invoice, total_quantities=True) or ['']:
             sheet.append([str(invoice.customer), invoice.customer.address or '', item])
             for cell in sheet[sheet.max_row]:
                 # Customer and product text must never become Excel formulas.
