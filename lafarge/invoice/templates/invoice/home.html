@@ -15,12 +15,12 @@
                 <div class="delivery-export-actions">
                     <label class="delivery-select-all" for="select-all-deliveries">
                         <input id="select-all-deliveries" type="checkbox" class="form-check-input"
-                               {% if delivery_invoices %}checked{% else %}disabled{% endif %}>
+                               {% if delivery_invoices %}{% if not delivered_today_count %}checked{% endif %}{% else %}disabled{% endif %}>
                         <span>Select all</span>
                     </label>
-                    <span id="delivery-selection-count" class="panel-label" aria-live="polite">{{ delivery_invoices|length }} selected</span>
+                    <span id="delivery-selection-count" class="panel-label" aria-live="polite">{{ undelivered_count }} selected</span>
                     <button id="export-deliveries" type="submit" class="btn btn-outline-primary"
-                            {% if not delivery_invoices %}disabled{% endif %}>
+                            {% if not undelivered_count %}disabled{% endif %}>
                         <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Export to Excel
                     </button>
                 </div>
@@ -40,13 +40,21 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for invoice in delivery_invoices %}
+                    {% regroup delivery_invoices by delivery_date as delivery_groups %}
+                    {% for group in delivery_groups %}
+                    <tr class="delivery-group-heading">
+                        <td colspan="8">
+                            <span class="delivery-group-name fw-semibold">{% if group.grouper %}Delivered today{% else %}Not delivered{% endif %}</span>
+                            <span class="count-pill">{{ group.list|length }}</span>
+                        </td>
+                    </tr>
+                    {% for invoice in group.list %}
                     <tr class="{% cycle 'table-row-light' 'table-row-dark' %}"
                         data-href="{% url 'invoice_detail' invoice.number %}"
                         style="cursor: pointer;">
                         <td class="delivery-selection-cell">
                             <label class="delivery-row-select">
-                                <input type="checkbox" name="invoice_ids" value="{{ invoice.id }}" checked
+                                <input type="checkbox" name="invoice_ids" value="{{ invoice.id }}" {% if not invoice.delivery_date %}checked{% endif %}
                                        class="form-check-input delivery-checkbox"
                                        aria-label="Select invoice #{{ invoice.number }} for export">
                             </label>
@@ -70,6 +78,7 @@
                             </ul>
                         </td>
                     </tr>
+                    {% endfor %}
                     {% empty %}
                     <tr>
                         <td colspan="8" class="text-center text-muted">No invoices delivered today or awaiting delivery.</td>

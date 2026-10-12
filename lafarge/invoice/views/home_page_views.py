@@ -149,8 +149,11 @@ def home(request):
             'items': _delivery_items(invoice),
         })
 
+    modified_invoices.sort(key=lambda invoice: invoice['delivery_date'] is not None)
+
     return render(request, 'invoice/home.html', {
         'delivery_invoices': modified_invoices,
+        'undelivered_count': sum(invoice['delivery_date'] is None for invoice in modified_invoices),
         'delivered_today_count': sum(invoice['delivery_date'] == today for invoice in modified_invoices),
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,

@@ -77,18 +77,50 @@ class DeliveryExportTest(TestCase):
         self.addCleanup(workbook.close)
         return workbook.active
 
-    def test_all_deliveries_start_selected_on_the_home_page(self):
+    def test_only_undelivered_invoices_start_selected_on_the_home_page(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         parser = DeliveryCheckboxParser()
         parser.feed(response.content.decode())
         self.assertEqual(parser.deliveries, {
-            str(self.invoice.pk): True,
-            str(self.other_invoice.pk): True,
+            str(self.invoice.pk): False,
+            str(self.other_invoice.pk): False,
             str(self.undelivered_invoice.pk): True,
         })
+        self.assertEqual(list(parser.deliveries), [
+            str(self.undelivered_invoice.pk), str(self.invoice.pk), str(self.other_invoice.pk),
+        ])
         self.assertContains(response, 'Not delivered')
+        self.assertEqual(response.context['undelivered_count'], 1)
         self.assertEqual(response.context['delivered_today_count'], 2)
+        selected_ids = [invoice_id for invoice_id, selected in parser.deliveries.items() if selected]
+        self.assertEqual(list(self.export_sheet(selected_ids).values), [
+            ('Customer', 'Address', 'Items'),
+            ('Customer Two', '456 Test Road', 'Syrup 6.0'),
+        ])
+
+    def test_undelivered_invoices_stay_together_before_delivered_invoices(self):
+        other_pending = Invoice.objects.create(number='10007', customer=self.customer)
+        response = self.client.get(reverse('home'))
+        parser = DeliveryCheckboxParser()
+        parser.feed(response.content.decode())
+        self.assertEqual(list(parser.deliveries), [
+            str(self.undelivered_invoice.pk), str(other_pending.pk),
+            str(self.invoice.pk), str(self.other_invoice.pk),
+        ])
+        self.assertEqual(parser.deliveries[str(other_pending.pk)], True)
+        self.assertEqual(response.context['undelivered_count'], 2)
+
+    def test_delivered_only_table_starts_with_nothing_selected(self):
+        self.undelivered_invoice.delete()
+        response = self.client.get(reverse('home'))
+        parser = DeliveryCheckboxParser()
+        parser.feed(response.content.decode())
+        self.assertEqual(parser.deliveries, {
+            str(self.invoice.pk): False,
+            str(self.other_invoice.pk): False,
+        })
+        self.assertEqual(response.context['undelivered_count'], 0)
 
     def test_selected_undelivered_invoice_can_be_exported(self):
         sheet = self.export_sheet([self.undelivered_invoice.pk])
