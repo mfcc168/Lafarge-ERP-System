@@ -7,15 +7,84 @@ from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
-from django.http import JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.utils.timezone import localdate
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
+from django.views.decorators.http import require_GET
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
 
 from ..models import Invoice
 
 logger = logging.getLogger(__name__)
+
+
+def _delivery_invoices(delivery_date):
+    return Invoice.objects.filter(delivery_date=delivery_date).select_related(
+        'customer', 'salesman', 'deliveryman',
+    ).prefetch_related('invoiceitem_set__product').order_by('pk')
+
+
+def _delivery_items(invoice):
+    """Use the same product names and quantities in the table and export."""
+    grouped_items = defaultdict(list)
+    for item in invoice.invoiceitem_set.all():
+        if item.product:
+            clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+            grouped_items[clean_name].append(str(item.quantity))
+    return [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+
+
+@staff_member_required
+@require_GET
+def export_today_deliveries(request):
+    """Export selected deliveries with one row per displayed item."""
+    raw_ids = request.GET.getlist('invoice_ids')
+    if not raw_ids:
+        return HttpResponseBadRequest('Select at least one delivery to export.')
+    try:
+        invoice_ids = {int(value) for value in raw_ids}
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('Invalid delivery selection.')
+    if any(value <= 0 or value > 9223372036854775807 for value in invoice_ids):
+        return HttpResponseBadRequest('Invalid delivery selection.')
+
+    today = localdate()
+    invoices = list(_delivery_invoices(today).filter(pk__in=invoice_ids))
+    if not invoices:
+        return HttpResponseBadRequest('No selected deliveries are scheduled for today.')
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Today's deliveries"
+    sheet.append(['Customer', 'Address', 'Items'])
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(fill_type='solid', fgColor='F2F4F7')
+
+    for invoice in invoices:
+        # Keep a selected delivery even if it does not have any items yet.
+        for item in _delivery_items(invoice) or ['']:
+            sheet.append([str(invoice.customer), invoice.customer.address or '', item])
+            for cell in sheet[sheet.max_row]:
+                # Customer and product text must never become Excel formulas.
+                cell.data_type = 's'
+                cell.alignment = Alignment(vertical='top', wrap_text=True)
+
+    sheet.column_dimensions['A'].width = 36
+    sheet.column_dimensions['B'].width = 60
+    sheet.column_dimensions['C'].width = 60
+    sheet.freeze_panes = 'A2'
+    sheet.auto_filter.ref = sheet.dimensions
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = f'attachment; filename="todays-deliveries-{today.isoformat()}.xlsx"'
+    workbook.save(response)
+    return response
 
 
 @staff_member_required
@@ -23,9 +92,7 @@ def home(request):
     """Dashboard view displaying today's invoices and pending deposits."""
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
-    invoices_today = Invoice.objects.filter(delivery_date=today).select_related(
-        'customer', 'salesman', 'deliveryman',
-    ).prefetch_related('invoiceitem_set__product')
+    invoices_today = _delivery_invoices(today)
 
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date).select_related('customer')
@@ -65,20 +132,15 @@ def home(request):
 
     modified_invoices = []
     for invoice in invoices_today:
-        grouped_items = defaultdict(list)
-        for item in invoice.invoiceitem_set.all():
-            if item.product:
-                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
-                grouped_items[clean_name].append(str(item.quantity))
-
         modified_invoices.append({
+            'id': invoice.pk,
             'delivery_date': invoice.delivery_date,
             'number': invoice.number,
             'customer': invoice.customer,
             'deliveryman': invoice.deliveryman,
             'salesman': invoice.salesman,
             'total_price': invoice.total_price,
-            'items': [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+            'items': _delivery_items(invoice),
         })
 
     return render(request, 'invoice/home.html', {
