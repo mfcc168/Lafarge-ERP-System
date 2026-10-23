@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.timezone import localdate
 from openpyxl import load_workbook
 
-from ..models import Customer, Invoice, InvoiceItem, Product
+from ..models import AdditionalItem, Customer, Invoice, InvoiceItem, Product
 
 
 class DeliveryCheckboxParser(HTMLParser):
@@ -111,6 +111,25 @@ class DeliveryExportTest(TestCase):
         self.assertEqual(parser.deliveries[str(other_pending.pk)], True)
         self.assertEqual(response.context['undelivered_count'], 2)
 
+    def test_home_total_includes_all_undelivered_invoice_totals(self):
+        Invoice.objects.create(
+            number='10007', customer=self.customer, total_price=Decimal('1200.10'),
+        )
+        AdditionalItem.objects.create(
+            invoice=self.undelivered_invoice, description='Delivery charge', price=Decimal('0.70'),
+        )
+
+        response = self.client.get(reverse('home'))
+
+        # Delivered invoices (past, today, and future) must not contribute.
+        self.assertEqual(response.context['total_undelivered'], Decimal('1230.80'))
+        self.assertContains(
+            response,
+            '<span class="ms-3 text-nowrap">Total: <strong>$1,230.80</strong></span>',
+            count=1,
+            html=True,
+        )
+
     def test_delivered_only_table_starts_with_nothing_selected(self):
         self.undelivered_invoice.delete()
         response = self.client.get(reverse('home'))
@@ -121,6 +140,7 @@ class DeliveryExportTest(TestCase):
             str(self.other_invoice.pk): False,
         })
         self.assertEqual(response.context['undelivered_count'], 0)
+        self.assertEqual(response.context['total_undelivered'], Decimal('0.00'))
 
     def test_selected_undelivered_invoice_can_be_exported(self):
         sheet = self.export_sheet([self.undelivered_invoice.pk])
