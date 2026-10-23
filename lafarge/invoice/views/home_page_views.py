@@ -5,27 +5,107 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear
-from django.http import JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.utils.timezone import localdate
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
+from django.views.decorators.http import require_GET
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
 
 from ..models import Invoice
 
 logger = logging.getLogger(__name__)
 
 
+def _delivery_invoices(delivery_date):
+    """Include deliveries on the given date and invoices awaiting delivery."""
+    return Invoice.objects.filter(
+        Q(delivery_date=delivery_date) | Q(delivery_date__isnull=True),
+    ).select_related(
+        'customer', 'salesman', 'deliveryman',
+    ).prefetch_related('invoiceitem_set__product').order_by('pk')
+
+
+def _delivery_items(invoice, total_quantities=False):
+    """Group product lots, optionally totaling quantities for the Excel export."""
+    grouped_items = defaultdict(list)
+    for item in invoice.invoiceitem_set.all():
+        if item.product:
+            clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
+            grouped_items[clean_name].append(item.quantity)
+    if total_quantities:
+        return [f"{name} {sum(quantities):.1f}" for name, quantities in grouped_items.items()]
+    return [f"{name} ({' + '.join(str(quantity) for quantity in quantities)})"
+            for name, quantities in grouped_items.items()]
+
+
+def _delivery_export_address(address):
+    """Use the second-last nonempty comma-separated part of the address."""
+    parts = [part.strip() for part in re.split('[,，]', address or '') if part.strip()]
+    return parts[-2] if len(parts) > 1 else (parts[0] if parts else '')
+
+
+@staff_member_required
+@require_GET
+def export_today_deliveries(request):
+    """Export selected deliveries with one row per product and summed quantities."""
+    raw_ids = request.GET.getlist('invoice_ids')
+    if not raw_ids:
+        return HttpResponseBadRequest('Select at least one delivery to export.')
+    try:
+        invoice_ids = {int(value) for value in raw_ids}
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('Invalid delivery selection.')
+    if any(value <= 0 or value > 9223372036854775807 for value in invoice_ids):
+        return HttpResponseBadRequest('Invalid delivery selection.')
+
+    today = localdate()
+    invoices = list(_delivery_invoices(today).filter(pk__in=invoice_ids))
+    if not invoices:
+        return HttpResponseBadRequest('No selected invoices are delivered today or awaiting delivery.')
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Today's deliveries"
+    sheet.append(['Customer', 'Address', 'Items'])
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(fill_type='solid', fgColor='F2F4F7')
+
+    for invoice in invoices:
+        export_address = _delivery_export_address(invoice.customer.address)
+        # Keep a selected delivery even if it does not have any items yet.
+        for item in _delivery_items(invoice, total_quantities=True) or ['']:
+            sheet.append([str(invoice.customer), export_address, item])
+            for cell in sheet[sheet.max_row]:
+                # Customer and product text must never become Excel formulas.
+                cell.data_type = 's'
+                cell.alignment = Alignment(vertical='top', wrap_text=True)
+
+    sheet.column_dimensions['A'].width = 36
+    sheet.column_dimensions['B'].width = 60
+    sheet.column_dimensions['C'].width = 60
+    sheet.freeze_panes = 'A2'
+    sheet.auto_filter.ref = sheet.dimensions
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = f'attachment; filename="todays-deliveries-{today.isoformat()}.xlsx"'
+    workbook.save(response)
+    return response
+
+
 @staff_member_required
 def home(request):
-    """Dashboard view displaying today's invoices and pending deposits."""
+    """Display today's deliveries, undelivered invoices, and pending deposits."""
     start_date = make_aware(datetime(2025, 3, 19))
     today = localdate()
-    invoices_today = Invoice.objects.filter(delivery_date=today).select_related(
-        'customer', 'salesman', 'deliveryman',
-    ).prefetch_related('invoiceitem_set__product')
+    delivery_invoices = _delivery_invoices(today)
 
     pending_deposits = Invoice.objects.filter(payment_date__isnull=False, deposit_date__isnull=True,
                                               payment_date__gte=start_date).select_related('customer')
@@ -64,25 +144,24 @@ def home(request):
             future_payment_counts_dict[payment_method] = future_invoices.count()
 
     modified_invoices = []
-    for invoice in invoices_today:
-        grouped_items = defaultdict(list)
-        for item in invoice.invoiceitem_set.all():
-            if item.product:
-                clean_name = re.sub(r"\s*\(Lot\s*no\.?:?\s*[A-Za-z0-9-]+\)", "", item.product.name)
-                grouped_items[clean_name].append(str(item.quantity))
-
+    for invoice in delivery_invoices:
         modified_invoices.append({
+            'id': invoice.pk,
             'delivery_date': invoice.delivery_date,
             'number': invoice.number,
             'customer': invoice.customer,
             'deliveryman': invoice.deliveryman,
             'salesman': invoice.salesman,
             'total_price': invoice.total_price,
-            'items': [f"{name} ({' + '.join(quantities)})" for name, quantities in grouped_items.items()]
+            'items': _delivery_items(invoice),
         })
 
+    modified_invoices.sort(key=lambda invoice: invoice['delivery_date'] is not None)
+
     return render(request, 'invoice/home.html', {
-        'invoices_today': modified_invoices,
+        'delivery_invoices': modified_invoices,
+        'undelivered_count': sum(invoice['delivery_date'] is None for invoice in modified_invoices),
+        'delivered_today_count': sum(invoice['delivery_date'] == today for invoice in modified_invoices),
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,
         'payment_totals_dict': payment_totals_dict,

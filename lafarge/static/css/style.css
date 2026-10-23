@@ -359,6 +359,46 @@
     flex-wrap: wrap;
     gap: 12px;
 }
+.delivery-export-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.delivery-select-all,
+.delivery-row-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    margin: 0;
+    cursor: pointer;
+}
+.delivery-select-all {
+    color: var(--erp-muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+.delivery-select-all input,
+.delivery-row-select input {
+    margin: 0;
+    cursor: pointer;
+}
+.erp-app .delivery-export-table .delivery-selection-cell {
+    min-width: 0;
+    width: 52px;
+}
+@media (max-width: 700px) {
+    .delivery-export-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+    .delivery-select-all,
+    .delivery-row-select {
+        min-height: 44px;
+    }
+}
 .count-pill {
     display: inline-flex;
     align-items: center;
