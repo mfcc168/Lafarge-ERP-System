@@ -46,6 +46,9 @@
                         <td colspan="8">
                             <span class="delivery-group-name fw-semibold">{% if group.grouper %}Delivered today{% else %}Not delivered{% endif %}</span>
                             <span class="count-pill">{{ group.list|length }}</span>
+                            {% if not group.grouper %}
+                            <span class="ms-3 text-nowrap">Total: <strong>${{ total_undelivered|currency }}</strong></span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% for invoice in group.list %}

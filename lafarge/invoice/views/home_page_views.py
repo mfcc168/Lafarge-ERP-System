@@ -3,6 +3,7 @@ import logging
 import re
 from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q, Sum
@@ -157,10 +158,15 @@ def home(request):
         })
 
     modified_invoices.sort(key=lambda invoice: invoice['delivery_date'] is not None)
+    total_undelivered = sum(
+        (invoice['total_price'] for invoice in modified_invoices if invoice['delivery_date'] is None),
+        Decimal('0.00'),
+    )
 
     return render(request, 'invoice/home.html', {
         'delivery_invoices': modified_invoices,
         'undelivered_count': sum(invoice['delivery_date'] is None for invoice in modified_invoices),
+        'total_undelivered': total_undelivered,
         'delivered_today_count': sum(invoice['delivery_date'] == today for invoice in modified_invoices),
         'pending_deposits': pending_deposits,
         'total_pending_deposit': total_pending_deposit,
